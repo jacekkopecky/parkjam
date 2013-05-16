@@ -8,6 +8,9 @@ Web site: http://parking.kmi.open.ac.uk
 Google Play: https://play.google.com/store/apps/details?id=uk.ac.open.kmi.parking
 
 
+Copyright: 
+ - Jacek Kopecky (jacek@jacek.cz) 
+ - Knowledge Media Institute, The Open University, Milton Keynes, UK
 
 ParkJam is built with Androjena for handling RDF data, see copyright
 information below.
