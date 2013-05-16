@@ -29,11 +29,27 @@ Prerequisites:
 
 - you have cloned the sources from github
 - you have set up Eclipse to compile Android projects (API version 10, with Google APIs)
-- you have appropriate keys, including a Google Maps API v1 key (new ones cannot 
-  be obtained as of March 2013, but ParkJam will migrate to maps API v2 in due course)
-- on the above point - you may need to change the top-level package for
-  ParkJam if you want to test it with your API key
+- you have appropriate development keys
+    - you need an existing Google Maps API v1 key (new ones cannot be obtained 
+      as of March 2013, but ParkJam will migrate to maps API v2 in due course)
+    - possibly, you may use my debug key if you ask me for it
+    - on the above point - you may need to change the top-level package for
+      ParkJam if you want to test it with your API key
+    - without a valid key, the map won't display map data, but it will
+      display car parks and your location
+- you have set up your device(s) and/or emulator(s) to run 
+    - you need at least Android 2.3 with Google APIs
+    - you have the correct settings for running apps you build yourself
 
+Setting up:
+
+1) File/Import "Existing Android Code Into Workspace"
+ - select the directory/folder where you cloned the sources
+ - Eclipse should show you uk.ac.open.kmi.parking.MainActivity 
+ - confirm to Finish the import
+2) in Project Properties / Android select build target Google APIs 2.3.3
+ - if that's not already there
+3) now you should be able to run this as an android application
 
 
 If any steps don't work as described, or if anything is omitted, please do
