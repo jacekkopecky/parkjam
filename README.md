@@ -50,8 +50,10 @@ Setting up:
  - select the directory/folder where you cloned the sources
  - Eclipse should show you uk.ac.open.kmi.parking.MainActivity 
  - confirm to Finish the import
+
 2) in Project Properties / Android select build target Google APIs 2.3.3
  - if that's not already there
+
 3) now you should be able to run this as an android application
 
 
