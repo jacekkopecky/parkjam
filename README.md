@@ -60,6 +60,8 @@ let us know and we may update these instructions.
 
 -----------------------------------------------------------------------------------------------------------
 
+The following information is about Androjena:
+
 Androjena is an Android port of Hewlett-Packard's Jena Semantic Framework (see http://jena.sourceforge.net).
 
 Androjena is licensed under the Apache License, Version 2.0 (the "License");
@@ -72,7 +74,6 @@ licenses/jena_2.6.2_license.txt
 Androjena ships with or contains code from several libraries. A list follows with library names and 
 location of respective licenses/copyright notices copies inside this distribution:
 
-IBM ICU4J 3.4.5: licenses/icu_1.8.1_and_later_license.htm
 Jena IRI 0.8: licenses/jena_2.6.2_license.txt
 Apache Xerces: licenses/apache_software_license_2.0.txt
 Quality Open Software's SLF4J-android 1.6.1: licenses/slf4j_android_1.6.1_license.txt
