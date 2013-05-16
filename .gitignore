@@ -18,3 +18,20 @@ local.properties
 # Eclipse project files
 .classpath
 .project
+.settings
+
+# mac stuff
+.DS_Store
+*/**/.DS_Store
+
+# dunno
+lint.xml
+
+# VIM editing stuff
+.*.swp
+*/**/.*.swp
+*.bak
+*/**/*.bak
+
+# reports from proguard
+proguard
