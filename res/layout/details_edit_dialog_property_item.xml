@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/details_edit_dialog.property_item"
+    android:id="@+id/details_edit_dialog_property_item"
+    android:freezesText="false"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="2mm"
+    android:paddingBottom="2mm"
+    android:ellipsize="end"
+    android:singleLine="true"
+    android:maxLines="1"/>

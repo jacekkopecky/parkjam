@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android" android:oneshot="false">
+    <item android:drawable="@drawable/loading_purple119" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple100" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple101" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple102" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple103" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple104" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple105" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple106" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple107" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple108" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple109" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple110" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple111" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple112" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple113" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple114" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple115" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple116" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple117" android:duration="@integer/loading_purple_delay" />
+    <item android:drawable="@drawable/loading_purple118" android:duration="@integer/loading_purple_delay" />
+</animation-list>

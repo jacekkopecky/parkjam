@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    style="@style/details">
+    
+    <TextView
+        android:id="@+id/details_activity_label"
+        style="@style/details.heading"
+        android:text="@string/details_activity_label" />
+    
+    <LinearLayout
+        android:id="@+id/details_top_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/details_activity_label"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:onClick="clickEditTitle"
+        >
+            
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1mm"
+            android:layout_marginBottom="1mm"
+            android:scaleType="fitCenter"
+            android:clickable="true"
+            android:src="@drawable/icon" />
+    
+        <TextView
+            style="@style/currpark_text.details"
+            android:id="@+id/details_currpark"
+            android:freezesText="true"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+    
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:id="@+id/details_button_edit_title"
+            android:src="@drawable/ic_menu_edit_purple" />
+    
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:scrollbarStyle="insideOverlay"
+        android:fillViewport="true"
+        android:layout_below="@id/details_top_part" 
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:orientation="vertical">
+            
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/details_availability" 
+                android:orientation="vertical"
+                android:layout_marginBottom="1mm">
+                
+                <TextView
+                    style="@style/details.heading"
+                    android:text="@string/details_availability_heading" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    
+                    <ImageView
+                        android:layout_width="@dimen/details_avail_buttons_size"
+                        android:layout_height="@dimen/details_avail_buttons_size"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:id="@+id/details_button_full"
+                        android:onClick="onButtonPressReport"
+                        android:clickable="true"
+                        android:scaleType="center"
+                        android:src="@drawable/red_circle_48px" 
+                        android:background="@drawable/bubble_highlight_background"/>
+                    <ImageView
+                        android:layout_width="@dimen/details_avail_buttons_size"
+                        android:layout_height="@dimen/details_avail_buttons_size"
+                        android:layout_toLeftOf="@id/details_button_full"
+                        android:layout_centerVertical="true"
+                        android:id="@+id/details_button_avail"
+                        android:onClick="onButtonPressReport"
+                        android:clickable="true"
+                        android:scaleType="center"
+                        android:src="@drawable/green_circle_48px" 
+                        android:background="@drawable/bubble_highlight_background"/>
+                    <TextView 
+                        style="@style/details.availability"
+                        android:layout_width="match_parent"
+                        android:layout_toLeftOf="@id/details_button_avail"
+                        android:layout_centerVertical="true"
+                        android:layout_height="wrap_content"
+                        android:freezesText="true"
+                        android:id="@+id/details_availability_text"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <RelativeLayout
+                style="@style/details.heading"
+                android:clickable="true"
+                android:onClick="clickEditDetails"
+                >
+                <TextView
+                    style="@style/details.heading_text"
+                    android:text="@string/details_description_heading" 
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1mm"
+                    android:layout_marginBottom="1mm"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:scaleType="fitCenter"
+                    android:id="@+id/details_button_edit_details"
+                    android:src="@drawable/ic_menu_edit_purple" />
+            </RelativeLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/details_description" 
+                android:orientation="vertical"
+                android:layout_marginBottom="1mm">
+                
+            </LinearLayout>
+            
+<!--             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/details_services" 
+                android:orientation="vertical"
+                android:layout_marginBottom="1mm">
+                
+                <TextView
+                    style="@style/details.heading"
+                    android:text="@string/details_services_heading" />
+            
+                 todo list of services here, ended with a button to show a sortable complete list 
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/details_businesses" 
+                android:orientation="vertical"
+                android:layout_marginBottom="1mm">
+                
+                <TextView
+                    style="@style/details.heading"
+                    android:text="@string/details_businesses_heading" />
+            
+                 todo list of nearby businesses here, ended with a button to show a sortable complete list
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/details_events" 
+                android:orientation="vertical"
+                android:layout_marginBottom="1mm">
+                
+                <TextView
+                    style="@style/details.heading"
+                    android:text="@string/details_events_heading" />
+            
+                 todo list of nearby events here, ended with a button to show a sortable complete list of events
+            </LinearLayout>
+                        
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/details_users" 
+                android:orientation="vertical"
+                android:layout_marginBottom="1mm">
+                
+                <TextView
+                    style="@style/details.heading"
+                    android:text="@string/details_users_heading"
+                    />
+            
+                 todo list of top users here, ended with a button to show a complete list which should be sortable
+            </LinearLayout> -->
+            <RelativeLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                >
+                <TextView 
+                    style="@style/details.entry_uri"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:freezesText="true"
+                    android:id="@+id/details_uri_text"/>            
+            </RelativeLayout>            
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

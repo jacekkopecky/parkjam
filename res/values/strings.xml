@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ParkJam</string>
+    <string name="details_activity_label">ParkJam Car Park Details</string>
+    <string name="tc_dialog_name">Please read and accept</string>
+    <string name="set_preferences">ParkJam Preferences</string>
+    
+    <string name="carpark_unnamed_title">Car park %s</string>
+    
+    <string name="currpark_initial">loading car parks&#8230;</string>
+    <string name="currpark_no_location">current location unknown&#8230;</string>
+    <string name="currpark_no_nearby">no known car park near&#xa0;you&#8230;</string>
+    <string name="currpark_too_far_out">zoom in to see car&#xa0;parks</string>
+    <string name="currpark_in_car_park">nearby:&#xa0;</string>
+    <string name="currpark_selected">watching:&#xa0;</string>
+    
+    <string name="loading_desired_carpark">loading&#8230;</string>
+    
+    <string name="menu_settings">Settings</string>
+    <string name="menu_map_layers">Layers&#8230;</string>
+    <string name="menu_my_location">My loc</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_favorites">Favorites</string>
+    <string name="menu_pinned_show">Show pinned</string>
+    <string name="menu_pinned_hide">Hide pinned</string>
+    <string name="menu_find_my_car">Find my car</string>
+    <string name="menu_add_carpark">New car park</string>
+    
+    <string name="search_dialog_title">Search for a place</string>
+    <string name="search_dialog_search">Search</string>
+    <string name="search_dialog_ok">OK</string>
+    <string name="search_dialog_cancel">Cancel</string>
+    <string name="search_results_title">Select best result</string>
+    <string name="search_not_found">no matching location found&#8230;</string>
+    
+    <string name="menu_layers_satellite">Satellite view</string>
+    <string name="menu_layers_traffic">Show traffic</string>
+<!--     <string name="menu_layers_businesses">Show businesses</string> -->
+     
+    <string name="menu_currpark_show_details">Show details</string>
+    <string name="menu_currpark_follow_nearest">Follow nearest car parks</string>
+    <string name="menu_currpark_mark_available">Report as available</string>
+    <string name="menu_currpark_mark_full">Report as full</string>
+    <string name="menu_currpark_zoom">Center on this car park</string>
+    <string name="menu_currpark_unpin">Unpin</string>
+    
+     <!-- parameters in the format: 1 capitalized Availability string, 2 lowercase reported availability string, 3 age string, 4 press button string -->
+    <string name="availability_unknown">Availability status unknown.</string> 
+    <string name="availability_normal">%1$s (%3$s).</string>
+    <string name="availability_noreport">%1$s – probably, no reports yet.</string>
+    <string name="availability_oldreport">%1$s – probably, last reported as %2$s a long time ago.</string>
+    
+    <string name="availability_short_normal">%2$s %3$s</string>
+    <string name="availability_short_noreport">no availability reports yet</string>
+    <string name="availability_short_oldreport">no recent availability reports</string>
+
+    <plurals name="availability_age_hours">
+        <item quantity="one">1h ago</item>
+        <item quantity="other">%dh ago</item>
+    </plurals>
+     
+    <plurals name="availability_age_minutes">
+        <item quantity="one">1m ago</item>
+        <item quantity="other">%dm ago</item>
+    </plurals>
+    
+    <string name="availability_age_now">a moment ago</string>
+     
+    <!-- capitalized for use at the beginning of the description -->
+    <string name="availability_Full">Full</string>
+    <string name="availability_Available">Available</string>
+    
+    <!-- lowercase for use within the description -->
+    <string name="availability_full">full</string>
+    <string name="availability_available">available</string>
+    
+    <string name="availability_report_as_full">Press the button on the right to report it as full.</string>
+    <string name="availability_report_as_available">Press the button on the right to report it as available.</string>
+     
+    <string name="button_disabled_toast">status just changed a moment ago</string>
+     
+    <string name="toast_no_location">Current location not available</string>
+     
+    <string name="details_availability_heading">Availability (tap buttons to report)</string>
+    <string name="details_description_heading">Description</string>
+    <string name="details_no_information">No details known. Tap the pencil icon to submit new information about this car park.</string>
+    <string name="details_not_indexed">Other users may not see this car park yet; it should become visible within an hour.</string>
+    <string name="details_unverified_property"><i><small>(recently added)</small></i></string>
+    <!-- <string name="details_services_heading">Available services</string> -->
+    <!-- <string name="details_businesses_heading">Nearby businesses</string> -->
+    <!-- <string name="details_events_heading">Nearby events</string> -->
+    <!-- <string name="details_users_heading">Top users</string> -->
+    
+    <string name="details_edit_name">Change car park name</string>
+    <string name="details_edit_add_property">Add car park information</string>
+    <string name="details_edit_ok">Submit</string>
+    <string name="details_edit_cancel">Cancel</string>
+    <string name="details_edit_add">add a new piece of information</string>
+    <string name="details_edit_select_one_comment">first select a property from the list above, then you can fill in the appropriate value</string>
+    <string name="details_edit_select_one">select a property</string>
+    <string name="details_edit_submitted">thanks, sending data</string>
+    
+    <string name="terms_button_accept">Accept</string>
+    <string name="terms_button_decline">Decline</string>
+    <string name="terms_activity_label">ParkJam Terms and Conditions</string>
+    <string name="pp_activity_label">ParkJam Privacy Policy</string>
+     
+    <string name="preference_info_category">Information</string>
+    <string name="preference_info_version">App version</string>
+    <string name="preference_info_terms">Terms &amp; Conditions</string>
+    <string name="preference_info_terms_summary">Display the Terms and Conditions of ParkJam</string>
+    <string name="preference_info_pp">Privacy Policy</string>
+    <string name="preference_info_pp_summary">Display the Privacy Policy of ParkJam</string>
+    <string name="preference_nosleep">Stay Awake</string>
+    <string name="preference_nosleep_summary">Prevent screen turning off while ParkJam is running</string>
+    <string name="preference_fullscreen">Full Screen Landscape</string>
+    <string name="preference_fullscreen_summary">In landscape mode, don\'t show notification bar in the main map view</string>
+    <string name="preference_shadow">Car park icon shadow</string>
+    <string name="preference_shadow_summary">Disabling shadows speeds up drawing</string>
+    <string name="preference_unconfirmedprops">Show unconfirmed info</string>
+    <string name="toast_pref_unconfirmedprops">setting preference to show unconfirmed info</string>
+    <string name="preference_unconfirmedprops_summary">Disable this if you don\'t want to see unconfirmed information on car parks</string>
+    
+    <string name="drawer_empty"><i>When you pin car parks, they will appear here.</i></string>
+<!--     <string name="drawer_none_here"><i>You have pinned car parks in other parts of the world.</i></string> -->
+    
+    <string name="add_carpark_OK">&#xa0;SUBMIT</string>
+    <string name="add_carpark_cancel">&#xa0;CANCEL</string>
+    <string name="add_carpark_submitting">submitting&#8230;</string>
+    <string name="add_carpark_help"><b>Adding a&#xa0;new car&#xa0;park:</b> move&#xa0;and&#xa0;zoom&#xa0;the&#xa0;map so the&#xa0;car&#xa0;park is&#xa0;accurately&#xa0;located, then&#xa0;tap&#xa0;submit</string>
+    
+    <string name="error_parking_not_found">error: current car park unknown</string>
+    <string name="error_submitting_data">error submitting data</string>
+    
+    <string name="tap_bubble">tap the name bubble to watch this car park</string>
+    
+    <!--  adding soon:
+        tap to watch this car park
+        add a car park here
+        the new pin can be moved to the desired location 
+     -->
+     
+</resources>

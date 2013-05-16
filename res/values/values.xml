@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bubble_text_size">16sp</dimen>
+    <dimen name="bubble_details_text_size">14sp</dimen>
+    <dimen name="bubble_availability_size">14sp</dimen>
+    <dimen name="bubble_button_height">40dp</dimen>
+    <dimen name="bubble_separator_width">1dp</dimen>
+    <dimen name="currpark_text_size">24sp</dimen>
+    <dimen name="currpark_details_text_size">20sp</dimen>
+    <dimen name="currpark_shadow_width">5dp</dimen>
+    <dimen name="addpark_btn_text_size">16sp</dimen>
+    <dimen name="addpark_text_size">16sp</dimen>
+    <dimen name="details_text_size">16sp</dimen>
+    <dimen name="details_uri_text_size">10sp</dimen>
+    <dimen name="details_edit_dialog_heading_text_size">24sp</dimen>
+    <dimen name="details_edit_dialog_property_text_size">20sp</dimen>
+    <dimen name="details_edit_dialog_property_description_text_size">14sp</dimen>
+    <dimen name="details_edit_dialog_property_uri_text_size">10sp</dimen>
+    <dimen name="details_entry_side_padding">1mm</dimen>
+    <dimen name="details_entry_topbottom_padding">1mm</dimen>
+    <dimen name="details_avail_buttons_size">60dp</dimen>
+    <dimen name="status_bar_height">54dp</dimen>
+    <dimen name="pinned_drawer_height">160dp</dimen>
+    <dimen name="pinned_drawer_width_max">240dp</dimen>
+    <dimen name="pinned_drawer_side_margin">2mm</dimen>
+    <dimen name="pinned_drawer_text_size">16sp</dimen>
+    <dimen name="pinned_drawer_empty_text_size">14sp</dimen>
+    <dimen name="pinned_drawer_entry_padding">1mm</dimen>
+    
+    <integer name="button_disabled_delay">1000</integer>
+    
+    <integer name="bubble_flight_animation_duration">500</integer>
+    <integer name="pinned_drawer_animation_duration">300</integer>
+    <!-- TODO near_car_park_meters should be more like 100 --> 
+    <integer name="near_car_park_meters">350</integer> 
+    
+    <integer name="loading_purple_delay">100</integer>
+    <integer name="parking_highlight_delay">100</integer>
+    <integer name="mylocation_delay">500</integer>
+    
+</resources>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout   xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/main_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" 
+        android:orientation="vertical"
+    >
+    
+    <include layout="@layout/map"  android:layout_width="match_parent" android:layout_height="match_parent"/>
+
+    <LinearLayout
+	    android:id="@+id/addpark_container"
+        android:visibility="gone"
+        android:orientation="vertical"
+	    android:layout_width="match_parent" 
+	    android:layout_height="wrap_content" 
+	    android:layout_alignParentTop="true" 
+	    >
+        <LinearLayout
+            android:id="@+id/addpark_buttons"
+            android:background="@color/currpark_background"
+	        android:orientation="horizontal"
+            android:gravity="right"
+            android:paddingLeft="@dimen/status_bar_height"
+	        android:layout_width="match_parent"
+	        android:layout_height="@dimen/status_bar_height">
+	        <Button
+                style="@style/addpark_btn_text"
+                android:layout_width="wrap_content"
+	            android:layout_height="@dimen/status_bar_height"
+                android:drawableLeft="@drawable/ic_menu_done_purple"
+                android:background="@drawable/bubble_highlight_background"
+	            android:scaleType="center"
+                android:text="@string/add_carpark_OK"
+	            android:id="@+id/addpark_done"/>
+            <Button
+                style="@style/addpark_btn_text"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/status_bar_height"
+                android:drawableLeft="@drawable/ic_menu_cancel_purple"
+                android:background="@drawable/bubble_highlight_background"
+                android:scaleType="center"
+                android:text="@string/add_carpark_cancel"
+                android:layout_marginLeft="2mm"
+                android:layout_marginRight="2mm"
+                android:id="@+id/addpark_cancel"/>
+	    </LinearLayout>
+        <TextView
+            style="@style/currpark.addpark"
+            android:id="@+id/addpark_text"
+            android:freezesText="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_carpark_help" />
+        <ImageView
+            android:layout_width="match_parent"  
+            android:src="@drawable/currpark_gradient"
+            android:layout_height="2mm" />
+    </LinearLayout>
+	    
+    <LinearLayout
+        android:id="@+id/status_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:minHeight="@dimen/status_bar_height" 
+        android:gravity="center"
+        android:orientation="vertical">
+        
+        <TextView
+                style="@style/status_text"
+                android:id="@+id/status_text"
+                android:freezesText="false"
+                android:paddingLeft="@dimen/status_bar_height"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/status_bar_height"
+                android:maxLines="2" 
+                android:text="@string/currpark_initial"/>
+        <ImageView
+            android:layout_width="match_parent"  
+            android:src="@drawable/currpark_gradient"
+            android:layout_height="2mm" />
+    </LinearLayout>
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pinned_drawer_container"
+        android:layout_marginLeft="@dimen/status_bar_height" 
+        android:layout_marginRight="@dimen/status_bar_height" 
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="@dimen/pinned_drawer_width_max"
+        android:layout_height="@dimen/pinned_drawer_height"
+        android:orientation="vertical" >
+        <ListView 
+            android:id="@+id/pinned_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:clickable="true"
+            android:cacheColorHint="#00000000"
+            android:scrollingCache="true"
+            android:fadingEdgeLength="32dp"
+            android:background="@drawable/drawer" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="@dimen/status_bar_height"
+        android:layout_height="@dimen/status_bar_height"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:scaleType="center"
+        android:onClick="openOptionsMenu"
+        android:id="@+id/loading_animation"
+        android:src="@drawable/loading" />
+
+</RelativeLayout>
+    

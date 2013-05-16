@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/details_edit_dialog_layout"
+    android:orientation="vertical"
+    android:gravity="center">
+    
+    <TextView 
+        style="@style/details_edit_dialog.heading"
+        android:id="@+id/details_edit_dialog_heading"
+        android:freezesText="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:text="@string/details_edit_add_property"/>
+    <Spinner
+        android:id="@+id/details_edit_dialog_property"
+        android:layout_width="wrap_content"
+        android:background="@drawable/spinner_default_holo_dark"
+        android:layout_height="wrap_content" />
+    <TextView 
+        style="@style/details_edit_dialog.property_description"
+        android:id="@+id/details_edit_dialog_property_description"
+        android:freezesText="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="5"/>
+    <EditText
+        android:id="@+id/details_edit_dialog_edit"
+        android:inputType="text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
+</LinearLayout>

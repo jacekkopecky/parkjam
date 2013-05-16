@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android" android:oneshot="false">
+    <item android:drawable="@drawable/parking_busy_a04" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_a10" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_a12" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_a10" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_a04" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_b04" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_b10" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_b12" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_b10" android:duration="@integer/parking_highlight_delay" />
+    <item android:drawable="@drawable/parking_busy_b04" android:duration="@integer/parking_highlight_delay" />
+</animation-list>

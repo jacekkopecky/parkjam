@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bubble" 
+    android:id="@+id/bubble"
+    >
+    
+    <TableRow
+        android:id="@+id/bubble_top_box"
+        style="@style/bubble.title"
+        >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:id="@+id/bubble_top_texts">
+            
+            <TextView
+                android:maxLines="2"
+                android:minWidth="220dp"
+                android:ellipsize="end"
+                android:maxEms="20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/bubble.title"
+                android:id="@+id/bubble_title" 
+                android:text=" "
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                style="@style/bubble.availability"
+                android:id="@+id/bubble_availability"
+                />
+        </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="1mm"
+            android:layout_marginRight="1mm"
+            android:scaleType="center"
+            android:src="@drawable/btn_circle_go3" />
+    </TableRow>
+    
+    <TableRow>
+    <View
+        android:id="@+id/bubble_top_separator"
+        android:layout_marginTop="1mm"
+        android:layout_marginBottom="1mm" 
+        android:visibility="gone"
+        android:layout_height="@dimen/bubble_separator_width"
+        android:layout_width="0dp"
+        android:layout_span="2"
+        android:background="@color/bubble_separator"
+        />
+    </TableRow>
+    
+    <TableRow>
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_span="2"
+            android:id="@+id/bubble_details_scrollview"
+            android:scrollbarStyle="insideOverlay">
+            <LinearLayout
+                android:id="@+id/bubble_details" 
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </ScrollView>
+<!--         <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="1mm"
+            android:scaleType="center"
+            android:clickable="true"
+            android:src="@drawable/btn_circle_go3" /> -->
+    </TableRow>
+    
+    <TableRow>
+    <View
+        android:id="@+id/bubble_bottom_separator"
+        android:layout_marginTop="1mm"
+        android:layout_height="@dimen/bubble_separator_width"
+        android:layout_width="0dp"
+        android:layout_span="2"
+        android:background="@color/bubble_separator"
+        />
+    </TableRow>
+    
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_span="2" 
+        android:gravity="fill_horizontal|center_vertical"
+        >
+        <ImageView
+            style="@style/bubble.button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/bubble_button_height"
+            android:scaleType="center"
+            android:clickable="true"
+            android:id="@+id/bubble_pin"
+            android:src="@drawable/btn_pin_inactive" />
+        <View
+            android:layout_marginLeft="1mm"
+            android:layout_marginRight="1mm" 
+            android:layout_height="@dimen/bubble_button_height"
+            android:layout_width="@dimen/bubble_separator_width"
+            android:background="@color/bubble_separator" />
+        <ImageView
+            style="@style/bubble.button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/bubble_button_height"
+            android:scaleType="center"
+            android:clickable="true"
+            android:id="@+id/bubble_report_available"
+            android:src="@drawable/green_circle_32px" />
+        <View
+            android:layout_marginLeft="1mm"
+            android:layout_marginRight="1mm" 
+            android:layout_height="@dimen/bubble_button_height"
+            android:layout_width="@dimen/bubble_separator_width"
+            android:background="@color/bubble_separator" />
+        <ImageView
+            style="@style/bubble.button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/bubble_button_height"
+            android:scaleType="center"
+            android:clickable="true"
+            android:id="@+id/bubble_report_full"
+            android:src="@drawable/red_circle_32px" />
+        <View
+            android:layout_marginLeft="1mm"
+            android:layout_marginRight="1mm" 
+            android:layout_height="@dimen/bubble_button_height"
+            android:layout_width="@dimen/bubble_separator_width"
+            android:background="@color/bubble_separator" />
+        <ImageView
+            style="@style/bubble.button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/bubble_button_height"
+            android:scaleType="center"
+            android:clickable="true"
+            android:id="@+id/bubble_directions"
+            android:src="@drawable/ic_menu_directions" />
+<!--             <View
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_width="0dp" />                
+            <TextView
+                style="@style/bubble.button"
+                android:clickable="true"
+                android:id="@+id/bubble_pin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/btn_pin_inactive"
+                android:text="PIN" />
+            <View
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_width="0dp" />                
+            <View
+                android:layout_marginLeft="1mm"
+                android:layout_marginRight="1mm" 
+                android:layout_height="@dimen/bubble_button_height"
+                android:layout_width="@dimen/bubble_separator_width"
+                android:background="@color/bubble_separator"
+                />
+            <View
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_width="0dp" />                
+            <TextView
+                style="@style/bubble.button"
+                android:clickable="true"
+                android:id="@+id/bubble_report_spaces"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/green_circle"
+                android:text="AVAILABLE" />
+            <View
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_width="0dp" />                
+            <View
+                android:layout_marginLeft="1mm"
+                android:layout_marginRight="1mm" 
+                android:layout_height="@dimen/bubble_button_height"
+                android:layout_width="@dimen/bubble_separator_width"
+                android:background="@color/bubble_separator"
+                />
+            <View
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_width="0dp" />                
+            <TextView
+                style="@style/bubble.button"
+                android:clickable="true"
+                android:id="@+id/bubble_report_full"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/red_circle"
+                android:text="FULL" />
+            <View
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_width="0dp" />                
+ -->            
+        </LinearLayout>
+        
+    <!--  todo add buttons and text for pin, report full, confirm available -->
+
+</TableLayout>

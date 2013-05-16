@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="currpark">
+        <item name="android:textColor">@color/default_text</item>
+        <item name="android:textSize">@dimen/currpark_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:background">@color/currpark_background</item>
+        <item name="android:paddingTop">1mm</item>        
+        <item name="android:paddingLeft">1mm</item>        
+        <item name="android:paddingRight">1mm</item>        
+        <item name="android:paddingBottom">1mm</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+    </style>
+    <style name="currpark_container">
+        <item name="android:background">@color/currpark_background</item>
+    </style>
+    <style name="currpark_text">
+        <item name="android:textColor">@color/default_text</item>
+        <item name="android:textSize">@dimen/currpark_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+    </style>
+    <style name="status_text">
+        <item name="android:textColor">@color/default_text</item>
+        <item name="android:background">@color/currpark_background</item>
+        <item name="android:textSize">@dimen/currpark_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+    </style>
+    
+    <style name="addpark_btn_text">
+        <item name="android:textColor">@color/addpark_btn_text</item>
+        <item name="android:textSize">@dimen/addpark_btn_text_size</item>
+        <!-- <item name="android:textStyle">bold</item> -->
+        <item name="android:typeface">sans</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+    </style>
+    
+    <style name="currpark.addpark">
+        <item name="android:textSize">@dimen/addpark_text_size</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:paddingTop">0mm</item>        
+    </style>
+    
+    <style name="currpark_text.details">
+        <item name="android:textSize">@dimen/currpark_details_text_size</item>
+        <item name="android:gravity">center</item>
+    </style>
+    
+    <style name="details">
+        <item name="android:background">#8000</item>
+        <item name="android:textColor">@color/default_details_text</item>
+        <item name="android:textSize">@dimen/details_text_size</item>
+        <item name="android:typeface">sans</item>
+    </style>
+    
+    <!--  this is replicated in code in ParkingDetailsActivity -->
+<!--     <style name="details.entry"> 
+        <item name="android:background">#000</item>
+        <item name="android:textColor">@color/default_text</item>
+        <item name="android:textSize">@dimen/details_text_size</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:paddingLeft">1mm</item>
+    </style> -->
+    
+    <!-- same as the above which is implemented in code -->
+    <style name="details.availability"> 
+        <item name="android:background">@color/details_entry_background</item>
+        <item name="android:textColor">@color/default_details_text</item>
+        <item name="android:textSize">@dimen/details_text_size</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:paddingLeft">1mm</item>
+        <item name="android:paddingRight">1mm</item>
+    </style>
+    
+    <style name="details.entry_uri">
+        <item name="android:textColor">@color/uri_text</item>
+        <item name="android:textSize">@dimen/details_uri_text_size</item>
+        <item name="android:background">@color/details_uri_background</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:paddingLeft">1mm</item>
+    </style>
+    
+    <style name="details.heading">
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item> 
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:background">@color/details_dark</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>        
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="details.heading_text">
+        <item name="android:background">@color/details_dark</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>        
+    </style>
+    
+    <style name="details_edit_dialog">
+        <item name="android:textColor">#fff</item>
+        <item name="android:background">#000</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:paddingLeft">6sp</item>
+        <item name="android:paddingRight">6sp</item>
+    </style>
+    
+    <style name="details_edit_dialog.heading">
+        <item name="android:textSize">@dimen/details_edit_dialog_heading_text_size</item>
+        <item name="android:paddingBottom">1mm</item>
+    </style>
+    
+    <style name="details_edit_dialog.property_item">
+        <item name="android:textSize">@dimen/details_edit_dialog_property_text_size</item>
+    </style>
+    
+    <style name="details_edit_dialog.property_description">
+        <item name="android:textSize">@dimen/details_edit_dialog_property_description_text_size</item>
+        <item name="android:paddingBottom">1mm</item>
+        <item name="android:maxLines">6</item>
+    </style>
+    
+    <style name="details_edit_dialog.property_rdf">
+        <item name="android:textSize">@dimen/details_edit_dialog_property_uri_text_size</item>
+        <item name="android:textColor">@color/details_edit_dialog_uri_text</item>
+        <item name="android:paddingLeft">1mm</item>
+        <item name="android:paddingRight">1mm</item>
+    </style>
+    
+    <style name="bubble">
+        <item name="android:textColor">@color/bubble_text</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:background">@drawable/bubble_highlight_background</item>
+    </style>
+    
+    <style name="bubble.title">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/bubble_text_size</item>
+    </style>
+    
+    <style name="bubble.availability">
+        <item name="android:textSize">@dimen/bubble_availability_size</item>
+    </style>
+    
+    <style name="bubble.button">
+        <item name="android:textSize">@dimen/addpark_btn_text_size</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">middle</item>
+        <item name="android:minHeight">32dp</item>
+    </style>
+    
+    
+    
+    <color name="currpark_background">#dd331a34</color> <!--  was a000 -->
+    <color name="currpark_background_shadow_end">#00331a34</color>
+    <color name="details_uri_background">#444</color>
+    <color name="details_entry_background">#000</color>
+    <color name="details_entry_selected">#431946</color>
+    <color name="details_dark">#86328c</color>
+    <color name="details_line_separator">#888</color>
+    <color name="details_unverified_text">#ceadd1</color>
+    
+    <color name="default_text">#fff</color>
+    <color name="bubble_text">#fff</color>
+    <color name="bubble_link">#6cf</color>
+    <color name="bubble_separator">#8fff</color>
+    <color name="addpark_btn_text">#fff<!-- #ecc6f0 --></color>
+    <color name="uri_text">#ccc</color>
+    <color name="details_edit_dialog_uri_text">#ccc</color>
+    <color name="default_details_text">#fff</color>
+    <color name="details_add_entry_text">#888</color>
+    <color name="btn_yes_text">#3f3</color>
+    <color name="btn_no_text">#f33</color>
+    <color name="drawer_empty_text">#666</color>
+    <color name="drawer_text">#000</color>
+    
+    <color name="green_dark">#39b54a</color>
+    <color name="green_light">#8cc63f</color>
+    <color name="purple_dark">#86328c</color>
+    <color name="purple_light">#c763ad</color>
+    <color name="orange_dark">#f15a22</color>
+    <color name="orange_light">#ff931e</color>
+    
+    <color name="bubble_highlight_pressed">#fa0</color>
+    <color name="bubble_highlight_active">#80af</color>
+    <color name="transparent">#0000</color>
+    
+</resources>

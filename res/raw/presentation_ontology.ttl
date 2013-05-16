@@ -1,0 +1,295 @@
+@prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix r: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix p: <http://parking.kmi.open.ac.uk/ontologies/presentation#> .
+@prefix d: <http://www.w3.org/2001/XMLSchema#> .
+@prefix CP: <http://parking.kmi.open.ac.uk/ontologies/carpark#> .
+
+###################################################################################################
+# names, then address, then descriptions, then other notes
+
+
+p:label a r:Property ;
+        s:comment "Label for presentation purposes." .
+p:order a r:Property ;
+        s:comment "Number (xs:double) that orders the presentation (lower number means the property should be presented earlier" .
+
+p:comment a r:Property ;
+        s:comment "Note for presentation purposes, should guide users in filling out a value, or in understanding the value, of some property." .
+
+p:datatype a r:Property ;
+        s:comment "The data type used for the values in LGD." .
+
+p:PreferredProperty a s:Class ;
+        s:comment "Properties in this class are preferred when a user adds information." .
+
+
+s:label                                                                         p:label "Name"@en ;                                     p:order "1"^^d:double ;    a p:PreferredProperty .
+<http://linkedgeodata.org/property/name%3Aam>                                   p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Aga>                                   p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Agd>                                   p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Agr>                                   p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Ahsb>                                  p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Ahy>                                   p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Aja_rm>                                p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Ajp>                                   p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Ako_rm>                                p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Ali>                                   p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/name%3Asr%40latn>                            p:label "Name"@en ;                                     p:order "1"^^d:double .
+<http://linkedgeodata.org/property/official_name>                               p:label "Name (official)"@en ;                          p:order "1.1"^^d:double .
+<http://linkedgeodata.org/property/name%3Aatl>                                  p:label "Name (alternative)"@en ;                       p:order "1.2"^^d:double .
+<http://linkedgeodata.org/property/alt_name>                                    p:label "Name (alternative)"@en ;                       p:order "1.2"^^d:double .
+<http://linkedgeodata.org/property/name%3Aalt>                                  p:label "Name (alternative)"@en ;                       p:order "1.2"^^d:double .
+<http://linkedgeodata.org/property/name_alt>                                    p:label "Name (alternative)"@en ;                       p:order "1.2"^^d:double .
+<http://linkedgeodata.org/property/key>                                         p:label "Key"@en ;                                      p:order "1.3"^^d:double .
+<http://linkedgeodata.org/property/old_name>                                    p:label "Old name"@en ;                                 p:order "1.4"^^d:double .
+
+<http://linkedgeodata.org/property/addr%3Afull>                                 p:label "Address"@en ;                                  p:order "2"^^d:double ;    a p:PreferredProperty .
+<http://linkedgeodata.org/property/addr%3Ahousename>                            p:label "House name"@en ;                               p:order "2.1"^^d:double .
+<http://linkedgeodata.org/ontology/hasStreet>                                   p:label "Street"@en ;                                   p:order "2.2"^^d:double .
+<http://linkedgeodata.org/ontology/hasHouseNumber>                              p:label "House number"@en ;                             p:order "2.3"^^d:double .
+<http://linkedgeodata.org/property/phone>                                       p:label "Phone"@en ;                                    p:order "2.4"^^d:double ;  a p:PreferredProperty .
+<http://linkedgeodata.org/property/telephone>                                   p:label "Phone"@en ;                                    p:order "2.4"^^d:double .
+<http://linkedgeodata.org/property/telefono>                                    p:label "Phone"@en ;                                    p:order "2.4"^^d:double .
+
+<http://linkedgeodata.org/ontology/description>                                 p:label "Description"@en ;                              p:order "3"^^d:double ;    a p:PreferredProperty .
+<http://linkedgeodata.org/property/description%3Afi>                            p:label "Description"@en ;                              p:order "3"^^d:double .
+<http://linkedgeodata.org/property/description%3Ais>                            p:label "Description"@en ;                              p:order "3"^^d:double .
+<http://linkedgeodata.org/property/description%3Alv>                            p:label "Description"@en ;                              p:order "3"^^d:double .
+<http://linkedgeodata.org/property/description%3Ano>                            p:label "Description"@en ;                              p:order "3"^^d:double .
+<http://linkedgeodata.org/property/description%3Asv>                            p:label "Description"@en ;                              p:order "3"^^d:double .
+<http://linkedgeodata.org/property/description>                                 p:label "Description"@en ;                              p:order "3"^^d:double .
+<http://linkedgeodata.org/property/descrption%3Aca>                             p:label "Description"@en ;                              p:order "3"^^d:double .
+<http://linkedgeodata.org/property/parking>                                     p:label "Parking type"@en ;                             p:order "3.6"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: surface, multi-storey, underground"@en .
+
+<http://linkedgeodata.org/property/comment>                                     p:label "Comment"@en ;                                  p:order "4"^^d:double ;    a p:PreferredProperty .
+<http://linkedgeodata.org/ontology/note>                                        p:label "Note"@en ;                                     p:order "4"^^d:double .
+<http://linkedgeodata.org/ontology/disused>                                     p:label "Disused"@en ;                                  p:order "4.1"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/snowplowed>                                  p:label "Snow plowing"@en ;                             p:order "4.1"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/snowplowing>                                 p:label "Snow plowing"@en ;                             p:order "4.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/tunnel>                                      p:label "Tunnel"@en ;                                   p:order "4.1"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/property/cover>                                       p:label "Cover"@en ;                                    p:order "4.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no"@en .
+<http://linkedgeodata.org/property/covered>                                     p:label "Cover"@en ;                                    p:order "4.1"^^d:double ;                          p:comment "Common values: yes, no"@en .
+<http://linkedgeodata.org/property/fuel%3Aelectricity>                          p:label "Fuel (electricity)"@en ;                       p:order "4.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no"@en .
+<http://linkedgeodata.org/property/height>                                      p:label "Height"@en ;                                   p:order "4.2"^^d:double ;                          p:comment "Common values: 3m, 2.5m"@en .
+<http://linkedgeodata.org/property/maxheight%3Aimperial>                        p:label "Max height (imperial)"@en ;                    p:order "4.2"^^d:double ;                          p:comment "Common value: 6'6\""@en .
+<http://linkedgeodata.org/property/maxheight%3Aphysical>                        p:label "Max height"@en ;                               p:order "4.2"^^d:double .
+<http://linkedgeodata.org/property/maxheight>                                   p:label "Max height"@en ;                               p:order "4.2"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: 2, 2.1"@en .
+<http://linkedgeodata.org/property/note%3Afi>                                   p:label "Note"@en ;                                     p:order "4"^^d:double .
+<http://linkedgeodata.org/property/note%3Aja>                                   p:label "Note"@en ;                                     p:order "4"^^d:double .
+<http://linkedgeodata.org/property/note%3Ano>                                   p:label "Note"@en ;                                     p:order "4"^^d:double .
+<http://linkedgeodata.org/property/note1>                                       p:label "Note"@en ;                                     p:order "4"^^d:double .
+<http://linkedgeodata.org/property/note2>                                       p:label "Note"@en ;                                     p:order "4"^^d:double .
+<http://linkedgeodata.org/property/note>                                        p:label "Note"@en ;                                     p:order "4"^^d:double .
+<http://linkedgeodata.org/property/operator>                                    p:label "Operator"@en ;                                 p:order "4.1"^^d:double ;  a p:PreferredProperty .
+<http://linkedgeodata.org/property/park_ride>                                   p:label "Park and ride"@en ;                            p:order "4.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no, bus, train"@en .
+<http://linkedgeodata.org/property/parking_alignment>                           p:label "Parking alignment"@en ;                        p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/parking_info>                                p:label "Information"@en ;                              p:order "4"^^d:double .
+<http://linkedgeodata.org/property/parking_type>                                p:label "Parking type"@en ;                             p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/remarks>                                     p:label "Remarks"@en ;                                  p:order "4"^^d:double .
+<http://linkedgeodata.org/property/restricted>                                  p:label "Restricted"@en ;                               p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/restriction>                                 p:label "Restrictions"@en ;                             p:order "4.1"^^d:double ;                          p:comment "Common values: private, for shoppers only"@en .
+<http://linkedgeodata.org/property/parking%3Acondition>                         p:label "Restrictions"@en ;                             p:order "4.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: disc, private, customers, 2h, Mo-Fr 09:00-19:00"@en .
+<http://linkedgeodata.org/property/restrictions>                                p:label "Restrictions"@en ;                             p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/surface>                                     p:label "Surface"@en ;                                  p:order "4.2"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: asphalt, paved, gravel, unpaved"@en .
+<http://linkedgeodata.org/ontology/wheelchair%3Adescription>                    p:label "Wheelchair"@en ;                               p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/wheelchair%3Aaccess>                         p:label "Wheelchair access"@en ;                        p:order "4.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, limited, no"@en .
+<http://linkedgeodata.org/property/wheelchair%3Adescription%3Aen>               p:label "Wheelchair"@en ;                               p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/wheelchair%3Adescription%3Anl>               p:label "Wheelchair"@en ;                               p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/wheelchair%3Adescription>                    p:label "Wheelchair"@en ;                               p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/whitewater%3Anote>                           p:label "Wheelchair note"@en ;                          p:order "4.1"^^d:double .
+<http://linkedgeodata.org/property/condition>                                   p:label "Condition"@en ;                                p:order "4.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: FAIR, GOOD, EXCELLENT"@en .
+
+
+###################################################################################################
+# capacity
+
+<http://linkedgeodata.org/property/capacity>                                    p:label "Capacity"@en ;                                 p:order "5"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: 5, 10, 100"@en .
+<http://linkedgeodata.org/ontology/capacity_park_ride>                          p:label "Capacity (Park and Ride)"@en ;                 p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/wheelchair%3Acapacity>                       p:label "Capacity (wheelchair)"@en ;                    p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acapacity>                          p:label "Capacity"@en ;                                 p:order "5"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Abicycle>                          p:label "Capacity (bicycle)"@en ;                       p:order "5.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no, 0, 10, 20"@en .
+<http://linkedgeodata.org/property/capacity%3Abus>                              p:label "Capacity (bus)"@en ;                           p:order "5.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no, 0, 5, 10"@en .
+<http://linkedgeodata.org/property/capacity%3Abuses>                            p:label "Capacity (bus)"@en ;                           p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Acampers>                          p:label "Capacity (camper)"@en ;                        p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Acar>                              p:label "Capacity (car)"@en ;                           p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Acaravan>                          p:label "Capacity (caravan)"@en ;                       p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Acaravans>                         p:label "Capacity (caravan)"@en ;                       p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Acarclub>                          p:label "Capacity (carclub)"@en ;                       p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Acarriage>                         p:label "Capacity (carriage)"@en ;                      p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Acoach>                            p:label "Capacity (coach)"@en ;                         p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Adisabled>                         p:label "Capacity (disabled)"@en ;                      p:order "5.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no, 0, 1, 5"@en .
+<http://linkedgeodata.org/property/capacity%3Aelectric>                         p:label "Capacity (electric)"@en ;                      p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Aemergency>                        p:label "Capacity (emergency)"@en ;                     p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Afee>                              p:label "Capacity (fee)"@en ;                           p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Afrauenparkplatz>                  p:label "Capacity (women parking)"@en ;                 p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Ahgv>                              p:label "Capacity (HGV)"@en ;                           p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Along>                             p:label "Capacity (long)"@en ;                          p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3AmotorHome>                        p:label "Capacity (motor homes)"@en ;                   p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Amotorbike>                        p:label "Capacity (motorbikes)"@en ;                    p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Amotorcar>                         p:label "Capacity (motorcars)"@en ;                     p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Amotorcycle>                       p:label "Capacity (motorcycles)"@en ;                   p:order "5.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no, 5, 10"@en .
+<http://linkedgeodata.org/property/capacity%3Amotorhome>                        p:label "Capacity (motor homes)"@en ;                   p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Aparent>                           p:label "Capacity (parents)"@en ;                       p:order "5.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no, 0, 2, 10"@en .
+<http://linkedgeodata.org/property/capacity%3Aparents>                          p:label "Capacity (parents)"@en ;                       p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Apermissive>                       p:label "Capacity (permissive)"@en ;                    p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Apower_outlet>                     p:label "Capacity (power outlet)"@en ;                  p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Aprivate>                          p:label "Capacity (private)"@en ;                       p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Apsv>                              p:label "Capacity (PSV)"@en ;                           p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Aservice>                          p:label "Capacity (service)"@en ;                       p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Astaff>                            p:label "Capacity (staff)"@en ;                         p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Astandard>                         p:label "Capacity (standard)"@en ;                      p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/capacity%3Awomen>                            p:label "Capacity (women parking)"@en ;                 p:order "5.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, no, 0, 1, 5"@en .
+<http://linkedgeodata.org/property/capacity_disabled>                           p:label "Capacity (disabled)"@en ;                      p:order "5.1"^^d:double .
+<http://linkedgeodata.org/ontology/parking_slots>                               p:label "Capacity"@en ;                                 p:order "5"^^d:double .
+<http://linkedgeodata.org/property/disabled>                                    p:label "Capacity (disabled)"@en ;                      p:order "5.1"^^d:double ;                          p:comment "Common values: yes, no, 1, 4"@en .
+<http://linkedgeodata.org/property/disabled_parking>                            p:label "Disabled parking"@en ;                         p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/disabled_person>                             p:label "Disabled parking"@en ;                         p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/disabled_places>                             p:label "Disabled places"@en ;                          p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/disabled_sp>                                 p:label "Disabled spaces"@en ;                          p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/disabled_spaces>                             p:label "Disabled spaces"@en ;                          p:order "5.1"^^d:double ;                          p:comment "Common values: yes, no, 1, 4"@en .
+<http://linkedgeodata.org/property/hgv_spaces>                                  p:label "Capacity (HGV)"@en ;                           p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/motorcycle_spaces>                           p:label "Motorcycle spaces"@en ;                        p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/space>                                       p:label "Spaces"@en ;                                   p:order "5"^^d:double .
+<http://linkedgeodata.org/property/spaces%3Acar_sharing>                        p:label "Spaces (car sharing)"@en ;                     p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/spaces%3Adisabled>                           p:label "Spaces (disabled)"@en ;                        p:order "5.1"^^d:double .
+<http://linkedgeodata.org/property/spaces>                                      p:label "Spaces"@en ;                                   p:order "5"^^d:double .
+<http://linkedgeodata.org/property/standard_spaces>                             p:label "Spaces (standard)"@en ;                        p:order "5.1"^^d:double .
+
+
+###################################################################################################
+# allowed/disallowed types of vehicles
+
+<http://linkedgeodata.org/ontology/caravans>                                    p:label "Caravans"@en ;                                 p:order "6"^^d:double .
+<http://linkedgeodata.org/ontology/coach>                                       p:label "Coach"@en ;                                    p:order "6"^^d:double .
+<http://linkedgeodata.org/property/bus>                                         p:label "Bus"@en ;                                      p:order "6"^^d:double ;                            p:comment "Common values: yes, no, designated"@en .
+<http://linkedgeodata.org/property/camper>                                      p:label "Camper"@en ;                                   p:order "6"^^d:double .
+<http://linkedgeodata.org/property/camping>                                     p:label "Camping"@en ;                                  p:order "6"^^d:double .
+<http://linkedgeodata.org/property/campmobile>                                  p:label "Campmobile"@en ;                               p:order "6"^^d:double .
+<http://linkedgeodata.org/property/caravan>                                     p:label "Caravan"@en ;                                  p:order "6"^^d:double .
+<http://linkedgeodata.org/property/designated>                                  p:label "Designated"@en ;                               p:order "6"^^d:double .
+<http://linkedgeodata.org/property/designation>                                 p:label "Designation"@en ;                              p:order "6"^^d:double .
+<http://linkedgeodata.org/property/hgv>                                         p:label "HGV"@en ;                                      p:order "6"^^d:double ;                            p:comment "Common values: yes, no, designated, permissive"@en .
+<http://linkedgeodata.org/property/motorcycle>                                  p:label "Motorcycle"@en ;                               p:order "6"^^d:double ;                            p:comment "Common values: yes, no, designated"@en .
+<http://linkedgeodata.org/property/motorcycles>                                 p:label "Motorcycles"@en ;                              p:order "6"^^d:double .
+
+
+###################################################################################################
+# fees
+
+<http://linkedgeodata.org/ontology/fee>                                         p:label "Fee"@en ;                                      p:order "7"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+CP:online_payment                                                               p:label "Pay online"@en ;                               p:order "3.5"^^d:double ; a p:PreferredProperty .
+<http://linkedgeodata.org/ontology/free>                                        p:label "Free"@en ;                                     p:order "7"^^d:double ;                            p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/payment%3Aaccount_cards>                     p:label "Payment by account cards"@en ;                 p:order "7.2"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/payment%3Acredit_cards>                      p:label "Payment by credit cards"@en ;                  p:order "7.2"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/payment%3Adebit_cards>                       p:label "Payment by debit cards"@en ;                   p:order "7.2"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/payment%3Aelectronic_purses>                 p:label "Payment by electronic purses"@en ;             p:order "7.2"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/payment%3Anotes>                             p:label "Payment by notes"@en ;                         p:order "7.2"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/payment%3Atelephone_cards>                   p:label "Payment by telephone cards"@en ;               p:order "7.2"^^d:double ;                          p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/toll>                                        p:label "Toll"@en ;                                     p:order "7"^^d:double ;                            p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/property/charge>                                      p:label "Charge"@en ;                                   p:order "7"^^d:double ;                            p:comment "Common values: free, no, pay and display, 5 USD daily / 30 USD yearly"@en .
+<http://linkedgeodata.org/property/cost>                                        p:label "Cost"@en ;                                     p:order "7"^^d:double ;                            p:comment "Common values: free, yes, $2.00"@en .
+<http://linkedgeodata.org/property/description%3Afee>                           p:label "Fee"@en ;                                      p:order "7"^^d:double .
+<http://linkedgeodata.org/property/fee%3Aamount>                                p:label "Fee amount"@en ;                               p:order "7"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: $2, 5 USD daily / 30 USD yearly"@en.
+<http://linkedgeodata.org/property/fee%3Acar>                                   p:label "Fee (car)"@en ;                                p:order "7.1"^^d:double .
+<http://linkedgeodata.org/property/fee%3Acustomers>                             p:label "Fee (customers)"@en ;                          p:order "7.1"^^d:double .
+<http://linkedgeodata.org/property/fee%3Aminstay>                               p:label "Fee (minimum stay)"@en ;                       p:order "7.1"^^d:double ;                          p:comment "Common values: 15min, 2h"@en .
+<http://linkedgeodata.org/property/fee%3Anote>                                  p:label "Fee (note)"@en ;                               p:order "7.3"^^d:double .
+<http://linkedgeodata.org/property/fee%3Aonly>                                  p:label "Fee only"@en ;                                 p:order "7.3"^^d:double .
+<http://linkedgeodata.org/property/fee%3Aprice>                                 p:label "Fee price"@en ;                                p:order "7"^^d:double .
+<http://linkedgeodata.org/property/fee%3Asnow%3Adescription>                    p:label "Fee"@en ;                                      p:order "7"^^d:double ;                            p:comment "Common value: fee only when snow"@en .
+<http://linkedgeodata.org/property/fee%3Asnow>                                  p:label "Fee by snow"@en ;                              p:order "7.1"^^d:double .
+<http://linkedgeodata.org/property/fee%3Atime>                                  p:label "Fee time"@en ;                                 p:order "7.4"^^d:double ;                          p:comment "Common value: Mo-Fr 8:00-20:00; Sa 8:00-16:00"@en .
+<http://linkedgeodata.org/property/fee%3Atimes>                                 p:label "Fee times"@en ;                                p:order "7.4"^^d:double ;  a p:PreferredProperty ; p:comment "Common value: Mo-Fr 8:00-20:00; Sa 8:00-16:00"@en .
+<http://linkedgeodata.org/property/fee%3Atype>                                  p:label "Fee type"@en ;                                 p:order "7.1"^^d:double .
+<http://linkedgeodata.org/property/fee_per_day>                                 p:label "Fee per day"@en ;                              p:order "7.1"^^d:double .
+<http://linkedgeodata.org/property/fees>                                        p:label "Fees"@en ;                                     p:order "7"^^d:double ;                            p:comment "Common values: yes, no"@en .
+<http://linkedgeodata.org/property/note%3Afee>                                  p:label "Note (fees)"@en ;                              p:order "7.5"^^d:double .
+<http://linkedgeodata.org/property/parking_disc>                                p:label "Parking disc"@en ;                             p:order "7.1"^^d:double ;  a p:PreferredProperty ; p:comment "Common values: yes, Mo-Fr 08:00-18:00; Sa 08:00-12:00"@en .
+<http://linkedgeodata.org/property/parking_fee>                                 p:label "Fee"@en ;                                      p:order "7"^^d:double .
+<http://linkedgeodata.org/property/parking_fee_during>                          p:label "Fee during"@en ;                               p:order "7.1"^^d:double .
+<http://linkedgeodata.org/property/parking_ticket>                              p:label "Parking ticket"@en ;                           p:order "7.1"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Adisc>                  p:label "Condition (parking disc)"@en ;                 p:order "7.1"^^d:double .
+
+
+###################################################################################################
+# operating hours, restrictions
+
+<http://linkedgeodata.org/property/affected_hours>                              p:label "Affected hours"@en ;                           p:order "8"^^d:double .
+<http://linkedgeodata.org/property/date_off>                                    p:label "Date off"@en ;                                 p:order "8.05"^^d:double .
+<http://linkedgeodata.org/property/date_on>                                     p:label "Date on"@en ;                                  p:order "8"^^d:double .
+<http://linkedgeodata.org/property/day>                                         p:label "Day"@en ;                                      p:order "8"^^d:double .
+<http://linkedgeodata.org/property/duration>                                    p:label "Duration"@en ;                                 p:order "8"^^d:double .
+<http://linkedgeodata.org/property/hour_off>                                    p:label "Hour off"@en ;                                 p:order "8.05"^^d:double .
+<http://linkedgeodata.org/property/hour_on>                                     p:label "Hour on"@en ;                                  p:order "8"^^d:double .
+<http://linkedgeodata.org/property/hours>                                       p:label "Hours"@en ;                                    p:order "8"^^d:double .
+<http://linkedgeodata.org/property/max_duration%3Abus>                          p:label "Max duration (bus)"@en ;                       p:order "8"^^d:double .
+<http://linkedgeodata.org/property/max_stay>                                    p:label "Max stay"@en ;                                 p:order "8"^^d:double .
+<http://linkedgeodata.org/property/max_time>                                    p:label "Max time"@en ;                                 p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxduration%3Ahours>                         p:label "Max duration (hours)"@en ;                     p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxduration>                                 p:label "Max duration"@en ;                             p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3A%2809%3A00-18%3A00%29>             p:label "Max stay (09:00-18:00)"@en ;                   p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Aaffected_hours>                    p:label "Max stay (affected hours)"@en ;                p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Aday_off>                           p:label "Max stay (day off)"@en ;                       p:order "8.05"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Aday_on>                            p:label "Max stay (day on)"@en ;                        p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Ahour_off>                          p:label "Max stay (hour off)"@en ;                      p:order "8.05"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Ahour_on>                           p:label "Max stay (hour on)"@en ;                       p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Aonly>                              p:label "Max stay (only)"@en ;                          p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Atime>                              p:label "Max stay (time)"@en ;                          p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay%3Atimes>                             p:label "Max stay (times)"@en ;                         p:order "8"^^d:double .
+<http://linkedgeodata.org/property/maxstay>                                     p:label "Max stay"@en ;                                 p:order "8"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: 2 hours, 3 hours, 24h"@en .
+<http://linkedgeodata.org/property/maxstay_hours>                               p:label "Max stay (hours)"@en ;                         p:order "8"^^d:double .
+<http://linkedgeodata.org/property/openind_hours>                               p:label "Opening hours"@en ;                            p:order "8"^^d:double .
+<http://linkedgeodata.org/property/opening_hours%3Abus>                         p:label "Opening hours (bus)"@en ;                      p:order "8.05"^^d:double .
+<http://linkedgeodata.org/property/opening_hours>                               p:label "Opening hours"@en ;                            p:order "8"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: 24/7, Mo-Fr 08:30-17:00"@en .
+<http://linkedgeodata.org/property/operating_hours>                             p:label "Operating hours"@en ;                          p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking_time>                                p:label "Parking time"@en ;                             p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parklimit>                                   p:label "Parking limit"@en ;                            p:order "8"^^d:double .
+<http://linkedgeodata.org/property/time_interval>                               p:label "Time interval"@en ;                            p:order "8"^^d:double .
+<http://linkedgeodata.org/property/time_limit>                                  p:label "Time limit"@en ;                               p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Amaxstay>        p:label "Parking area max stay"@en ;                    p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Atime_interval>  p:label "Parking area time interval"@en ;               p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Atime_limit>     p:label "Parking area time limit"@en ;                  p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aboth%3Amaxstay>        p:label "Max stay (both)"@en ;                          p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aboth%3Atime_interval>  p:label "Time interval (both)"@en ;                     p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Adefault%3Amaxstay>     p:label "Default max stay"@en ;                         p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aleft%3Amaxstay>        p:label "Max stay (left)"@en ;                          p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aleft%3Atime_interval>  p:label "Time interval (left)"@en ;                     p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aleft>                  p:label "Parking (left)"@en ;                           p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Amaxstay>               p:label "Max stay"@en ;                                 p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aright%3Amaxstay>       p:label "Max stay (right)"@en ;                         p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aright%3Atime_interval> p:label "Time interval (right)"@en ;                    p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aside%3Amaxstay>        p:label "Max stay (side)"@en ;                          p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Atime_interval>         p:label "Time interval"@en ;                            p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Aconditions%3Aright%3Atime_limit>   p:label "Time limit (right)"@en ;                       p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aboth>                  p:label "Parking (both)"@en ;                           p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Adefault>               p:label "Parking condition"@en ;                        p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Adestination>           p:label "Parking destination"@en ;                      p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aright>                 p:label "Parking (right)"@en ;                          p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Avehicle>               p:label "Parking vehicles"@en ;                         p:order "8"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Avehicles>              p:label "Parking vehicles"@en ;                         p:order "8"^^d:double .
+
+
+###################################################################################################
+# access and supervision
+
+<http://linkedgeodata.org/ontology/fenced>                                      p:label "Fenced"@en ;                                   p:order "9"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/lit>                                         p:label "Lit"@en ;                                      p:order "9"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/ontology/supervised>                                  p:label "Supervised"@en ;                               p:order "9"^^d:double ; p:comment "Common values: 1, 0 (as in yes/no)"@en  ; p:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+<http://linkedgeodata.org/property/access>                                      p:label "Access"@en ;                                   p:order "9"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: private, permissive, unknown, customers"@en .
+<http://linkedgeodata.org/property/private>                                     p:label "Private"@en ;                                  p:order "9"^^d:double ;                            p:comment "Common values: yes, no"@en .
+<http://linkedgeodata.org/property/public>                                      p:label "Public"@en ;                                   p:order "9"^^d:double .
+<http://linkedgeodata.org/property/surveillance>                                p:label "Surveillance"@en ;                             p:order "9"^^d:double ;    a p:PreferredProperty ; p:comment "Common values: indoor, outdoor, yes, no"@en .
+<http://linkedgeodata.org/property/parking%3Acondition%3A...%3Aresidents>       p:label "Parking condition (residents)"@en ;            p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3A>               p:label "Parking condition"@en ;                        p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Acustomers%3A>   p:label "Parking condition (customers)"@en ;            p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Acustomers>      p:label "Parking condition (customers)"@en ;            p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Adefault>        p:label "Parking condition"@en ;                        p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Aresidents>      p:label "Parking condition (residents)"@en ;            p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea%3Avehicles>       p:label "Parking condition (vehicles)"@en ;             p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aarea>                  p:label "Parking condition (area)"@en ;                 p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aprivate>               p:label "Parking condition (private)"@en ;              p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aresidents>             p:label "Parking condition (residents)"@en ;            p:order "9"^^d:double .
+<http://linkedgeodata.org/property/parking%3Acondition%3Aright%3Aresidents>     p:label "Parking condition (residents - right)"@en ;    p:order "9"^^d:double .
+<http://linkedgeodata.org/property/note%3Aaccess>                               p:label "Access note"@en ;                              p:order "9"^^d:double .
+
+

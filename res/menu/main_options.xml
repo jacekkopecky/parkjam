@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_my_location"
+          android:title="@string/menu_my_location"
+          android:icon="@android:drawable/ic_menu_mylocation"/>
+<!--     <item android:id="@+id/menu_favorites"
+          android:title="@string/menu_favorites" 
+          android:icon="@drawable/ic_menu_star"
+          android:enabled="false" /> -->
+    <item android:id="@+id/menu_pinned"
+          android:title="@string/menu_pinned_show"
+          android:icon="@drawable/ic_menu_make_offline_grey"/>
+    <item android:id="@+id/menu_search"
+          android:title="@string/menu_search" 
+          android:icon="@android:drawable/ic_menu_search"/>
+<!--     <item android:id="@+id/menu_find_my_car"
+          android:title="@string/menu_find_my_car"  
+          android:icon="@android:drawable/ic_menu_myplaces"
+          android:enabled="false"/> -->
+    <item android:id="@+id/menu_map_layers"
+          android:icon="@android:drawable/ic_menu_mapmode"
+          android:title="@string/menu_map_layers" >
+          <menu>
+              <group android:checkableBehavior="all">
+                  <item android:id="@+id/menu_traffic"
+                      android:title="@string/menu_layers_traffic"/>
+                  <item android:id="@+id/menu_satellite"
+                      android:title="@string/menu_layers_satellite"/>
+                  <!-- <item android:id="@+id/menu_businesses"
+                      android:title="@string/menu_layers_businesses"
+                      android:enabled="false"/> -->
+              </group>   
+          </menu>
+    </item>
+    <item android:id="@+id/menu_add_car_park"
+          android:title="@string/menu_add_carpark"
+          android:icon="@android:drawable/ic_menu_add"/>
+    <item android:id="@+id/menu_settings"
+          android:title="@string/menu_settings"
+          android:icon="@android:drawable/ic_menu_preferences"/>
+</menu>

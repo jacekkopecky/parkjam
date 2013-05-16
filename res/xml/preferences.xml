@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+<!--  see http://www.kaloer.com/android-preferences    and   http://developer.android.com/reference/android/preference/PreferenceActivity.html     -->
+    
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="preferenceNoSleep"
+        android:summary="@string/preference_nosleep_summary"
+        android:title="@string/preference_nosleep" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="preferenceFullscreen"
+        android:summary="@string/preference_fullscreen_summary"
+        android:title="@string/preference_fullscreen" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="preferenceShadow"
+        android:summary="@string/preference_shadow_summary"
+        android:title="@string/preference_shadow" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="preferenceShowUnconfirmedProperties"
+        android:summary="@string/preference_unconfirmedprops_summary"
+        android:title="@string/preference_unconfirmedprops" />
+
+    <PreferenceCategory android:title="@string/preference_info_category" >
+        <PreferenceScreen
+            android:title="@string/preference_info_version" 
+            android:key="preferenceInfoVersion">
+            <intent android:action="android.intent.action.VIEW" android:data="http://parking.kmi.open.ac.uk/changelog.html"/>
+        </PreferenceScreen>
+            
+        <PreferenceScreen
+            android:summary="@string/preference_info_terms_summary"
+            android:title="@string/preference_info_terms" >
+            <intent
+                android:targetPackage="uk.ac.open.kmi.parking"
+                android:targetClass="uk.ac.open.kmi.parking.TermsAndConditions"/>
+        </PreferenceScreen>
+        <PreferenceScreen
+            android:summary="@string/preference_info_pp_summary"
+            android:title="@string/preference_info_pp" >
+            <intent
+                android:targetPackage="uk.ac.open.kmi.parking"
+                android:targetClass="uk.ac.open.kmi.parking.PrivacyPolicy"/>
+        </PreferenceScreen>
+</PreferenceCategory>
+</PreferenceScreen>
