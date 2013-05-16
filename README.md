@@ -19,6 +19,28 @@ guarantees.
 
 
 
+-----------------------------------------------------------------------------------------------------------
+Setting up in Eclipse:
+
+These instructions should get you from cloning the ParkJam source code to
+running your own ParkJam in your device.
+
+Prerequisites:
+
+- you have cloned the sources from github
+- you have set up Eclipse to compile Android projects (API version 10, with Google APIs)
+- you have appropriate keys, including a Google Maps API v1 key (new ones cannot 
+  be obtained as of March 2013, but ParkJam will migrate to maps API v2 in due course)
+- on the above point - you may need to change the top-level package for
+  ParkJam if you want to test it with your API key
+
+
+
+If any steps don't work as described, or if anything is omitted, please do
+let us know and we may update these instructions.
+
+
+
 
 -----------------------------------------------------------------------------------------------------------
 
