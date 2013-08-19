@@ -8,6 +8,7 @@ Web site: http://parking.kmi.open.ac.uk
 Google Play: https://play.google.com/store/apps/details?id=uk.ac.open.kmi.parking
 
 Also see the server GitHub project: https://github.com/jacekkopecky/parkjam-server 
+and the website project: https://github.com/jacekkopecky/parkjam-www
 
 
 Copyright: 
