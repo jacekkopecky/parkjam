@@ -1,5 +1,7 @@
-ParkJam mobile app: "The best way to find parking is to know beforehand where the spaces are."
+ParkJam mobile app
 =======
+
+"The best way to find parking is to know beforehand where the spaces are."
 
 Web site: http://parking.kmi.open.ac.uk 
 
