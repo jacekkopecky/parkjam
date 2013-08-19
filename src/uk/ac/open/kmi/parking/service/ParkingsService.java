@@ -112,7 +112,7 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
 
     // todo check that for every registerListener there is an unregisterListener, maybe without exceptions
 
-    // todo the service should be in the foreground if watching a car park when parkme is not active - also when details activity is on
+    // todo the service should be in the foreground if watching a car park when parkjam is not active - also when details activity is on
 
     /**
      * singleton constructor

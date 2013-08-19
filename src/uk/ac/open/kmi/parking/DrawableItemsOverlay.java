@@ -210,7 +210,7 @@ public class DrawableItemsOverlay extends Overlay {
             this.bufferBitmap.eraseColor(Color.TRANSPARENT);
             this.bufferOffsetX = (this.bufferBitmap.getWidth() - mapView.getWidth()) / 2;
             this.bufferOffsetY = (this.bufferBitmap.getHeight() - mapView.getHeight()) / 2;
-//          android.util.Log.d("parkme", "currentSize " + this.currentSize);
+//          android.util.Log.d(TAG, "currentSize " + this.currentSize);
 
             Collection<DrawableOverlayItem> items = this.parkingsService.getSortedCurrentItems(mapView.getMapCenter(), mapView.getLongitudeSpan(), mapView.getLatitudeSpan());
 

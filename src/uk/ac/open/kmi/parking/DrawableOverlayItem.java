@@ -23,7 +23,7 @@ import android.view.View;
 import com.google.android.maps.GeoPoint;
 
 /**
- * an item in the parkme overlay class
+ * an item in the parkjam overlay class
  * @author Jacek Kopecky
  *
  */

@@ -176,7 +176,7 @@ class NearPrecomputationThread implements Runnable, TileUpdateListener, TileDesi
 //                    Log.d(TAG, "recomputed (with " + count + " out of " + total + " tiles, " + retval.size() + " parkings) for " + coords);
                 } else {
                     // otherwise no need to do anything
-//                        Log.i("parkme", "no recomputation for " + event);
+//                        Log.i(TAG, "no recomputation for " + event);
                 }
 
                 // recompute the nearest one here

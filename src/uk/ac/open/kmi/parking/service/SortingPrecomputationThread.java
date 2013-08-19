@@ -72,7 +72,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                 }
                 //                    long currTime = System.currentTimeMillis();
                 //                    if (currTime > (nextReportTime)) {
-                //                        Log.d("parkme", "" + (currTime-nextReportTime+999) + "ms: " + callCount + " requests");
+                //                        Log.d(TAG, "" + (currTime-nextReportTime+999) + "ms: " + callCount + " requests");
                 //                        callCount=0;
                 //                        nextReportTime=currTime+999;
                 //                    }
@@ -229,7 +229,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                     //                        Log.d(TAG, "recomputed (with " + count + " out of " + total + " tiles, " + retval.size() + " parkings) in " + (System.currentTimeMillis()-startTime) + "ms");
                 } else {
                     // otherwise no need to do anything
-                    //                        Log.i("parkme", "no recomputation for " + eventE6);
+                    //                        Log.i(TAG, "no recomputation for " + eventE6);
                 }
             } catch (InterruptedException e) {
                 //                    Log.i(TAG, "thread interrupted, quitting");
