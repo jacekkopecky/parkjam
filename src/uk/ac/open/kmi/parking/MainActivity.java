@@ -34,14 +34,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
@@ -58,7 +55,6 @@ import android.view.animation.TranslateAnimation;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,18 +66,15 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * main
  * @author Jacek Kopecky
  *
  */
+@SuppressWarnings("deprecation") // todo drop this
 public class MainActivity extends Activity implements
         LocationListener,
         SortedCurrentItemsUpdateListener,
@@ -92,7 +85,7 @@ public class MainActivity extends Activity implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener
  {
-    @SuppressWarnings("unused")
+//    @SuppressWarnings("unused")
     private static final String TAG = "main activity";
 
     private GoogleMap map;
@@ -119,7 +112,7 @@ public class MainActivity extends Activity implements
 
     private Uri desiredCarpark = null;
 
-    boolean tooFarOut = false;
+//    boolean tooFarOut = false;
     boolean addingMode = false;
 
     private static final int DIALOG_TERMS = 0;
@@ -530,13 +523,13 @@ public class MainActivity extends Activity implements
         }
     }
 
-    void setTooFarOut(boolean far) {
-        if (this.tooFarOut != far) {
-            this.tooFarOut = far;
-            this.updateUIState();
-        }
-    }
-
+//    void setTooFarOut(boolean far) {
+//        if (this.tooFarOut != far) {
+//            this.tooFarOut = far;
+//            this.updateUIState();
+//        }
+//    }
+//
     /**
      * helper method that calls the details view
      * @param context the current activity
@@ -556,11 +549,13 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        Log.d(TAG, "onPrepareOptionsMenu");
         menu.findItem(R.id.menu_traffic).setChecked(this.map.isTrafficEnabled());
         menu.findItem(R.id.menu_satellite).setChecked(this.map.getMapType() != GoogleMap.MAP_TYPE_NORMAL);
-        menu.findItem(R.id.menu_add_car_park).setVisible(!this.tooFarOut && !this.addingMode);
+//        menu.findItem(R.id.menu_add_car_park).setVisible(!this.tooFarOut && !this.addingMode);
         menu.findItem(R.id.menu_pinned).setTitle(this.showingPinned ? R.string.menu_pinned_hide : R.string.menu_pinned_show);
-        menu.findItem(R.id.menu_pinned).setVisible(!this.tooFarOut && !this.addingMode);
+//        menu.findItem(R.id.menu_pinned).setVisible(!this.tooFarOut && !this.addingMode);
+        menu.findItem(R.id.menu_pinned).setVisible(!this.addingMode);
         return true;
     }
 
@@ -745,10 +740,10 @@ public class MainActivity extends Activity implements
      */
     private void updateUIState() {
 //        Log.d(TAG, "updating UI state");
-        if (this.tooFarOut) {
-            showStatusText(R.string.currpark_too_far_out);
-            return;
-        }
+//        if (this.tooFarOut) {
+//            showStatusText(R.string.currpark_too_far_out);
+//            return;
+//        }
 
         if (!this.addingMode && !this.parkingsService.loadedSomeCarparks()) {
             showStatusText(R.string.currpark_initial);
