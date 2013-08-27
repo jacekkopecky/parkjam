@@ -26,7 +26,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import uk.ac.open.kmi.parking.DrawableOverlayItem;
+import uk.ac.open.kmi.parking.MapItem;
 import uk.ac.open.kmi.parking.Parking;
 
 /**
@@ -35,7 +35,7 @@ import uk.ac.open.kmi.parking.Parking;
 class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileDesirabilityChecker {
     @SuppressWarnings("unused")
     private static final String TAG = "sorting thread";
-    volatile Collection<DrawableOverlayItem> sortedCurrentItems = Collections.emptyList(); // HardwiredParkingList.listParkings();
+    volatile Collection<MapItem> sortedCurrentItems = Collections.emptyList(); // HardwiredParkingList.listParkings();
     private volatile MapRectangle currentCoveredCoordinatesE6 = null;
     private final BlockingQueue<Event> eventQueue = new ArrayBlockingQueue<Event>(1000); // todo make this number configurable? also the number of updatedTiles below
     private TileDownloaderThread tileDownloader;
@@ -166,7 +166,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
 
                     final boolean onlyConfirmed = !ParkingsService.get(null).getShowUnconfirmedCarparks();
 
-                    TreeSet<DrawableOverlayItem> retval = new TreeSet<DrawableOverlayItem>(new DrawableOverlayItem.Comparator());
+                    TreeSet<MapItem> retval = new TreeSet<MapItem>(new MapItem.Comparator());
                     //                        int count=0; int total=0;
                     long minNextUpdateTime = Long.MAX_VALUE;
                     // todo this should go from the center, not from the corner

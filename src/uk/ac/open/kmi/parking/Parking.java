@@ -33,7 +33,7 @@ import com.hp.hpl.jena.rdf.model.Property;
  * @author Jacek Kopecky
  *
  */
-public class Parking extends DrawableOverlayItem {
+public class Parking extends MapItem {
     @SuppressWarnings("unused")
     private static final String TAG = "parking";
 

@@ -19,7 +19,7 @@ package uk.ac.open.kmi.parking.service;
 import java.util.Collection;
 import java.util.List;
 
-import uk.ac.open.kmi.parking.DrawableOverlayItem;
+import uk.ac.open.kmi.parking.MapItem;
 import uk.ac.open.kmi.parking.Parking;
 import uk.ac.open.kmi.parking.Parking.Availability;
 import uk.ac.open.kmi.parking.R;
@@ -158,7 +158,7 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
      * @param latitudeSpan height of the map
      * @return a collection of drawable overlay items, sorted north-to-south
      */
-    public Collection<DrawableOverlayItem> getSortedCurrentItems(LatLng mapCenter, int longitudeSpan, int latitudeSpan) {
+    public Collection<MapItem> getSortedCurrentItems(LatLng mapCenter, int longitudeSpan, int latitudeSpan) {
         if (!this.threadsStopped) {
             // forward the location to the sorting precomputation thread
             this.sortingPrecomputer.onNewCoordinates(
@@ -175,7 +175,7 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
      * returns (quickly) the current a precomputed collection of drawable overlay items
      * @return a collection of drawable overlay items, sorted north-to-south
      */
-    public Collection<DrawableOverlayItem> getSortedCurrentItems() {
+    public Collection<MapItem> getSortedCurrentItems() {
         return this.sortingPrecomputer.sortedCurrentItems;
     }
 

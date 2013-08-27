@@ -73,7 +73,7 @@ class BubbleOverlay {
 //     * WARNING: this must be called from the UI thread that calls draw()
 //     * @param item the item to show in the bubble, null if no bubble should be shown
 //     */
-    public void setItem(DrawableOverlayItem item) {
+    public void setItem(MapItem item) {
 //        if (this.bubbleView != null) {
 //            if (this.bubbleCarpark != null && this.bubbleCarpark.equals(item)) {
 //                return;
@@ -157,7 +157,7 @@ class BubbleOverlay {
 //        }
     }
 //
-    public void createBubble(final MainActivity context, final DrawableOverlayItem item) {
+    public void createBubble(final MainActivity context, final MapItem item) {
 //        // todo recycle the inflated object, just clean it up?
 //        this.bubbleView = context.getLayoutInflater().inflate(R.layout.bubble, null);
 //        ((TableLayout)this.bubbleView.findViewById(R.id.bubble)).setColumnShrinkable(0, true);

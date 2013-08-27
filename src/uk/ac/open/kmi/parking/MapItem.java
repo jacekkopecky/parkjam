@@ -27,7 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
  * @author Jacek Kopecky
  *
  */
-public abstract class DrawableOverlayItem {
+public abstract class MapItem {
 
     /**
      * the RDF ID of the car park
@@ -50,7 +50,7 @@ public abstract class DrawableOverlayItem {
      * @param title the main name of the title
      * @param id the identifier of the item
      */
-    public DrawableOverlayItem(LatLng point, String title, Uri id) {
+    public MapItem(LatLng point, String title, Uri id) {
         this.point = point;
         this.title = title;
         this.id = id;
@@ -77,9 +77,9 @@ public abstract class DrawableOverlayItem {
     /**
      * comparator that sorts drawables north-to-south, west-to-east
      */
-    public static class Comparator implements java.util.Comparator<DrawableOverlayItem> {
+    public static class Comparator implements java.util.Comparator<MapItem> {
 
-        public int compare(DrawableOverlayItem object1, DrawableOverlayItem object2) {
+        public int compare(MapItem object1, MapItem object2) {
             if (object1 == null) {
                 if (object2 == null) {
                     return 0;

@@ -97,7 +97,6 @@ public class MainActivity extends Activity implements
 
     private GoogleMap map;
     private MyLocationTracker myLocTracker;
-    private DrawableItemsOverlay parkingsOverlay;
     private BubbleOverlay bubbleOverlay;
     private LocationClient locationClient;
     private LocationRequest locationRequest;
@@ -208,6 +207,19 @@ public class MainActivity extends Activity implements
 
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
+//        final Marker m = this.map.addMarker(new MarkerOptions()
+//            .position(new LatLng(50.8, -1.1))
+//            .title("San Francisco")
+//            .snippet("Population: 776733"));
+//        this.map.setOnMarkerClickListener(new OnMarkerClickListener() {
+//            private boolean full = true;
+//            public boolean onMarkerClick(Marker arg0) {
+//                this.full = !this.full;
+//                m.setIcon(BitmapDescriptorFactory.fromResource(this.full ? R.drawable.parking_full : R.drawable.parking_available));
+//                Toast.makeText(MainActivity.this, "changing to " + this.full, Toast.LENGTH_SHORT).show();
+//                return false;
+//            }
+//        });
 
 //        List<Overlay> overlays = this.mapView.getOverlays();
 
@@ -249,17 +261,6 @@ public class MainActivity extends Activity implements
 //                this.map,
 //                dm.density);
 //
-//        this.parkingsOverlay = new DrawableItemsOverlay(
-        this.parkingsOverlay = new DrawableItemsOverlay();
-//                this,
-//                checkSettingsPref(Preferences.PREFERENCE_SHADOW, true), this.bubbleOverlay,
-//                this.parkingsService,
-//                viewHighlightU,
-//                drawableUnknownBounds,
-//                dm.xdpi, dm.ydpi,
-//                this);
-//        overlays.add(this.parkingsOverlay);
-////        this.parkings = this.parkingsOverlay.items;
 
         if (dm.widthPixels / 3 > getResources().getDimension(R.dimen.pinned_drawer_width_max)) {
             android.view.ViewGroup.LayoutParams lp = this.pinnedDrawerContainer.getLayoutParams();
@@ -385,7 +386,7 @@ public class MainActivity extends Activity implements
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
-        this.parkingsOverlay.setShadow(checkSettingsPref(Preferences.PREFERENCE_SHADOW, true));
+//        this.parkingsOverlay.setShadow(checkSettingsPref(Preferences.PREFERENCE_SHADOW, true));
         this.parkingsService.setShowUnconfirmedCarparks(checkSettingsPref(Preferences.PREFERENCE_SHOW_UNCONFIRMED_PROPERTIES, true));
     }
 
@@ -510,7 +511,6 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onStop() {
-        this.parkingsOverlay.onStop();
         if (this.locationClient.isConnected()) {
             this.locationClient.removeLocationUpdates(this);
         }
@@ -542,7 +542,7 @@ public class MainActivity extends Activity implements
      * @param context the current activity
      * @param item the parking whose details should be viewed
      */
-    public static void showDetailsForCarpark(Context context, DrawableOverlayItem item) {
+    public static void showDetailsForCarpark(Context context, MapItem item) {
         Intent intent = new Intent(context, ParkingDetailsActivity.class);
         intent.setData(item.id);
         context.startActivity(intent);
@@ -758,7 +758,6 @@ public class MainActivity extends Activity implements
         hideStatusText();
 
         this.bubbleOverlay.updateAvailability();
-        this.parkingsOverlay.forceRedraw();
 //        this.mapView.invalidate();
 
         if (this.addingMode) {
@@ -850,7 +849,6 @@ public class MainActivity extends Activity implements
             public void run() {
                 MainActivity.this.bubbleOverlay.updateAvailability(parking);
                 MainActivity.this.pinnedDrawerAdapter.updateIfContains(parking);
-                MainActivity.this.parkingsOverlay.forceRedraw();
 //                MainActivity.this.mapView.invalidate();
             }
         });
@@ -1013,7 +1011,7 @@ public class MainActivity extends Activity implements
         return this.searchDialog;
     }
 
-    void openNavigationTo(DrawableOverlayItem p) {
+    void openNavigationTo(MapItem p) {
         String saddr = ""; // start point address
         if (this.currentLocation != null) {
             saddr = "saddr=" + this.currentLocation.getLatitude() + "," + this.currentLocation.getLongitude() + "&";
