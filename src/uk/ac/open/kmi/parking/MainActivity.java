@@ -96,6 +96,7 @@ public class MainActivity extends Activity implements
     private static final String TAG = "main activity";
 
     private GoogleMap map;
+    private MyLocationTracker myLocTracker;
     private DrawableItemsOverlay parkingsOverlay;
     private BubbleOverlay bubbleOverlay;
     private LocationClient locationClient;
@@ -202,6 +203,8 @@ public class MainActivity extends Activity implements
 
         this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
         this.map.moveCamera(CameraUpdateFactory.zoomTo(savedInstanceState == null ? INITIAL_ZOOM : savedInstanceState.getFloat(SAVED_MAP_ZOOM, INITIAL_ZOOM)));
+
+        this.myLocTracker = new MyLocationTracker(this.map);
 
 
         final Marker m = this.map.addMarker(new MarkerOptions()
@@ -450,7 +453,7 @@ public class MainActivity extends Activity implements
     public void onResume() {
         Log.i(TAG, "onResume");
         super.onResume();
-        this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
+//        this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
 
         LoadingStatus.registerListener(this);
         this.parkingsService.registerSortedCurrentItemsUpdateListener(this);
@@ -765,6 +768,7 @@ public class MainActivity extends Activity implements
         }
         this.parkingsService.onLocationChanged(location);
         this.bubbleOverlay.bringToFront();
+        this.myLocTracker.onLocationChanged(location);
 //        Log.d(TAG, "onLocationChanged called");
 
         // todo also make sure that after some time without updates, current location is no longer valid
