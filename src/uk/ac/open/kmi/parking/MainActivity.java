@@ -206,46 +206,10 @@ public class MainActivity extends Activity implements
 
         this.myLocTracker = new MyLocationTracker(this.map);
 
-
-        final Marker m = this.map.addMarker(new MarkerOptions()
-            .position(new LatLng(50.8, -1.1))
-            .title("San Francisco")
-            .snippet("Population: 776733"));
-        this.map.setOnMarkerClickListener(new OnMarkerClickListener() {
-            private boolean full = true;
-            public boolean onMarkerClick(Marker arg0) {
-                this.full = !this.full;
-                m.setIcon(BitmapDescriptorFactory.fromResource(this.full ? R.drawable.parking_full : R.drawable.parking_available));
-                m.setAnchor(0.5f, this.full?1f:3f);
-                Toast.makeText(MainActivity.this, "changing to " + this.full, Toast.LENGTH_SHORT).show();
-                new AsyncTask<Void,Void,Void>(){
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void x) {
-                        m.setSnippet("pops");
-                        if (m.isInfoWindowShown()) m.showInfoWindow();
-                    }
-
-                }.execute();
-                return false;
-            }
-        });
-
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
-//        List<Overlay> overlays = this.mapView.getOverlays();
 
-        this.map.setMyLocationEnabled(true);
+//        List<Overlay> overlays = this.mapView.getOverlays();
 
 //        // set parking drawables
 //        Drawable drawableFull = this.getResources().getDrawable(R.drawable.parking_full);
@@ -276,7 +240,8 @@ public class MainActivity extends Activity implements
 //        Parking.setDrawables(drawableFull, drawableFullBounds, drawableAvailable, drawableAvailableBounds, drawableUnknown, drawableUnknownBounds, viewHighlightA, viewHighlightF, viewHighlightU);
 //
         DisplayMetrics dm = new DisplayMetrics();
-//        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
 //        this.bubbleOverlay = new BubbleOverlay(
         this.bubbleOverlay = new BubbleOverlay();
 //                this,
@@ -955,7 +920,7 @@ public class MainActivity extends Activity implements
                 this.searchResults = this.parkingsService.geocoder.getFromLocationName(this.searchDialogAddress.getText().toString(), 10);
             }
         } catch (IOException e) {
-//            Log.d(TAG, "geocoding problem ", e);
+            Log.d(TAG, "geocoding problem ", e);
         }
 
         if (this.searchResults == null || this.searchResults.size() == 0) {
