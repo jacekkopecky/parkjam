@@ -31,7 +31,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.android.maps.GeoPoint;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * this class takes care of storing car parks that are pinned or added by the user (until indexed by the server).
@@ -106,7 +106,7 @@ class RememberedCarparks {
 //    }
 //
 
-    public void rememberAddedCarpark(String id, GeoPoint p, CarparkDetailsUpdateListener l) {
+    public void rememberAddedCarpark(String id, LatLng p, CarparkDetailsUpdateListener l) {
         this.addedCarparks.put(id, new ParkingLite(id, p, l));
     }
 
@@ -145,10 +145,10 @@ class RememberedCarparks {
     public static class ParkingLite {
         public String id;
         public Uri uri;
-        public GeoPoint point;
+        public LatLng point;
         public CarparkDetailsUpdateListener listener;
 
-        public ParkingLite(String i, GeoPoint p, CarparkDetailsUpdateListener l) {
+        public ParkingLite(String i, LatLng p, CarparkDetailsUpdateListener l) {
             this.id = i;
             this.uri = Uri.parse(i);
             this.point = p;

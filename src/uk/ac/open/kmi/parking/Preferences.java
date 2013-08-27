@@ -36,6 +36,7 @@ public class Preferences extends PreferenceActivity {
 
         Preference versionPref = findPreference("preferenceInfoVersion");
         versionPref.setSummary(getVersionName());
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private String getVersionName() {

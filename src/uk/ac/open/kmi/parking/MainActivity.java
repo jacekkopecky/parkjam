@@ -25,6 +25,7 @@ import uk.ac.open.kmi.parking.service.CarparkDetailsUpdateListener;
 import uk.ac.open.kmi.parking.service.NearbyCarparkUpdateListener;
 import uk.ac.open.kmi.parking.service.ParkingsService;
 import uk.ac.open.kmi.parking.service.SortedCurrentItemsUpdateListener;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -37,12 +38,10 @@ import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
@@ -63,30 +62,44 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ZoomControls;
 
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MapActivity;
-import com.google.android.maps.MapController;
-import com.google.android.maps.MapView;
-import com.google.android.maps.MapView.LayoutParams;
-import com.google.android.maps.Overlay;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * main
  * @author Jacek Kopecky
  *
  */
-public class MainActivity extends MapActivity implements LocationListener, SortedCurrentItemsUpdateListener, NearbyCarparkUpdateListener, LoadingStatus.Listener, CarparkAvailabilityUpdateListener, CarparkDetailsUpdateListener {
+public class MainActivity extends Activity implements
+        LocationListener,
+        SortedCurrentItemsUpdateListener,
+        NearbyCarparkUpdateListener,
+        LoadingStatus.Listener,
+        CarparkAvailabilityUpdateListener,
+        CarparkDetailsUpdateListener,
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener
+ {
     @SuppressWarnings("unused")
     private static final String TAG = "main activity";
 
-    private MapView mapView;
-    private MyLocationOverlay myLoc;
-    private MapController mapController;
+    private GoogleMap map;
     private DrawableItemsOverlay parkingsOverlay;
     private BubbleOverlay bubbleOverlay;
-    private LocationManager locationManager;
+    private LocationClient locationClient;
+    private LocationRequest locationRequest;
     private AnimationDrawable loadingAnimation;
 
     private ParkingsService parkingsService = null;
@@ -114,7 +127,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
     private static final int DIALOG_LOADING_CARPARK = 2;
     private static final int DIALOG_SEARCH = 3;
 
-    private static final int INITIAL_ZOOM = 18;
+    private static final float INITIAL_ZOOM = 18f;
 
     private Dialog termsDialog = null;
     private ProgressDialog addparkDialog = null;
@@ -158,7 +171,8 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
 //            Log.d(TAG, "setting nosleep");
         }
 
-        this.loadingAnimation = (AnimationDrawable) ((ImageView)findViewById(R.id.loading_animation)).getDrawable();
+        this.loadingAnimation = (AnimationDrawable) this.getResources().getDrawable(R.drawable.loading);
+        getActionBar().setLogo(this.loadingAnimation);
 
         this.addparkContainer = findViewById(R.id.addpark_container);
         findViewById(R.id.addpark_cancel).setOnClickListener(new OnClickListener() {
@@ -186,88 +200,98 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
             this.showPinnedWhenAnyFound = false;
         }
 
-        this.mapView = (MapView) findViewById(R.id.mapview);
-        this.mapController = this.mapView.getController();
-        this.mapController.setZoom(savedInstanceState == null ? INITIAL_ZOOM : savedInstanceState.getInt(SAVED_MAP_ZOOM, INITIAL_ZOOM));
-        this.mapView.setBuiltInZoomControls(false);
+        this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
+        this.map.moveCamera(CameraUpdateFactory.zoomTo(savedInstanceState == null ? INITIAL_ZOOM : savedInstanceState.getFloat(SAVED_MAP_ZOOM, INITIAL_ZOOM)));
 
-        final ZoomControls zoomControls = new ZoomControls(MainActivity.this);
-        zoomControls.setOnZoomInClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                MainActivity.this.mapController.zoomIn();
-            }
-        });
-        zoomControls.setOnZoomOutClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                MainActivity.this.mapController.zoomOut();
-            }
-        });
 
-        this.mapView.post(new Runnable() {
-            public void run() {
-                LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, MainActivity.this.mapView.getWidth()-5, MainActivity.this.mapView.getHeight(), LayoutParams.BOTTOM|LayoutParams.RIGHT);
-                zoomControls.setLayoutParams(lp);
-                MainActivity.this.mapView.addView(zoomControls);
+        final Marker m = this.map.addMarker(new MarkerOptions()
+            .position(new LatLng(50.8, -1.1))
+            .title("San Francisco")
+            .snippet("Population: 776733"));
+        this.map.setOnMarkerClickListener(new OnMarkerClickListener() {
+            private boolean full = true;
+            public boolean onMarkerClick(Marker arg0) {
+                this.full = !this.full;
+                m.setIcon(BitmapDescriptorFactory.fromResource(this.full ? R.drawable.parking_full : R.drawable.parking_available));
+                m.setAnchor(0.5f, this.full?1f:3f);
+                Toast.makeText(MainActivity.this, "changing to " + this.full, Toast.LENGTH_SHORT).show();
+                new AsyncTask<Void,Void,Void>(){
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void x) {
+                        m.setSnippet("pops");
+                        if (m.isInfoWindowShown()) m.showInfoWindow();
+                    }
+
+                }.execute();
+                return false;
             }
         });
 
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
-        List<Overlay> overlays = this.mapView.getOverlays();
+//        List<Overlay> overlays = this.mapView.getOverlays();
 
-        // this should be added after the parkings and other stuff but before the bubble
-        View viewMyLocationPoint = new View(this);
-        viewMyLocationPoint.setBackgroundResource(R.drawable.mylocation);
+        this.map.setMyLocationEnabled(true);
 
-        this.myLoc = new MyLocationOverlay(this.mapView, viewMyLocationPoint);
-        overlays.add(this.myLoc);
-
-        // set parking drawables
-        Drawable drawableFull = this.getResources().getDrawable(R.drawable.parking_full);
-        int width = drawableFull.getIntrinsicWidth();
-        int height = drawableFull.getIntrinsicHeight();
-//        Rect drawableFullBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
-        Rect drawableFullBounds = new Rect(-width/2, -height, width-width/2, 0);
-
-        Drawable drawableAvailable = this.getResources().getDrawable(R.drawable.parking_available);
-        width = drawableAvailable.getIntrinsicWidth();
-        height = drawableAvailable.getIntrinsicHeight();
-//        Rect drawableAvailableBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
-        Rect drawableAvailableBounds = new Rect(-width/2, -height, width-width/2, 0);
-
-        Drawable drawableUnknown = this.getResources().getDrawable(R.drawable.parking_busy);
-        width = drawableUnknown.getIntrinsicWidth();
-        height = drawableUnknown.getIntrinsicHeight();
-//        Rect drawableUnknownBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
-        Rect drawableUnknownBounds = new Rect(-width/2, -height, width-width/2, 0);
-
-        View viewHighlightA = new View(this);
-        viewHighlightA.setBackgroundResource(R.drawable.parking_available_highlight);
-        View viewHighlightF = new View(this);
-        viewHighlightF.setBackgroundResource(R.drawable.parking_full_highlight);
-        View viewHighlightU = new View(this);
-        viewHighlightU.setBackgroundResource(R.drawable.parking_busy_highlight);
-
-        Parking.setDrawables(drawableFull, drawableFullBounds, drawableAvailable, drawableAvailableBounds, drawableUnknown, drawableUnknownBounds, viewHighlightA, viewHighlightF, viewHighlightU);
-
+//        // set parking drawables
+//        Drawable drawableFull = this.getResources().getDrawable(R.drawable.parking_full);
+//        int width = drawableFull.getIntrinsicWidth();
+//        int height = drawableFull.getIntrinsicHeight();
+////        Rect drawableFullBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
+//        Rect drawableFullBounds = new Rect(-width/2, -height, width-width/2, 0);
+//
+//        Drawable drawableAvailable = this.getResources().getDrawable(R.drawable.parking_available);
+//        width = drawableAvailable.getIntrinsicWidth();
+//        height = drawableAvailable.getIntrinsicHeight();
+////        Rect drawableAvailableBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
+//        Rect drawableAvailableBounds = new Rect(-width/2, -height, width-width/2, 0);
+//
+//        Drawable drawableUnknown = this.getResources().getDrawable(R.drawable.parking_busy);
+//        width = drawableUnknown.getIntrinsicWidth();
+//        height = drawableUnknown.getIntrinsicHeight();
+////        Rect drawableUnknownBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
+//        Rect drawableUnknownBounds = new Rect(-width/2, -height, width-width/2, 0);
+//
+//        View viewHighlightA = new View(this);
+//        viewHighlightA.setBackgroundResource(R.drawable.parking_available_highlight);
+//        View viewHighlightF = new View(this);
+//        viewHighlightF.setBackgroundResource(R.drawable.parking_full_highlight);
+//        View viewHighlightU = new View(this);
+//        viewHighlightU.setBackgroundResource(R.drawable.parking_busy_highlight);
+//
+//        Parking.setDrawables(drawableFull, drawableFullBounds, drawableAvailable, drawableAvailableBounds, drawableUnknown, drawableUnknownBounds, viewHighlightA, viewHighlightF, viewHighlightU);
+//
         DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        this.bubbleOverlay = new BubbleOverlay(
-                this,
-                this.parkingsService,
-                this.mapView,
-                dm.density);
-
-        this.parkingsOverlay = new DrawableItemsOverlay(
-                this,
-                checkSettingsPref(Preferences.PREFERENCE_SHADOW, true), this.bubbleOverlay,
-                this.parkingsService,
-                viewHighlightU,
-                drawableUnknownBounds,
-                dm.xdpi, dm.ydpi,
-                this);
-        overlays.add(this.parkingsOverlay);
-//        this.parkings = this.parkingsOverlay.items;
+//        getWindowManager().getDefaultDisplay().getMetrics(dm);
+//        this.bubbleOverlay = new BubbleOverlay(
+        this.bubbleOverlay = new BubbleOverlay();
+//                this,
+//                this.parkingsService,
+//                this.map,
+//                dm.density);
+//
+//        this.parkingsOverlay = new DrawableItemsOverlay(
+        this.parkingsOverlay = new DrawableItemsOverlay();
+//                this,
+//                checkSettingsPref(Preferences.PREFERENCE_SHADOW, true), this.bubbleOverlay,
+//                this.parkingsService,
+//                viewHighlightU,
+//                drawableUnknownBounds,
+//                dm.xdpi, dm.ydpi,
+//                this);
+//        overlays.add(this.parkingsOverlay);
+////        this.parkings = this.parkingsOverlay.items;
 
         if (dm.widthPixels / 3 > getResources().getDimension(R.dimen.pinned_drawer_width_max)) {
             android.view.ViewGroup.LayoutParams lp = this.pinnedDrawerContainer.getLayoutParams();
@@ -280,7 +304,12 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
         }
 
         // Acquire a reference to the system Location Manager
-        this.locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        this.locationClient = new LocationClient(this, this, this);
+        this.locationRequest = LocationRequest.create();
+        this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        this.locationRequest.setInterval(5000);
+        this.locationRequest.setFastestInterval(1000);
+
     }
 
     private void showTermsAndConditions() {
@@ -361,8 +390,8 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
         });
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.FILL_PARENT;
-        lp.height = WindowManager.LayoutParams.FILL_PARENT;
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setAttributes(lp);
 
         dialog.setCancelable(false);
@@ -392,13 +421,12 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
         this.parkingsService.setShowUnconfirmedCarparks(checkSettingsPref(Preferences.PREFERENCE_SHOW_UNCONFIRMED_PROPERTIES, true));
     }
 
-    private static final Criteria locationCriteria = new Criteria(); // default should be good enough?
-
     @Override
     protected void onStart() {
 //        Log.i(TAG, "onStart");
         super.onStart();
         showTermsAndConditions();
+        this.locationClient.connect();
         ParkingDetailsActivity.preparePresentationOntologyInNewThread(this);
     }
 
@@ -422,6 +450,8 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
     public void onResume() {
         Log.i(TAG, "onResume");
         super.onResume();
+        this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
+
         LoadingStatus.registerListener(this);
         this.parkingsService.registerSortedCurrentItemsUpdateListener(this);
         this.parkingsService.registerNearbyCurrentItemsUpdateListener(this);
@@ -452,20 +482,15 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
             this.desiredCarpark = null;
         }
 
-        if (this.currentLocation == null) {
-            String bestProvider = this.locationManager.getBestProvider(locationCriteria, true);
-            if (bestProvider != null) {
-                this.currentLocation = this.locationManager.getLastKnownLocation(bestProvider);
-                if (this.animateToNextLocationFix && this.currentLocation != null) {
-                    animateToCurrentLocation(true);
-                    this.animateToNextLocationFix = false;
-                }
-                this.myLoc.onLocationChanged(this.currentLocation);
-                this.bubbleOverlay.bringToFront();
-                this.parkingsService.onLocationChanged(this.currentLocation);
-                // Register the listener with the Location Manager to receive location updates
-                this.locationManager.requestLocationUpdates(1000l, 10f, locationCriteria, this, null);
+        if (this.currentLocation == null && this.locationClient.isConnected()) {
+            this.currentLocation = this.locationClient.getLastLocation();
+            Log.d(TAG, "animate1: " + this.animateToNextLocationFix);
+            if (this.animateToNextLocationFix && this.currentLocation != null) {
+                animateToCurrentLocation(true);
+                this.animateToNextLocationFix = false;
             }
+            this.bubbleOverlay.bringToFront();
+            this.parkingsService.onLocationChanged(this.currentLocation);
         }
 
         this.pinnedDrawerAdapter.update();
@@ -475,14 +500,15 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
 
     void centerOnCarpark(final Parking parking, boolean immediate) {
         if (immediate) {
-            this.mapController.setCenter(parking.point);
+            this.map.moveCamera(CameraUpdateFactory.newLatLng(parking.point));
             this.bubbleOverlay.setItem(parking);
         } else {
             if (!parking.equals(this.bubbleOverlay.getItem())) {
                 this.bubbleOverlay.removeItem();
             }
-            this.mapController.animateTo(parking.point, new Runnable() {
-                public void run() {
+            this.map.animateCamera(CameraUpdateFactory.newLatLng(parking.point), new GoogleMap.CancelableCallback() {
+                public void onCancel() { /* ignore */ }
+                public void onFinish() {
                     MainActivity.this.bubbleOverlay.setItem(parking);
                 }
             });
@@ -504,8 +530,6 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
 
         LoadingStatus.unregisterListener(this);
 
-        this.locationManager.removeUpdates(this);
-
         this.parkingsService.geocoder = null;
         this.parkingsService.unregisterCarparkDetailsUpdateListener(this);
         this.parkingsService.unregisterCarparkAvailabilityUpdateListener(this);
@@ -519,6 +543,10 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
     @Override
     public void onStop() {
         this.parkingsOverlay.onStop();
+        if (this.locationClient.isConnected()) {
+            this.locationClient.removeLocationUpdates(this);
+        }
+        this.locationClient.disconnect();
         super.onStop();
     }
 
@@ -560,8 +588,8 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.menu_traffic).setChecked(this.mapView.isTraffic());
-        menu.findItem(R.id.menu_satellite).setChecked(this.mapView.isSatellite());
+        menu.findItem(R.id.menu_traffic).setChecked(this.map.isTrafficEnabled());
+        menu.findItem(R.id.menu_satellite).setChecked(this.map.getMapType() != GoogleMap.MAP_TYPE_NORMAL);
         menu.findItem(R.id.menu_add_car_park).setVisible(!this.tooFarOut && !this.addingMode);
         menu.findItem(R.id.menu_pinned).setTitle(this.showingPinned ? R.string.menu_pinned_hide : R.string.menu_pinned_show);
         menu.findItem(R.id.menu_pinned).setVisible(!this.tooFarOut && !this.addingMode);
@@ -572,18 +600,18 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_traffic:
-            boolean state = item.isChecked();
-            item.setChecked(!state);
-            this.mapView.setTraffic(!state);
+            boolean state = !item.isChecked();
+            item.setChecked(state);
+            this.map.setTrafficEnabled(state);
             return true;
         case R.id.menu_satellite:
-            state = item.isChecked();
-            item.setChecked(!state);
-            this.mapView.setSatellite(!state);
+            state = !item.isChecked();
+            item.setChecked(state);
+            this.map.setMapType(state?GoogleMap.MAP_TYPE_HYBRID:GoogleMap.MAP_TYPE_NORMAL);
             return true;
-        case R.id.menu_my_location:
-            animateToCurrentLocation(false);
-            return true;
+//        case R.id.menu_my_location:
+//            animateToCurrentLocation(false);
+//            return true;
         case R.id.menu_settings:
             Intent settingsActivity = new Intent(getBaseContext(), Preferences.class);
             startActivity(settingsActivity);
@@ -639,7 +667,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
         // then on activation it can do NOP if the timestamp has changed
 
         this.addingMode = false;
-        this.parkingsService.submitNewCarpark(this.mapView.getMapCenter(), new CarparkDetailsUpdateListener() {
+        this.parkingsService.submitNewCarpark(this.map.getCameraPosition().target, new CarparkDetailsUpdateListener() {
             public void onCarparkInformationUpdated(final Parking parking) {
                 MainActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
@@ -662,19 +690,14 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
 
     private void animateToCurrentLocation(boolean zoomOutIfNecessary) {
         if (this.currentLocation != null) {
-            this.mapController.animateTo(new GeoPoint((int)(this.currentLocation.getLatitude()*1e6), (int)(this.currentLocation.getLongitude()*1e6)));
+            this.map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(this.currentLocation.getLatitude(), this.currentLocation.getLongitude())));
             final float accuracy = this.currentLocation.getAccuracy();
-            if (zoomOutIfNecessary & accuracy > 200f & this.mapView.getZoomLevel() == INITIAL_ZOOM) {
-                this.mapView.post(new Runnable() {
-                    public void run() {
-                        MainActivity.this.mapController.zoomOut();
-                        if (accuracy > 500f) {
-                            MainActivity.this.mapController.zoomOut();
-                        }
-                    }
-                });
+            if (zoomOutIfNecessary & accuracy > 200f & Math.abs(this.map.getCameraPosition().zoom - INITIAL_ZOOM) < .1f) {
+                this.map.animateCamera(CameraUpdateFactory.zoomOut());
+                if (accuracy > 500f) {
+                    this.map.animateCamera(CameraUpdateFactory.zoomOut());
+                }
             }
-            this.myLoc.setCurrentLocationOnScreen(true);
         } else {
             Toast.makeText(this, R.string.toast_no_location, Toast.LENGTH_SHORT).show();
         }
@@ -741,11 +764,10 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
             this.animateToNextLocationFix = false;
         }
         this.parkingsService.onLocationChanged(location);
-        this.myLoc.onLocationChanged(location);
         this.bubbleOverlay.bringToFront();
 //        Log.d(TAG, "onLocationChanged called");
 
-        // todo also make sure that after some time without updates, current location is no longer valid (this may be done by MyLocationOverlay itself)
+        // todo also make sure that after some time without updates, current location is no longer valid
         // then currentLocation must be set to null
     }
 
@@ -768,7 +790,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
 
         this.bubbleOverlay.updateAvailability();
         this.parkingsOverlay.forceRedraw();
-        this.mapView.invalidate();
+//        this.mapView.invalidate();
 
         if (this.addingMode) {
             hidePinnedDrawer();
@@ -839,12 +861,6 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
         this.parkingsService.setPinnedUpdating(true);
     }
 
-    public void onProviderDisabled(String provider) { /* do nothing */ } // todo check if any provider is remaining?
-
-    public void onProviderEnabled(String provider) { /* do nothing */ } // todo ask for location updates again?
-
-    public void onStatusChanged(String provider, int status, Bundle extras) { /* do nothing */ }
-
     private final Runnable updateUIStateTask = new Runnable(){
         public void run() {
             updateUIState();
@@ -866,14 +882,9 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
                 MainActivity.this.bubbleOverlay.updateAvailability(parking);
                 MainActivity.this.pinnedDrawerAdapter.updateIfContains(parking);
                 MainActivity.this.parkingsOverlay.forceRedraw();
-                MainActivity.this.mapView.invalidate();
+//                MainActivity.this.mapView.invalidate();
             }
         });
-    }
-
-    @Override
-    protected boolean isRouteDisplayed() {
-        return false;
     }
 
     public void onStartedLoading() {
@@ -891,7 +902,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
     private void onButtonPressAcceptTerms() {
 //        Log.d(TAG, "pressed accept");
         if (this.currentLocation != null) {
-            this.mapController.setCenter(new GeoPoint((int)(this.currentLocation.getLatitude()*1000000), (int)(this.currentLocation.getLongitude()*1000000)));
+            this.map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(this.currentLocation.getLatitude(), this.currentLocation.getLongitude())));
         }
         dismissDialog(DIALOG_TERMS);
         Editor e = getPreferences(MODE_PRIVATE).edit();
@@ -975,7 +986,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
                     public void onClick(DialogInterface dialog, int which) {
                         Address selected = MainActivity.this.searchResults.get(which);
 //                        Log.d(TAG, "selected address " + which + " which is " + selected);
-                        MainActivity.this.mapController.animateTo(new GeoPoint((int)(selected.getLatitude()*1e6), (int)(selected.getLongitude()*1.e6)));
+                        MainActivity.this.map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(selected.getLatitude(), selected.getLongitude())));
                     }
                 });
             resultsDialog.setCancelable(true);
@@ -983,7 +994,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
                 resultsDialog.setPositiveButton(R.string.search_dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         Address selected = MainActivity.this.searchResults.get(0);
-                        MainActivity.this.mapController.animateTo(new GeoPoint((int)(selected.getLatitude()*1e6), (int)(selected.getLongitude()*1.e6)));
+                        MainActivity.this.map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(selected.getLatitude(), selected.getLongitude())));
                     }
                 });
             }
@@ -1038,7 +1049,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
         if (this.currentLocation != null) {
             saddr = "saddr=" + this.currentLocation.getLatitude() + "," + this.currentLocation.getLongitude() + "&";
         }
-        String daddr = "daddr=" + (p.point.getLatitudeE6()/1e6) + "," + (p.point.getLongitudeE6()/1e6); // destination point address
+        String daddr = "daddr=" + (p.point.latitude) + "," + (p.point.longitude); // destination point address
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                 Uri.parse("http://maps.google.com/maps?" + saddr + daddr));
         startActivity(intent);
@@ -1047,7 +1058,7 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
     private static final String SAVED_ANIMATE_TO_NEXT_LOCATION = "uk.ac.open.kmi.parking.animate-to-next-location";
     private static final String SAVED_ADDING_MODE = "uk.ac.open.kmi.parking.adding-mode";
     private static final String SAVED_BUBBLE_ITEM = "uk.ac.open.kmi.parking.bubble-item";
-    private static final String SAVED_MAP_ZOOM = "uk.ac.open.kmi.parking.zoom-level";
+    private static final String SAVED_MAP_ZOOM = "uk.ac.open.kmi.parking.zoom-level.float";
     private static final String SAVED_SHOWING_PINNED_DRAWER = "uk.ac.open.kmi.parking.show-pinned-drawer";
 
     @Override
@@ -1056,7 +1067,33 @@ public class MainActivity extends MapActivity implements LocationListener, Sorte
         Parking bubble = this.bubbleOverlay.getItem();
         state.putString(SAVED_BUBBLE_ITEM, bubble == null ? null : bubble.id.toString());
         state.putBoolean(SAVED_ADDING_MODE, this.addingMode);
-        state.putInt(SAVED_MAP_ZOOM, this.mapView.getZoomLevel());
+        state.putFloat(SAVED_MAP_ZOOM, this.map.getCameraPosition().zoom);
         state.putBoolean(SAVED_SHOWING_PINNED_DRAWER, this.showingPinned);
+    }
+
+    public void onConnectionFailed(ConnectionResult arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void onConnected(Bundle arg0) {
+        // start periodic updates
+        this.locationClient.requestLocationUpdates(this.locationRequest, this);
+
+        if (this.currentLocation == null) {
+            this.currentLocation = this.locationClient.getLastLocation();
+//            Toast.makeText(this, "location: " + this.currentLocation, Toast.LENGTH_LONG).show();
+            if (this.animateToNextLocationFix && this.currentLocation != null) {
+                animateToCurrentLocation(true);
+                this.animateToNextLocationFix = false;
+            }
+            this.bubbleOverlay.bringToFront();
+            this.parkingsService.onLocationChanged(this.currentLocation);
+        }
+    }
+
+    public void onDisconnected() {
+        // TODO Auto-generated method stub
+
     }
 }

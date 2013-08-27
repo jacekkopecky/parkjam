@@ -29,7 +29,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
-import com.google.android.maps.GeoPoint;
+import com.google.android.gms.maps.model.LatLng;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 
@@ -158,10 +158,15 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
      * @param latitudeSpan height of the map
      * @return a collection of drawable overlay items, sorted north-to-south
      */
-    public Collection<DrawableOverlayItem> getSortedCurrentItems(GeoPoint mapCenter, int longitudeSpan, int latitudeSpan) {
+    public Collection<DrawableOverlayItem> getSortedCurrentItems(LatLng mapCenter, int longitudeSpan, int latitudeSpan) {
         if (!this.threadsStopped) {
             // forward the location to the sorting precomputation thread
-            this.sortingPrecomputer.onNewCoordinates(new MapRectangle(mapCenter.getLatitudeE6()-latitudeSpan/2, mapCenter.getLongitudeE6()-longitudeSpan/2, mapCenter.getLatitudeE6()+latitudeSpan/2, mapCenter.getLongitudeE6()+longitudeSpan/2));
+            this.sortingPrecomputer.onNewCoordinates(
+                    new MapRectangle(
+                            (int)(mapCenter.latitude*1e6)-latitudeSpan/2,
+                            (int)(mapCenter.longitude*1e6)-longitudeSpan/2,
+                            (int)(mapCenter.latitude*1e6)+latitudeSpan/2,
+                            (int)(mapCenter.longitude*1e6)+longitudeSpan/2));
         }
         return getSortedCurrentItems();
     }
@@ -360,7 +365,7 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
      * @param point where the new carpark is located
      * @param listener who should be notified when the car park is submitted and ready
      */
-    public void submitNewCarpark(GeoPoint point, CarparkDetailsUpdateListener listener) {
+    public void submitNewCarpark(LatLng point, CarparkDetailsUpdateListener listener) {
         this.detailsAndAvailabilityDownloader.submitCarpark(point, listener);
     }
 
@@ -426,11 +431,11 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
         return this.tileDownloader.loadedSomeCarparks;
     }
 
-    void triggerTileRefresh(GeoPoint point) {
+    void triggerTileRefresh(LatLng point) {
         this.tileDownloader.refreshTile(point, null, null, null);
     }
 
-    void triggerTileRefresh(GeoPoint point, Uri id, Model data, CarparkDetailsUpdateListener listener) {
+    void triggerTileRefresh(LatLng point, Uri id, Model data, CarparkDetailsUpdateListener listener) {
         this.tileDownloader.refreshTile(point, id, data, listener);
     }
 

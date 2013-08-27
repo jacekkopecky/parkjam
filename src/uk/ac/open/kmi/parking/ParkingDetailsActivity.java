@@ -197,6 +197,8 @@ public class ParkingDetailsActivity extends Activity implements CarparkDetailsUp
         this.parkings.registerCarparkDetailsUpdateListener(this);
         this.parkings.registerCarparkAvailabilityUpdateListener(this);
         this.parkings.updateParkingDetails(this.parking);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

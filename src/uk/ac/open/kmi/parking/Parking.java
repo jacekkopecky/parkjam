@@ -24,7 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
 
-import com.google.android.maps.GeoPoint;
+import com.google.android.gms.maps.model.LatLng;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 
@@ -38,15 +38,6 @@ public class Parking extends DrawableOverlayItem {
     private static final String TAG = "parking";
 
     private static final long CUTOFF_MILLIS = 14*60*60*1000;
-
-    /**
-     * precomputed floating-point latitude
-     */
-    public final double latitude;
-    /**
-     * precomputed floating-point longitude
-     */
-    public final double longitude;
 
     @SuppressWarnings("javadoc")
     public static enum Availability { FULL, AVAILABLE, UNKNOWN };
@@ -150,10 +141,8 @@ public class Parking extends DrawableOverlayItem {
      * @param titleProperty the property that was used to get the name, will be ignored in presentation, is null when the server gave us no title
      * @param unconfirmed whether the car park is submitted recently and not yet approved
      */
-    public Parking(GeoPoint point, String title, Uri id, String availabilityResource, String updateResource, Availability available, Long timestamp, long availTTL, Property titleProperty, boolean unconfirmed) {
+    public Parking(LatLng point, String title, Uri id, String availabilityResource, String updateResource, Availability available, Long timestamp, long availTTL, Property titleProperty, boolean unconfirmed) {
         super(point, title, id);
-        this.latitude = point.getLatitudeE6() / 1000000.;
-        this.longitude = point.getLongitudeE6() / 1000000.;
         this.availabilityEffective = available;
         this.availabilityReported = available;
         this.availabilityTimestamp = timestamp;

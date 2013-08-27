@@ -77,7 +77,6 @@
         >
         
         <TextView
-            android:paddingLeft="@dimen/status_bar_height"
             style="@style/status_text"
             android:id="@+id/status_text"
             android:freezesText="false"
@@ -94,7 +93,7 @@
         
     <LinearLayout 
         android:id="@+id/pinned_drawer_container"
-        android:layout_marginLeft="@dimen/status_bar_height" 
+        android:layout_marginLeft="@dimen/pinned_drawer_side_margin" 
         android:layout_marginRight="@dimen/pinned_drawer_side_margin" 
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
@@ -113,7 +112,7 @@
             android:background="@drawable/drawer" />
     </LinearLayout>
     
-    <ImageView
+<!--     <ImageView
         android:layout_width="@dimen/status_bar_height"
         android:layout_height="@dimen/status_bar_height"
         android:layout_alignParentTop="true"
@@ -121,6 +120,6 @@
         android:scaleType="center"
         android:onClick="openOptionsMenu"
         android:id="@+id/loading_animation"
-        android:src="@drawable/loading" />
+        android:src="@drawable/loading" /> -->
 </RelativeLayout>
     

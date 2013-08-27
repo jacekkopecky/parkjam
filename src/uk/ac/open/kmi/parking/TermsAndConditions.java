@@ -30,5 +30,6 @@ public class TermsAndConditions extends Activity {
         setContentView(R.layout.terms_activity);
         WebView wv = (WebView)findViewById(R.id.terms_webview);
         wv.loadUrl("file:///android_asset/terms.html");
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }

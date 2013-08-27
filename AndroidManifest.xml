@@ -2,22 +2,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="uk.ac.open.kmi.parking"
     android:versionCode="9"
-    android:versionName="1.4.1post" >
+    android:versionName="1.4.1-sdk15v1" >
 
     <uses-sdk 
-        android:minSdkVersion="10" />
+        android:minSdkVersion="15" android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    
+    <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+    
 <!--     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />  -->
 
-    <application android:icon="@drawable/icon_purple" android:label="@string/app_name">
-        <uses-library android:name="com.google.android.maps" />
+    <application android:icon="@drawable/icon_purple" android:logo="@drawable/loading"  android:label="@string/app_name">
         <activity android:name=".MainActivity"
                   android:label="@string/app_name"
                   android:launchMode="singleTask" 
-                  android:theme="@android:style/Theme.NoTitleBar">
+                  android:theme="@android:style/Theme.Holo.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -30,9 +36,39 @@
                 <data android:scheme="http" android:host="parking.kmi.open.ac.uk" android:pathPrefix="/data/parks/" />
             </intent-filter>
         </activity>
-        <activity android:name=".ParkingDetailsActivity" android:label="@string/details_activity_label" android:theme="@android:style/Theme.NoTitleBar" android:configChanges="keyboardHidden|orientation" />
-        <activity android:name=".Preferences" android:label="@string/set_preferences"/>
-        <activity android:name=".TermsAndConditions" android:label="@string/terms_activity_label"/>
-        <activity android:name=".PrivacyPolicy" android:label="@string/pp_activity_label"/>
-        </application> 
+        <activity android:name=".ParkingDetailsActivity" 
+            android:label="@string/details_activity_label" 
+            android:theme="@android:style/Theme.Holo" 
+            android:configChanges="keyboardHidden|orientation" 
+            android:parentActivityName="uk.ac.open.kmi.parking.MainActivity"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.open.kmi.parking.MainActivity" />
+        </activity>
+        <activity android:name=".Preferences" android:label="@string/set_preferences"
+                        android:parentActivityName="uk.ac.open.kmi.parking.MainActivity"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.open.kmi.parking.MainActivity" />
+        </activity>
+        <activity android:name=".TermsAndConditions" android:label="@string/terms_activity_label"
+                        android:parentActivityName="uk.ac.open.kmi.parking.Preferences"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.open.kmi.parking.Preferences" />
+        </activity>
+        <activity android:name=".PrivacyPolicy" android:label="@string/pp_activity_label"
+                        android:parentActivityName="uk.ac.open.kmi.parking.Preferences"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.open.kmi.parking.Preferences" />
+        </activity>
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBisR6mEB21JvoV2-X9TzUKYvyrQX6vOI4"/>
+    </application> 
 </manifest>

@@ -42,7 +42,7 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.util.Log;
 
-import com.google.android.maps.GeoPoint;
+import com.google.android.gms.maps.model.LatLng;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -140,14 +140,14 @@ class DetailsAndAvailabilityThread implements Runnable {
      */
     private void handleSubmitCarparkRequest(Event event) {
 //        Log.d(TAG, "adding car park");
-        GeoPoint point = event.addparkPoint;
+        LatLng point = event.addparkPoint;
 
         // prepare the RDF for the data
         Model model = ModelFactory.createDefaultModel();
         Resource parking = model.createResource();
         model.add(parking, RDF.type, Onto.LGO_Parking);
-        model.add(parking, Onto.GEOPOS_lat, model.createTypedLiteral(String.valueOf(point.getLatitudeE6()/1e6d), XSDDatatype.XSDdouble));
-        model.add(parking, Onto.GEOPOS_long, model.createTypedLiteral(String.valueOf(point.getLongitudeE6()/1e6d), XSDDatatype.XSDdouble));
+        model.add(parking, Onto.GEOPOS_lat, model.createTypedLiteral(String.valueOf(point.latitude), XSDDatatype.XSDdouble));
+        model.add(parking, Onto.GEOPOS_long, model.createTypedLiteral(String.valueOf(point.longitude), XSDDatatype.XSDdouble));
 
         try {
             // submit this to the server
@@ -356,7 +356,7 @@ class DetailsAndAvailabilityThread implements Runnable {
             if (pinfo != null) {
                 // get the point, give it and the id and the model to tiledownloaderthread
 //                Log.d(TAG, "triggering tile refresh");
-                this.parkingsService.triggerTileRefresh(new GeoPoint(pinfo.late6, pinfo.lone6), event.extraCarpark, model, event.updateListener);
+                this.parkingsService.triggerTileRefresh(new LatLng(pinfo.lat, pinfo.lon), event.extraCarpark, model, event.updateListener);
             }
         } else {
             Log.e(TAG, "cannot read extra carpark from " + uri);
@@ -378,8 +378,8 @@ class DetailsAndAvailabilityThread implements Runnable {
             p.nextAvailUpdate = time + Config.DEFAULT_NETWORK_PROBLEM_DELAY; // if the update fails, don't try to update again immediately
             return;
         }
-        if (p.point.getLatitudeE6() != pinfo.late6 ||
-                p.point.getLongitudeE6() != pinfo.lone6) {
+        if (p.point.latitude != pinfo.lat ||
+                p.point.longitude != pinfo.lon) {
             Log.e(TAG, "parking location changed for " + p.id);
             // todo crucial information changed: tile downloader should flush/reload all? ParkingsService would potentially need to update current parking
         }
@@ -411,7 +411,7 @@ class DetailsAndAvailabilityThread implements Runnable {
             return;
         }
         try {
-            List<Address> addrs = geocoder.getFromLocation(p.latitude, p.longitude, 1);
+            List<Address> addrs = geocoder.getFromLocation(p.point.latitude, p.point.longitude, 1);
             if (addrs != null && addrs.size() != 0) {
 //                Log.d(TAG, "geocoded address " + addrs.get(0));
                 String addr = addrs.get(0).getAddressLine(0);
@@ -543,7 +543,7 @@ class DetailsAndAvailabilityThread implements Runnable {
         public Property property;
         public String propertyValue;
         public long binaryAvailabilityTimestamp;
-        public GeoPoint addparkPoint;
+        public LatLng addparkPoint;
         public CarparkDetailsUpdateListener updateListener;
         public Uri extraCarpark;
 
@@ -551,7 +551,7 @@ class DetailsAndAvailabilityThread implements Runnable {
             this.timeMillis = System.currentTimeMillis();
         }
 
-        public static Event createSubmitCarparkEvent(GeoPoint point, CarparkDetailsUpdateListener listener) {
+        public static Event createSubmitCarparkEvent(LatLng point, CarparkDetailsUpdateListener listener) {
             Event retval = new Event();
             retval.addparkPoint = point;
             retval.updateListener = listener;
@@ -621,7 +621,7 @@ class DetailsAndAvailabilityThread implements Runnable {
         enqueueEvent(Event.createDetailsUpdateEvent(p));
     }
 
-    public void submitCarpark(GeoPoint point, CarparkDetailsUpdateListener listener) {
+    public void submitCarpark(LatLng point, CarparkDetailsUpdateListener listener) {
         enqueueEvent(Event.createSubmitCarparkEvent(point, listener));
     }
 

@@ -22,7 +22,7 @@
     <dimen name="status_bar_height">54dp</dimen>
     <dimen name="pinned_drawer_height">160dp</dimen>
     <dimen name="pinned_drawer_width_max">240dp</dimen>
-    <dimen name="pinned_drawer_side_margin">2mm</dimen>
+    <dimen name="pinned_drawer_side_margin">11mm</dimen> <!--  guessed by measuring on screen on Galaxy S2, to avoid the "my location" button on the map -->
     <dimen name="pinned_drawer_text_size">16sp</dimen>
     <dimen name="pinned_drawer_empty_text_size">14sp</dimen>
     <dimen name="pinned_drawer_entry_padding">1mm</dimen>

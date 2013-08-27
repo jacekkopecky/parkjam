@@ -36,7 +36,7 @@ import uk.ac.open.kmi.parking.service.RememberedCarparks.ParkingLite;
 import android.net.Uri;
 import android.util.Log;
 
-import com.google.android.maps.GeoPoint;
+import com.google.android.gms.maps.model.LatLng;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -285,10 +285,10 @@ class TileDownloaderThread implements Runnable {
         List<ParkingLite> toForget = new ArrayList<ParkingLite>(toAdd.size());
         for (ParkingLite remembered : toAdd) {
             // check if the position is in the current supertile:
-            if (remembered.point.getLatitudeE6()<supertile.late6min) continue;
-            int i = (remembered.point.getLatitudeE6()-supertile.late6min)/ParkingsService.TILE_SIZE;
-            if (remembered.point.getLongitudeE6()<supertile.lone6min) continue;
-            int j = (remembered.point.getLongitudeE6()-supertile.lone6min)/ParkingsService.TILE_SIZE;
+            if (remembered.point.latitude*1e6<supertile.late6min) continue;
+            int i = ((int)Math.floor(remembered.point.latitude*1e6)-supertile.late6min)/ParkingsService.TILE_SIZE;
+            if (remembered.point.longitude*1e6<supertile.lone6min) continue;
+            int j = ((int)Math.floor(remembered.point.longitude*1e6)-supertile.lone6min)/ParkingsService.TILE_SIZE;
             if (i >=SUPERTILE_FACTOR || j >= SUPERTILE_FACTOR) {
                 // this car park not in the current supertile
                 continue;
@@ -413,10 +413,10 @@ class TileDownloaderThread implements Runnable {
      * @param extraData data already loaded for the extraId carpark
      * @param extraListener who should be notified when the extraId carpark is actually loaded
      */
-    public synchronized void refreshTile(GeoPoint point, Uri extraId, Model extraData, CarparkDetailsUpdateListener extraListener) {
+    public synchronized void refreshTile(LatLng point, Uri extraId, Model extraData, CarparkDetailsUpdateListener extraListener) {
         // check the tile and load all remembered but unloaded car parks; forget any remembered car parks loaded in normal tile; and then tell the listener and drop the listener from remembered carparks
-        int tileLatE0 = point.getLatitudeE6() / ParkingsService.TILE_SIZE; if (point.getLatitudeE6() < 0) tileLatE0--;
-        int tileLonE0 = point.getLongitudeE6() / ParkingsService.TILE_SIZE; if (point.getLongitudeE6() < 0) tileLonE0--;
+        int tileLatE0 = (int)(point.latitude*1e6) / ParkingsService.TILE_SIZE; if (point.latitude < 0) tileLatE0--;
+        int tileLonE0 = (int)(point.longitude*1e6) / ParkingsService.TILE_SIZE; if (point.longitude < 0) tileLonE0--;
 
         this.cacheTemplate.late6min = tileLatE0 * ParkingsService.TILE_SIZE;
         this.cacheTemplate.lone6min = tileLonE0 * ParkingsService.TILE_SIZE;
@@ -489,8 +489,8 @@ class TileDownloaderThread implements Runnable {
     }
 
     public static class ParkingInformation {
-        private double lat = Double.NaN;
-        private double lon = Double.NaN;
+        public double lat = Double.NaN;
+        public double lon = Double.NaN;
 
         public int late6 = 0;
         public int lone6 = 0;
@@ -588,7 +588,7 @@ class TileDownloaderThread implements Runnable {
 
         public Parking createParking() {
             // todo is initial availability TTL of 5s a good value? it should be the same as the smallest value the server would return from PAVAIL
-            return new Parking(new GeoPoint(this.late6, this.lone6),
+            return new Parking(new LatLng(this.lat, this.lon),
                     this.title,
                     Uri.parse(this.id),
                     this.availabilityResource,

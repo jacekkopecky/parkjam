@@ -3,7 +3,7 @@
     
 <!--  see http://www.kaloer.com/android-preferences    and   http://developer.android.com/reference/android/preference/PreferenceActivity.html     -->
     
-    <CheckBoxPreference
+    <CheckBoxPreference 
         android:defaultValue="false"
         android:key="preferenceNoSleep"
         android:summary="@string/preference_nosleep_summary"

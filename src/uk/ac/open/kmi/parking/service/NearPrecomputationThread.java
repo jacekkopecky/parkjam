@@ -234,7 +234,7 @@ class NearPrecomputationThread implements Runnable, TileUpdateListener, TileDesi
                 if (onlyConfirmed && parking.unconfirmed) {
                     continue;
                 }
-                Location.distanceBetween(location.getLatitude(), location.getLongitude(), parking.latitude, parking.longitude, distresult);
+                Location.distanceBetween(location.getLatitude(), location.getLongitude(), parking.point.latitude, parking.point.longitude, distresult);
                 if (distresult[0] < distance) {
                     distance = distresult[0];
                     currentCarpark = parking;

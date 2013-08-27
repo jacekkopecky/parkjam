@@ -16,7 +16,7 @@
 
 package uk.ac.open.kmi.parking;
 
-import com.google.android.maps.GeoPoint;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * this class implements a geopoint defined as the average of a bunch of points - later it could be upgraded to be an actual polygon that a parking could draw
@@ -24,15 +24,19 @@ import com.google.android.maps.GeoPoint;
  * @author Jacek Kopecky
  *
  */
-public class Polygon extends GeoPoint {
+public class Polygon {
     /**
-     * creates a polygon from a list of coordinates - the list must consist of pairs of latitude/longitude (*1e6) pairs, for example new Polygon(1,2,3,4,5,6) is a triangle between the points 1,2; 3,4 and 5,6. 
+     * creates a polygon from a list of coordinates - the list must consist of pairs of latitude/longitude (*1e6) pairs, for example new Polygon(1,2,3,4,5,6) is a triangle between the points 1,2; 3,4 and 5,6.
      * @param latlone6 a list of pairs of latitude and longitude in microdegrees
      */
-    public Polygon(int... latlone6) {
-        super(avg(0,latlone6), avg(1,latlone6));
+//    public Polygon(int... latlone6) {
+//        super(avg(0,latlone6), avg(1,latlone6));
+//    }
+
+    public LatLng avg(int... latlone6) {
+        return new LatLng(avg(0,latlone6), avg(1,latlone6));
     }
-    
+
     private static int avg(int offset, int[] latlone6) {
         if ((latlone6.length | 1) == 1) {
             throw new IllegalArgumentException("Polygon constructor must get an even number of agruments, each two subsequent params forming a latitude/longitude pair");

@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+          android:id="@+id/mapview"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:name="com.google.android.gms.maps.MapFragment"
+          xmlns:map="http://schemas.android.com/apk/res-auto"
+          map:cameraZoom="18"
+          map:uiZoomControls="true"
+          map:uiZoomGestures="true"
+          map:uiTiltGestures="true"
+          map:uiCompass="true"
+          map:uiRotateGestures="true"
+          map:uiScrollGestures="true"
+          map:cameraTargetLat="50.8"
+          map:cameraTargetLng="-1.01"
+          />
+
+<!--  <com.google.android.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/mapview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
     android:apiKey="0kQv704c2dDVeaaCrDjNs6JrPAnk0tpfo6mpKoQ"
-/> 
+/>  -->
 <!--  debug key 0kQv704c2dDVeaaCrDjNs6JrPAnk0tpfo6mpKoQ -->
 <!--  app key 0kQv704c2dDUKzr6xnKhgy-AUyvnrBLsxu20maw  -->

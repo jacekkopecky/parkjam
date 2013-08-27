@@ -20,7 +20,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
 
-import com.google.android.maps.GeoPoint;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * an item in the parkjam overlay class
@@ -37,7 +37,7 @@ public abstract class DrawableOverlayItem {
     /**
      * the location of this item
      */
-    public final GeoPoint point;
+    public final LatLng point;
 
     /**
      * the title of this item (allowed to change)
@@ -50,7 +50,7 @@ public abstract class DrawableOverlayItem {
      * @param title the main name of the title
      * @param id the identifier of the item
      */
-    public DrawableOverlayItem(GeoPoint point, String title, Uri id) {
+    public DrawableOverlayItem(LatLng point, String title, Uri id) {
         this.point = point;
         this.title = title;
         this.id = id;
@@ -89,14 +89,14 @@ public abstract class DrawableOverlayItem {
             } else if (object2 == null) {
                 return 1;
             }
-            GeoPoint p1 = object1.point;
-            GeoPoint p2 = object2.point;
-            if (p1.getLatitudeE6() > p2.getLatitudeE6()) {
+            LatLng p1 = object1.point;
+            LatLng p2 = object2.point;
+            if (p1.latitude > p2.latitude) {
                 return -1;
-            } else if (p1.getLatitudeE6() == p2.getLatitudeE6()) {
-                if (p1.getLongitudeE6() > p2.getLongitudeE6()) {
+            } else if (p1.latitude == p2.latitude) {
+                if (p1.longitude > p2.longitude) {
                     return -1;
-                } else if (p1.getLongitudeE6() == p2.getLongitudeE6()) {
+                } else if (p1.longitude == p2.longitude) {
                     int h1 = object1.hashCode();
                     int h2 = object2.hashCode();
                     return h1 < h2 ? -1 : (h1 == h2 ? 0 : 1);
