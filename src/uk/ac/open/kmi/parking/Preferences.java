@@ -26,7 +26,7 @@ import android.preference.PreferenceActivity;
 public class Preferences extends PreferenceActivity {
     static final String PREFERENCE_NOSLEEP = "preferenceNoSleep";
     static final String PREFERENCE_FULLSCREEN = "preferenceFullscreen";
-    static final String PREFERENCE_SHADOW = "preferenceShadow";
+//    static final String PREFERENCE_SHADOW = "preferenceShadow";
     static final String PREFERENCE_SHOW_UNCONFIRMED_PROPERTIES = "preferenceShowUnconfirmedProperties";
 
     @Override

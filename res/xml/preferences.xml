@@ -15,12 +15,12 @@
         android:summary="@string/preference_fullscreen_summary"
         android:title="@string/preference_fullscreen" />
 
-    <CheckBoxPreference
+<!--     <CheckBoxPreference
         android:defaultValue="true"
         android:key="preferenceShadow"
         android:summary="@string/preference_shadow_summary"
         android:title="@string/preference_shadow" />
-
+ -->
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="preferenceShowUnconfirmedProperties"
