@@ -13,7 +13,7 @@
           map:uiRotateGestures="true"
           map:uiScrollGestures="true"
           map:cameraTargetLat="50.8"
-          map:cameraTargetLng="-1.01"
+          map:cameraTargetLng="-1.1"
           />
 
 <!--  <com.google.android.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"

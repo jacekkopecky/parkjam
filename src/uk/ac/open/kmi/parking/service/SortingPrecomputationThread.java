@@ -26,6 +26,10 @@ import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import android.util.Log;
+
 import uk.ac.open.kmi.parking.MapItem;
 import uk.ac.open.kmi.parking.Parking;
 
@@ -35,10 +39,15 @@ import uk.ac.open.kmi.parking.Parking;
 class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileDesirabilityChecker {
     @SuppressWarnings("unused")
     private static final String TAG = "sorting thread";
+
     volatile Collection<MapItem> sortedCurrentItems = Collections.emptyList(); // HardwiredParkingList.listParkings();
+    volatile List<LatLng> currentSortedOutline = new ArrayList<LatLng>(4);
+
     private volatile MapRectangle currentCoveredCoordinatesE6 = null;
     private final BlockingQueue<Event> eventQueue = new ArrayBlockingQueue<Event>(1000); // todo make this number configurable? also the number of updatedTiles below
     private TileDownloaderThread tileDownloader;
+
+    private static final int MAX_CARPARKS_DISPLAYED = 50;
 
     public SortingPrecomputationThread(TileDownloaderThread tileDownloader) {
         this.tileDownloader = tileDownloader;
@@ -46,11 +55,10 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
         tileDownloader.registerTileDesirabilityChecker(this);
     }
 
-    // todo E0 is a bad mnemonic, it's actually E1, or rather E6/TILE_SIZE
-    private int lastTileMinLatE0 = Integer.MIN_VALUE;
-    private int lastTileMinLonE0 = Integer.MIN_VALUE;
-    private int lastTileMaxLatE0 = Integer.MAX_VALUE;
-    private int lastTileMaxLonE0 = Integer.MAX_VALUE;
+    private int lastTileMinLatTile = Integer.MIN_VALUE;
+    private int lastTileMinLonTile = Integer.MIN_VALUE;
+    private int lastTileMaxLatTile = Integer.MAX_VALUE;
+    private int lastTileMaxLonTile = Integer.MAX_VALUE;
     private MapRectangle lastCoordsE6 = null;
 
     private final List<MapTile> updatedTiles = new ArrayList<MapTile>(1000);
@@ -70,7 +78,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                     //                        Log.i(TAG, "queue size maximum increased to " + this.maxQueueSize);
                     // todo check that this is sane over longer lives of the app, possibly lower the size of the queue - just under a 100 is OK because of tile update events from newly-loaded supertiles
                 }
-                //                    long currTime = System.currentTimeMillis();
+//                                    long currTime = System.currentTimeMillis();
                 //                    if (currTime > (nextReportTime)) {
                 //                        Log.d(TAG, "" + (currTime-nextReportTime+999) + "ms: " + callCount + " requests");
                 //                        callCount=0;
@@ -78,9 +86,10 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                 //                    }
                 //                    callCount++;
 
-                Event event = this.eventQueue.take();
                 // in case the events are only tile updates, we want to act on the last coordinates
                 MapRectangle coordsE6 = this.lastCoordsE6;
+
+                Event event = this.eventQueue.take();
                 boolean forceUpdate = false;
                 do {
                     switch (event.type) {
@@ -102,17 +111,17 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                     continue;
                 }
 
-                //                    long startTime = System.currentTimeMillis();
+                                    long startTime = System.currentTimeMillis();
 
                 forceUpdate |= this.lastCoordsE6 == null;
                 if (!forceUpdate) {
                     for (MapTile tile : this.updatedTiles) {
-                        int tileLatE0 = tile.late6min / ParkingsService.TILE_SIZE;
-                        int tileLonE0 = tile.lone6min / ParkingsService.TILE_SIZE;
-                        if (tileLatE0 >= this.lastTileMinLatE0 &&
-                                tileLonE0 >= this.lastTileMinLonE0 &&
-                                tileLatE0 <= this.lastTileMaxLatE0 &&
-                                tileLonE0 <= this.lastTileMaxLonE0) {
+                        int tileLatTile = tile.late6min / ParkingsService.TILE_SIZE;
+                        int tileLonTile = tile.lone6min / ParkingsService.TILE_SIZE;
+                        if (tileLatTile >= this.lastTileMinLatTile &&
+                                tileLonTile >= this.lastTileMinLonTile &&
+                                tileLatTile <= this.lastTileMaxLatTile &&
+                                tileLonTile <= this.lastTileMaxLonTile) {
                             forceUpdate = true;
                             break;
                         }
@@ -127,53 +136,54 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
 
                 this.lastCoordsE6 = coordsE6;
                 // new limits, the tiles that are at least partially visible
-                int tileMinLatE0 = coordsE6.latmin / ParkingsService.TILE_SIZE;  if (coordsE6.latmin < 0) tileMinLatE0--;
-                int tileMinLonE0 = coordsE6.lonmin / ParkingsService.TILE_SIZE; if (coordsE6.lonmin < 0) tileMinLonE0--;
-                int tileMaxLatE0 = coordsE6.latmax / ParkingsService.TILE_SIZE; if (coordsE6.latmax < 0) tileMaxLatE0--;
-                int tileMaxLonE0 = coordsE6.lonmax / ParkingsService.TILE_SIZE; if (coordsE6.lonmax < 0) tileMaxLonE0--;
+                int tileMinLatTile = coordsE6.latminE6 / ParkingsService.TILE_SIZE;  if (coordsE6.latminE6 < 0) tileMinLatTile--;
+                int tileMinLonTile = coordsE6.lonminE6 / ParkingsService.TILE_SIZE; if (coordsE6.lonminE6 < 0) tileMinLonTile--;
+                int tileMaxLatTile = coordsE6.latmaxE6 / ParkingsService.TILE_SIZE; if (coordsE6.latmaxE6 < 0) tileMaxLatTile--;
+                int tileMaxLonTile = coordsE6.lonmaxE6 / ParkingsService.TILE_SIZE; if (coordsE6.lonmaxE6 < 0) tileMaxLonTile--;
 
                 // check that the new request isn't already satisfied
                 // the stuff with % is about whether more than a half of the border tile is visible (so we don't really necessarily have space next to it)
                 if (forceUpdate ||
-                        ((tileMinLatE0 == this.lastTileMinLatE0) && (coordsE6.latmin - tileMinLatE0*ParkingsService.TILE_SIZE)*2 < ParkingsService.TILE_SIZE) ||
-                        (tileMinLatE0 < this.lastTileMinLatE0) ||
-                        (tileMinLatE0 > (this.lastTileMinLatE0+2)) ||
-                        ((tileMinLonE0 == this.lastTileMinLonE0) && (coordsE6.lonmin - tileMinLonE0*ParkingsService.TILE_SIZE)*2 < ParkingsService.TILE_SIZE) ||
-                        (tileMinLonE0 < this.lastTileMinLonE0) ||
-                        (tileMinLonE0 > (this.lastTileMinLonE0+2)) ||
-                        ((tileMaxLatE0 == this.lastTileMaxLatE0) && (coordsE6.latmax - tileMaxLatE0*ParkingsService.TILE_SIZE)*2 > ParkingsService.TILE_SIZE) ||
-                        (tileMaxLatE0 > this.lastTileMaxLatE0) ||
-                        (tileMaxLatE0 < (this.lastTileMaxLatE0-2)) ||
-                        ((tileMaxLonE0 == this.lastTileMaxLonE0) && (coordsE6.lonmax - tileMaxLonE0*ParkingsService.TILE_SIZE)*2 > ParkingsService.TILE_SIZE) ||
-                        (tileMaxLonE0 > this.lastTileMaxLonE0) ||
-                        (tileMaxLonE0 < (this.lastTileMaxLonE0-2))) {
+                        ((tileMinLatTile == this.lastTileMinLatTile) && (coordsE6.latminE6 - tileMinLatTile*ParkingsService.TILE_SIZE)*2 < ParkingsService.TILE_SIZE) ||
+                        (tileMinLatTile < this.lastTileMinLatTile) ||
+                        (tileMinLatTile > (this.lastTileMinLatTile+2)) ||
+                        ((tileMinLonTile == this.lastTileMinLonTile) && (coordsE6.lonminE6 - tileMinLonTile*ParkingsService.TILE_SIZE)*2 < ParkingsService.TILE_SIZE) ||
+                        (tileMinLonTile < this.lastTileMinLonTile) ||
+                        (tileMinLonTile > (this.lastTileMinLonTile+2)) ||
+                        ((tileMaxLatTile == this.lastTileMaxLatTile) && (coordsE6.latmaxE6 - tileMaxLatTile*ParkingsService.TILE_SIZE)*2 > ParkingsService.TILE_SIZE) ||
+                        (tileMaxLatTile > this.lastTileMaxLatTile) ||
+                        (tileMaxLatTile < (this.lastTileMaxLatTile-2)) ||
+                        ((tileMaxLonTile == this.lastTileMaxLonTile) && (coordsE6.lonmaxE6 - tileMaxLonTile*ParkingsService.TILE_SIZE)*2 > ParkingsService.TILE_SIZE) ||
+                        (tileMaxLonTile > this.lastTileMaxLonTile) ||
+                        (tileMaxLonTile < (this.lastTileMaxLonTile-2))) {
                     // need to recompute
 
                     // add an extra buffer around the (at least partially) visible tiles
-                    this.lastTileMinLatE0 = --tileMinLatE0;
-                    this.lastTileMinLonE0 = --tileMinLonE0;
-                    this.lastTileMaxLatE0 = ++tileMaxLatE0;
-                    this.lastTileMaxLonE0 = ++tileMaxLonE0;
+                    this.lastTileMinLatTile = --tileMinLatTile;
+                    this.lastTileMinLonTile = --tileMinLonTile;
+                    this.lastTileMaxLatTile = ++tileMaxLatTile;
+                    this.lastTileMaxLonTile = ++tileMaxLonTile;
 
                     this.currentCoveredCoordinatesE6 =
                             new MapRectangle(
-                                    tileMinLatE0 * ParkingsService.TILE_SIZE,
-                                    tileMinLonE0 * ParkingsService.TILE_SIZE,
-                                    tileMaxLatE0 * ParkingsService.TILE_SIZE,
-                                    tileMaxLonE0 * ParkingsService.TILE_SIZE);
+                                    tileMinLatTile * ParkingsService.TILE_SIZE,
+                                    tileMinLonTile * ParkingsService.TILE_SIZE,
+                                    (tileMaxLatTile+1) * ParkingsService.TILE_SIZE-1,
+                                    (tileMaxLonTile+1) * ParkingsService.TILE_SIZE-1);
 
                     //                        Log.d(TAG, "coords " + coordsE6 + " lead to covered coordinates " + this.currentCoveredCoordinatesE6);
 
                     final boolean onlyConfirmed = !ParkingsService.get(null).getShowUnconfirmedCarparks();
 
-                    TreeSet<MapItem> retval = new TreeSet<MapItem>(new MapItem.Comparator());
-                    //                        int count=0; int total=0;
+                    LatLng coordsCenter = coordsE6.getCenter();
+                    TreeSet<MapItem> retval = new TreeSet<MapItem>(new MapItem.SquareDistComparator(coordsCenter));
+                    int count=0; int total=0;
                     long minNextUpdateTime = Long.MAX_VALUE;
                     // todo this should go from the center, not from the corner
-                    for (int latE0 = tileMinLatE0; latE0 <= tileMaxLatE0; latE0++) {
-                        for (int lonE0 = tileMinLonE0; lonE0 <= tileMaxLonE0; lonE0++) {
-                            MapTile tile = this.tileDownloader.getTile(latE0*ParkingsService.TILE_SIZE, lonE0*ParkingsService.TILE_SIZE);
-                            //                                total++;
+                    for (int latTile = tileMinLatTile; latTile <= tileMaxLatTile; latTile++) {
+                        for (int lonTile = tileMinLonTile; lonTile <= tileMaxLonTile; lonTile++) {
+                            MapTile tile = this.tileDownloader.getTile(latTile*ParkingsService.TILE_SIZE, lonTile*ParkingsService.TILE_SIZE);
+                            total++;
                             if (tile != null) {
                                 if (tile.nextUpdate < minNextUpdateTime) {
                                     minNextUpdateTime = tile.nextUpdate;
@@ -184,7 +194,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                                     }
                                     retval.add(parking);
                                 }
-                                //                                    count++;
+                                count++;
                             }
                         }
                     }
@@ -199,9 +209,9 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                     if (minNextUpdateTime < Long.MAX_VALUE && minNextUpdateTime != refresherTargetTime) {
                         refresherTargetTime = minNextUpdateTime;
                         final long sleepTime = minNextUpdateTime - System.currentTimeMillis();
-                        //                            Log.d(TAG, "next refresh time in " + sleepTime + "ms");
+//                          Log.d(TAG, "next refresh time in " + sleepTime + "ms");
                         if (sleepTime <= 0) {
-                            //                                Log.w(TAG, "next refresh hopefully in progress");
+//                          Log.w(TAG, "next refresh hopefully in progress");
                         } else {
                             refresher = new Thread(new Runnable() {
                                 public void run() {
@@ -217,16 +227,43 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                         }
                     }
 
-                    this.sortedCurrentItems = retval;
-                    // let listeners know about this change, but only if there's anything to display - we don't expect removing items
-                    if (!retval.isEmpty()) {
-                        synchronized(this) {
-                            for (SortedCurrentItemsUpdateListener listener : this.updateListeners) {
-                                listener.onSortedCurrentItemsUpdated();
-                            }
+                    // this must be set before listeners are called because they may use it
+                    ArrayList<MapItem> nearest = new ArrayList<MapItem>(MAX_CARPARKS_DISPLAYED);
+                    MapItem firstItemOutside = null;
+                    int i = 0;
+                    for (MapItem p: retval) {
+                        if ((i++) < MAX_CARPARKS_DISPLAYED) {
+                            nearest.add(p);
+                        } else {
+                            firstItemOutside = p;
+                            break;
                         }
                     }
-                    //                        Log.d(TAG, "recomputed (with " + count + " out of " + total + " tiles, " + retval.size() + " parkings) in " + (System.currentTimeMillis()-startTime) + "ms");
+                    this.sortedCurrentItems = nearest;
+
+                    this.currentSortedOutline.clear();
+                    if (firstItemOutside != null) {
+                        double currentSortedOutlineDistance = MapItem.squareDist(coordsCenter, firstItemOutside.point);
+                        this.currentSortedOutline.add(new LatLng(coordsCenter.latitude - currentSortedOutlineDistance, coordsCenter.longitude - currentSortedOutlineDistance));
+                        this.currentSortedOutline.add(new LatLng(coordsCenter.latitude + currentSortedOutlineDistance, coordsCenter.longitude - currentSortedOutlineDistance));
+                        this.currentSortedOutline.add(new LatLng(coordsCenter.latitude + currentSortedOutlineDistance, coordsCenter.longitude + currentSortedOutlineDistance));
+                        this.currentSortedOutline.add(new LatLng(coordsCenter.latitude - currentSortedOutlineDistance, coordsCenter.longitude + currentSortedOutlineDistance));
+                        Log.d(TAG, "outline until nearest point");
+                    } else {
+                        this.currentSortedOutline.add(new LatLng(this.currentCoveredCoordinatesE6.latminE6/1e6d, this.currentCoveredCoordinatesE6.lonminE6/1e6d));
+                        this.currentSortedOutline.add(new LatLng(this.currentCoveredCoordinatesE6.latminE6/1e6d, this.currentCoveredCoordinatesE6.lonmaxE6/1e6d));
+                        this.currentSortedOutline.add(new LatLng(this.currentCoveredCoordinatesE6.latmaxE6/1e6d, this.currentCoveredCoordinatesE6.lonmaxE6/1e6d));
+                        this.currentSortedOutline.add(new LatLng(this.currentCoveredCoordinatesE6.latmaxE6/1e6d, this.currentCoveredCoordinatesE6.lonminE6/1e6d));
+                        Log.d(TAG, "max outline");
+                    }
+
+                    // let listeners know about this change (even if there are no car parks, the coords may have changed)
+                    synchronized(this) {
+                        for (SortedCurrentItemsUpdateListener listener : this.updateListeners) {
+                            listener.onSortedCurrentItemsUpdated();
+                        }
+                    }
+                                            Log.d(TAG, "recomputed (with " + count + " out of " + total + " tiles, " + retval.size() + " parkings) in " + (System.currentTimeMillis()-startTime) + "ms");
                 } else {
                     // otherwise no need to do anything
                     //                        Log.i(TAG, "no recomputation for " + eventE6);
@@ -298,10 +335,10 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
             return true;
         } else {
             return
-                    tile.late6min >= currentCoveredE6.latmin &&
-                    tile.late6min <= currentCoveredE6.latmax &&
-                    tile.lone6min >= currentCoveredE6.lonmin &&
-                    tile.lone6min <= currentCoveredE6.lonmax;
+                    tile.late6min >= currentCoveredE6.latminE6 &&
+                    tile.late6min <= currentCoveredE6.latmaxE6 &&
+                    tile.lone6min >= currentCoveredE6.lonminE6 &&
+                    tile.lone6min <= currentCoveredE6.lonmaxE6;
         }
     }
 

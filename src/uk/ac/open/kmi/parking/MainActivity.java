@@ -22,7 +22,6 @@ import java.util.List;
 
 import uk.ac.open.kmi.parking.service.CarparkAvailabilityUpdateListener;
 import uk.ac.open.kmi.parking.service.CarparkDetailsUpdateListener;
-import uk.ac.open.kmi.parking.service.NearbyCarparkUpdateListener;
 import uk.ac.open.kmi.parking.service.ParkingsService;
 import uk.ac.open.kmi.parking.service.SortedCurrentItemsUpdateListener;
 import android.app.Activity;
@@ -34,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -66,8 +66,12 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * main
@@ -78,7 +82,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class MainActivity extends Activity implements
         LocationListener,
         SortedCurrentItemsUpdateListener,
-        NearbyCarparkUpdateListener,
+//        NearbyCarparkUpdateListener,
         LoadingStatus.Listener,
         CarparkAvailabilityUpdateListener,
         CarparkDetailsUpdateListener,
@@ -90,6 +94,7 @@ public class MainActivity extends Activity implements
 
     private GoogleMap map;
     private MyLocationTracker myLocTracker;
+    private MarkerManager carparkManager;
     private BubbleOverlay bubbleOverlay;
     private LocationClient locationClient;
     private LocationRequest locationRequest;
@@ -196,11 +201,18 @@ public class MainActivity extends Activity implements
         this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
         this.map.moveCamera(CameraUpdateFactory.zoomTo(savedInstanceState == null ? INITIAL_ZOOM : savedInstanceState.getFloat(SAVED_MAP_ZOOM, INITIAL_ZOOM)));
 
-        this.myLocTracker = new MyLocationTracker(this.map);
+        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map);
+
+        this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map);
 
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
-//        final Marker m = this.map.addMarker(new MarkerOptions()
+//        MarkerOptions mo = new MarkerOptions().draggable(true);
+//        this.map.addMarker(mo
+//            .position(new LatLng(50.799, -1.1))
+//            .title("top")
+//            .snippet("Population: 776733"));
+//        final Marker m = this.map.addMarker(mo
 //            .position(new LatLng(50.8, -1.1))
 //            .title("San Francisco")
 //            .snippet("Population: 776733"));
@@ -242,7 +254,7 @@ public class MainActivity extends Activity implements
 //        View viewHighlightU = new View(this);
 //        viewHighlightU.setBackgroundResource(R.drawable.parking_busy_highlight);
 //
-//        Parking.setDrawables(drawableFull, drawableFullBounds, drawableAvailable, drawableAvailableBounds, drawableUnknown, drawableUnknownBounds, viewHighlightA, viewHighlightF, viewHighlightU);
+        Parking.setDrawables(BitmapFactory.decodeResource(this.getResources(), R.drawable.parking_full), BitmapFactory.decodeResource(this.getResources(), R.drawable.parking_available));
 //
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -416,7 +428,7 @@ public class MainActivity extends Activity implements
 
         LoadingStatus.registerListener(this);
         this.parkingsService.registerSortedCurrentItemsUpdateListener(this);
-        this.parkingsService.registerNearbyCurrentItemsUpdateListener(this);
+//        this.parkingsService.registerNearbyCurrentItemsUpdateListener(this);
         this.parkingsService.registerCarparkAvailabilityUpdateListener(this);
         this.parkingsService.registerCarparkDetailsUpdateListener(this);
         this.parkingsService.geocoder = new Geocoder(this);
@@ -457,6 +469,7 @@ public class MainActivity extends Activity implements
 
         this.pinnedDrawerAdapter.update();
         updateUIState();
+        this.carparkManager.update();
         this.bubbleOverlay.updateDetails(null);
     }
 
@@ -496,7 +509,7 @@ public class MainActivity extends Activity implements
         this.parkingsService.unregisterCarparkDetailsUpdateListener(this);
         this.parkingsService.unregisterCarparkAvailabilityUpdateListener(this);
         this.parkingsService.unregisterSortedCurrentItemsUpdateListener(this);
-        this.parkingsService.unregisterNearbyCurrentItemsUpdateListener(this);
+//        this.parkingsService.unregisterNearbyCurrentItemsUpdateListener(this);
         this.parkingsService.stopService(this);
 
         super.onPause();
@@ -775,7 +788,7 @@ public class MainActivity extends Activity implements
         }
 
         // todo pinned car parks should have an icon for centering, reporting, voice info
-        // todo details view may need an icon for pinning
+        // todo details view/activity/fragment may need an icon for pinning
     }
 
     private void showAddparkViews() {
@@ -828,6 +841,7 @@ public class MainActivity extends Activity implements
         public void run() {
             updateUIState();
             MainActivity.this.pinnedDrawerAdapter.update();
+            MainActivity.this.carparkManager.update();
         }
     };
 
@@ -835,10 +849,10 @@ public class MainActivity extends Activity implements
         runOnUiThread(this.updateUIStateTask);
     }
 
-    public void onNearbyCarparkUpdated() {
-        runOnUiThread(this.updateUIStateTask);  // todo this only affects the pinned area with nearest carpark(s) so maybe not updateUIState?
-    }
-
+//    public void onNearbyCarparkUpdated() {
+//        runOnUiThread(this.updateUIStateTask);  // todo this only affects the pinned area with nearest carpark(s) so maybe not updateUIState?
+//    }
+//
     public void onCarparkAvailabilityUpdated(final Parking parking) {
         runOnUiThread(new Runnable() {
             public void run() {

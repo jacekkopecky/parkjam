@@ -19,11 +19,12 @@ package uk.ac.open.kmi.parking;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.view.View;
+import android.util.Log;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -34,7 +35,7 @@ import com.hp.hpl.jena.rdf.model.Property;
  *
  */
 public class Parking extends MapItem {
-    @SuppressWarnings("unused")
+//    @SuppressWarnings("unused")
     private static final String TAG = "parking";
 
     private static final long CUTOFF_MILLIS = 14*60*60*1000;
@@ -118,15 +119,15 @@ public class Parking extends MapItem {
     public boolean unconfirmed;
 
     // todo this can be more hard-wired and faster
-    private static Drawable drawFull = null;
-    private static Drawable drawAvailable = null;
-    private static Drawable drawUnknown = null;
-    private static View drawHighlightA = null;
-    private static View drawHighlightF = null;
-    private static View drawHighlightU = null;
-    private static Rect boundsFull = null;
-    private static Rect boundsAvailable = null;
-    private static Rect boundsUnknown = null;
+    private static BitmapDescriptor drawFull = null;
+    private static BitmapDescriptor drawAvailable = null;
+//    private static Drawable drawUnknown = null;
+//    private static View drawHighlightA = null;
+//    private static View drawHighlightF = null;
+//    private static View drawHighlightU = null;
+//    private static Rect boundsFull = null;
+//    private static Rect boundsAvailable = null;
+//    private static Rect boundsUnknown = null;
 
     /**
      * constructor, fills all the fields
@@ -179,66 +180,96 @@ public class Parking extends MapItem {
         this.available = available;
     }*/
 
+//    @Override
+//    public Drawable getDrawable() {
+//        if (drawFull == null) {
+//            throw new IllegalStateException("must use Parking.setDrawables() before using Parking instances in an overlay");
+//        }
+//        Drawable retval = null;
+//        switch (this.availabilityEffective) {
+//        case AVAILABLE:
+//            retval = drawAvailable;
+//            retval.setBounds(boundsAvailable);
+//            break;
+//        case FULL:
+//            retval = drawFull;
+//            retval.setBounds(boundsFull);
+//            break;
+//        case UNKNOWN:
+//            retval = drawUnknown;
+//            retval.setBounds(boundsUnknown);
+//            break;
+//        }
+//        return retval;
+//    }
+
     @Override
-    public Drawable getDrawable() {
+    public BitmapDescriptor getBitmapDescriptor() {
         if (drawFull == null) {
             throw new IllegalStateException("must use Parking.setDrawables() before using Parking instances in an overlay");
         }
-        Drawable retval = null;
+        BitmapDescriptor retval = null;
         switch (this.availabilityEffective) {
         case AVAILABLE:
             retval = drawAvailable;
-            retval.setBounds(boundsAvailable);
             break;
         case FULL:
             retval = drawFull;
-            retval.setBounds(boundsFull);
             break;
         case UNKNOWN:
-            retval = drawUnknown;
-            retval.setBounds(boundsUnknown);
+            Log.w(TAG, "car park with unknown availability has getBitmap called on it");
             break;
         }
         return retval;
     }
 
-    @Override
-    public View getHighlight() {
-        if (drawFull == null) {
-            throw new IllegalStateException("must use Parking.setDrawables() before using Parking instances in an overlay");
-        }
-        switch (this.availabilityEffective) {
-        case AVAILABLE:
-            return drawHighlightA;
-        case FULL:
-            return drawHighlightF;
-        default:
-            return drawHighlightU;
-        }
-    }
+//    @Override
+//    public View getHighlight() {
+//        if (drawFull == null) {
+//            throw new IllegalStateException("must use Parking.setDrawables() before using Parking instances in an overlay");
+//        }
+//        switch (this.availabilityEffective) {
+//        case AVAILABLE:
+//            return drawHighlightA;
+//        case FULL:
+//            return drawHighlightF;
+//        default:
+//            return drawHighlightU;
+//        }
+//    }
+//
+//    /**
+//     * sets the drawables to be used for full and available parkings
+//     * @param full drawable for full parkings
+//     * @param fullBounds the bounds for the drawable for full parkings - this can be used to put the origin point in the center (an icon), or at the bottom middle (a pin in the map)
+//     * @param available drawable for available parkings
+//     * @param availableBounds the bounds for the drawable for available parkings
+//     * @param unknown drawable for parkings with unknown availability
+//     * @param unknownBounds the bounds for the drawable for unknown-availability parkings
+//     * @param highlightA view for highlighting the current parking if available
+//     * @param highlightF view for highlighting the current parking if full
+//     * @param highlightU view for highlighting the current parking if unknown
+//     */
+//    public static void setDrawables(Drawable full, Rect fullBounds, Drawable available, Rect availableBounds, Drawable unknown, Rect unknownBounds, View highlightA, View highlightF, View highlightU) {
+//        drawFull = full;
+//        drawAvailable = available;
+//        drawUnknown = unknown;
+//        drawHighlightA = highlightA;
+//        drawHighlightF = highlightF;
+//        drawHighlightU = highlightU;
+//        boundsFull = fullBounds;
+//        boundsAvailable = availableBounds;
+//        boundsUnknown = unknownBounds;
+//    }
 
     /**
      * sets the drawables to be used for full and available parkings
      * @param full drawable for full parkings
-     * @param fullBounds the bounds for the drawable for full parkings - this can be used to put the origin point in the center (an icon), or at the bottom middle (a pin in the map)
      * @param available drawable for available parkings
-     * @param availableBounds the bounds for the drawable for available parkings
-     * @param unknown drawable for parkings with unknown availability
-     * @param unknownBounds the bounds for the drawable for unknown-availability parkings
-     * @param highlightA view for highlighting the current parking if available
-     * @param highlightF view for highlighting the current parking if full
-     * @param highlightU view for highlighting the current parking if unknown
      */
-    public static void setDrawables(Drawable full, Rect fullBounds, Drawable available, Rect availableBounds, Drawable unknown, Rect unknownBounds, View highlightA, View highlightF, View highlightU) {
-        drawFull = full;
-        drawAvailable = available;
-        drawUnknown = unknown;
-        drawHighlightA = highlightA;
-        drawHighlightF = highlightF;
-        drawHighlightU = highlightU;
-        boundsFull = fullBounds;
-        boundsAvailable = availableBounds;
-        boundsUnknown = unknownBounds;
+    public static void setDrawables(Bitmap full, Bitmap available) {
+        drawFull = BitmapDescriptorFactory.fromBitmap(full);
+        drawAvailable = BitmapDescriptorFactory.fromBitmap(available);
     }
 
     @Override

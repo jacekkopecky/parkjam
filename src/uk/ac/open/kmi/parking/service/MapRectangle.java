@@ -16,24 +16,30 @@
 
 package uk.ac.open.kmi.parking.service;
 
+import com.google.android.gms.maps.model.LatLng;
+
 class MapRectangle {
-    public int latmin, lonmin, latmax, lonmax;
+    public int latminE6, lonminE6, latmaxE6, lonmaxE6;
     public MapRectangle(int lami, int lomi, int lama, int loma) {
-        this.latmin = lami;
-        this.lonmin = lomi;
-        this.latmax = lama;
-        this.lonmax = loma;
+        this.latminE6 = lami;
+        this.lonminE6 = lomi;
+        this.latmaxE6 = lama;
+        this.lonmaxE6 = loma;
     }
-    
+
     public MapRectangle(MapRectangle r) {
-        this.latmin = r.latmin;
-        this.lonmin = r.lonmin;
-        this.latmax = r.latmax;
-        this.lonmax = r.lonmax;
+        this.latminE6 = r.latminE6;
+        this.lonminE6 = r.lonminE6;
+        this.latmaxE6 = r.latmaxE6;
+        this.lonmaxE6 = r.lonmaxE6;
+    }
+
+    public LatLng getCenter() {
+        return new LatLng((this.latmaxE6+this.latminE6)/2e6d, (this.lonmaxE6+this.lonminE6)/2e6d);
     }
 
     @Override
     public String toString() {
-        return "" + this.latmin + " " + this.lonmin + " " + this.latmax + " " + this.lonmax;
+        return "" + this.latminE6 + " " + this.lonminE6 + " " + this.latmaxE6 + " " + this.lonmaxE6;
     }
 }

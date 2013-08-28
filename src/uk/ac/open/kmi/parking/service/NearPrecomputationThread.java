@@ -271,10 +271,10 @@ class NearPrecomputationThread implements Runnable, TileUpdateListener, TileDesi
             return true;
         } else {
             return
-                    tile.late6min >= currentCoveredE6.latmin &&
-                    tile.late6min <= currentCoveredE6.latmax &&
-                    tile.lone6min >= currentCoveredE6.lonmin &&
-                    tile.lone6min <= currentCoveredE6.lonmax;
+                    tile.late6min >= currentCoveredE6.latminE6 &&
+                    tile.late6min <= currentCoveredE6.latmaxE6 &&
+                    tile.lone6min >= currentCoveredE6.lonminE6 &&
+                    tile.lone6min <= currentCoveredE6.lonmaxE6;
         }
     }
 

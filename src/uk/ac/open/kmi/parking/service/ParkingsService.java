@@ -154,29 +154,37 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
      * returns (quickly) a precomputed collection of drawable overlay items for the given map
      * todo extract this into a DrawableOverlayItemContainer interface? there should be multiple impls for this because we want parkings, businesses, events etc.
      * @param mapCenter center of the map
-     * @param longitudeSpan width of the map
-     * @param latitudeSpan height of the map
+     * @param longitudeSpanE6 width of the map
+     * @param latitudeSpanE6 height of the map
      * @return a collection of drawable overlay items, sorted north-to-south
      */
-    public Collection<MapItem> getSortedCurrentItems(LatLng mapCenter, int longitudeSpan, int latitudeSpan) {
+    public Collection<MapItem> getSortedCurrentItems(LatLng mapCenter, int longitudeSpanE6, int latitudeSpanE6) {
         if (!this.threadsStopped) {
             // forward the location to the sorting precomputation thread
             this.sortingPrecomputer.onNewCoordinates(
                     new MapRectangle(
-                            (int)(mapCenter.latitude*1e6)-latitudeSpan/2,
-                            (int)(mapCenter.longitude*1e6)-longitudeSpan/2,
-                            (int)(mapCenter.latitude*1e6)+latitudeSpan/2,
-                            (int)(mapCenter.longitude*1e6)+longitudeSpan/2));
+                            (int)(mapCenter.latitude*1e6)-latitudeSpanE6/2,
+                            (int)(mapCenter.longitude*1e6)-longitudeSpanE6/2,
+                            (int)(mapCenter.latitude*1e6)+latitudeSpanE6/2,
+                            (int)(mapCenter.longitude*1e6)+longitudeSpanE6/2));
         }
         return getSortedCurrentItems();
     }
 
     /**
-     * returns (quickly) the current a precomputed collection of drawable overlay items
+     * returns (quickly) a precomputed collection of drawable overlay items
      * @return a collection of drawable overlay items, sorted north-to-south
      */
     public Collection<MapItem> getSortedCurrentItems() {
         return this.sortingPrecomputer.sortedCurrentItems;
+    }
+
+    /**
+     * returns (quickly) a precomputed outline for the current sorted items
+     * @return the outline as a list of points for a polygon
+     */
+    public List<LatLng> getCurrentSortedOutline() {
+        return this.sortingPrecomputer.currentSortedOutline;
     }
 
     /**
