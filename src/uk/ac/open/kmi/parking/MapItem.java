@@ -114,12 +114,17 @@ public abstract class MapItem {
     public static class SquareDistComparator implements java.util.Comparator<MapItem> {
 
         private final LatLng center;
+        /**
+         * ratio of longitude length to latitude - at equator, that's 1; at higher latitudes it becomes smaller as the longitude lines get closer together
+         */
+        public final double lonRatio;
 
         /**
          * @param center the center along the distance from which the objects will be compared
          */
         public SquareDistComparator(LatLng center) {
             this.center = center;
+            this.lonRatio = Math.cos(center.latitude*(Math.PI/180d));
         }
 
         public int compare(MapItem object1, MapItem object2) {
@@ -134,8 +139,8 @@ public abstract class MapItem {
             }
             if (object1 == object2 || object1.equals(object2)) return 0;
 
-            double o1dist = squareDist(this.center, object1.point);
-            double o2dist = squareDist(this.center, object2.point);
+            double o1dist = squareDist(object1.point);
+            double o2dist = squareDist(object2.point);
             if (o1dist > o2dist) {
                 return 1;
             } else if (o1dist == o2dist) {
@@ -150,16 +155,15 @@ public abstract class MapItem {
                 return -1;
             }
         }
-    }
 
-    /**
-     * computes the square distance (maximum of the lat and long distances) between two points
-     * @param center first point
-     * @param item second point
-     * @return the square distance
-     */
-    public static double squareDist(LatLng center, LatLng item) {
-        return Math.max(Math.abs(item.latitude-center.latitude), Math.abs(item.longitude-center.longitude));
+        /**
+         * computes the square distance (maximum of the lat and long distances, compensating for longitude meaning less distance in higher latitudes) of the point to the given center
+         * @param item the point
+         * @return the square distance in lengths of latitude
+         */
+        public double squareDist(LatLng item) {
+            return Math.max(Math.abs(item.latitude-this.center.latitude), Math.abs(item.longitude-this.center.longitude)*this.lonRatio);
+        }
     }
 
     @Override

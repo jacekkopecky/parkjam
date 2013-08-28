@@ -44,9 +44,15 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
 
     /**
      * the granularity at which the server is contacted, any map request will use a tile of this many microdegrees, both in latitude and longitude
-     * NOTE that the value must be big enough to cover the largest distance to the nearest car park
+     * well actually, the server is contacted in "supertiles", which are multiples of these tiles; these are used in caching and displaying -- todo get rid of distinction TILE/SUPERTILE?
+     * NOTE that the value must be big enough to cover the largest useful distance to the nearest car park
      */
-    public static final int TILE_SIZE = 30000;
+    public static final int TILE_SIZE_E6 = 60000;
+
+    /**
+     * tile size in double-precision degrees
+     */
+    public static final double TILE_SIZE_D = TILE_SIZE_E6 / 1e6d;
 
     private SortingPrecomputationThread sortingPrecomputer;
     private NearPrecomputationThread nearPrecomputer;
@@ -154,19 +160,12 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
      * returns (quickly) a precomputed collection of drawable overlay items for the given map
      * todo extract this into a DrawableOverlayItemContainer interface? there should be multiple impls for this because we want parkings, businesses, events etc.
      * @param mapCenter center of the map
-     * @param longitudeSpanE6 width of the map
-     * @param latitudeSpanE6 height of the map
      * @return a collection of drawable overlay items, sorted north-to-south
      */
-    public Collection<MapItem> getSortedCurrentItems(LatLng mapCenter, int longitudeSpanE6, int latitudeSpanE6) {
+    public Collection<MapItem> getSortedCurrentItems(LatLng mapCenter) {
         if (!this.threadsStopped) {
             // forward the location to the sorting precomputation thread
-            this.sortingPrecomputer.onNewCoordinates(
-                    new MapRectangle(
-                            (int)(mapCenter.latitude*1e6)-latitudeSpanE6/2,
-                            (int)(mapCenter.longitude*1e6)-longitudeSpanE6/2,
-                            (int)(mapCenter.latitude*1e6)+latitudeSpanE6/2,
-                            (int)(mapCenter.longitude*1e6)+longitudeSpanE6/2));
+            this.sortingPrecomputer.onNewCoordinates(mapCenter);
         }
         return getSortedCurrentItems();
     }

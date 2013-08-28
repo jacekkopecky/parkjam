@@ -16,12 +16,8 @@
 
 package uk.ac.open.kmi.parking;
 
-import java.util.Collection;
-
 import uk.ac.open.kmi.parking.service.ParkingsService;
-
 import android.location.Location;
-import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,7 +27,6 @@ import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
  * handles tracking of current location on the map:
@@ -46,7 +41,7 @@ public class MyLocationTracker implements
     OnMyLocationButtonClickListener,
     LocationListener {
 
-//  @SuppressWarnings("unused")
+    @SuppressWarnings("unused")
     private static final String TAG = "myloc tracker";
 
     private GoogleMap map;
@@ -75,30 +70,14 @@ public class MyLocationTracker implements
         return false;
     }
 
-    private final static double LON_MAX_SPAN = 0.1d;
-    private final static double LAT_MAX_SPAN = 0.1d;
-
     public void onCameraChange(CameraPosition arg0) {
         if (this.inAnimationUntil < System.currentTimeMillis()) {
             this.tracking = false;
             this.map.getUiSettings().setMyLocationButtonEnabled(true);
         }
 
-        // get current sorted car parks - need not be sorted any more
-        LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
-        double latSpan = bounds.northeast.latitude - bounds.southwest.latitude;
-        if (latSpan < 0) latSpan += 360d;
-        if (latSpan > LAT_MAX_SPAN) latSpan = LAT_MAX_SPAN;
-
-        double lonSpan = bounds.northeast.longitude - bounds.southwest.longitude;
-        if (lonSpan < 0) lonSpan += 360d;
-        if (lonSpan > LON_MAX_SPAN) lonSpan = LON_MAX_SPAN;
-        // todo the .xd above is a guess for the biggest useful spans, must be tested in both axes
-
-        Log.d(TAG, "lat/lon span: " + latSpan + ", " + lonSpan);
-
-        // tell parkings service that the map is showing a new region
-        this.parkingsService.getSortedCurrentItems(this.map.getCameraPosition().target, (int)(lonSpan*1e6d), (int)(latSpan*1e6d));
+        // tell parkings service that the map has moved
+        this.parkingsService.getSortedCurrentItems(this.map.getCameraPosition().target);
 
     }
 

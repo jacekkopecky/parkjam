@@ -59,8 +59,8 @@ class TileDownloaderThread implements Runnable {
     private final BlockingQueue<Event> eventQueue = new ArrayBlockingQueue<Event>(1000); // todo make this number configurable?
     private final Set<Event> eventPresenceSet = Collections.synchronizedSet(new HashSet<Event>(1000));
 
-    private static final int SUPERTILE_FACTOR = 10;
-    private static final int SUPERTILE_SIZE = ParkingsService.TILE_SIZE * SUPERTILE_FACTOR;
+    private static final int SUPERTILE_FACTOR = 5;
+    private static final int SUPERTILE_SIZE = ParkingsService.TILE_SIZE_E6 * SUPERTILE_FACTOR;
 
     // ten supertiles in the cache - up to four around the current location, six in browsing the map
     private final LRUCache<MapTile> cache = new LRUCache<MapTile>(10*SUPERTILE_FACTOR*SUPERTILE_FACTOR);
@@ -156,8 +156,8 @@ class TileDownloaderThread implements Runnable {
                 MapTile[][] newtiles = new MapTile[SUPERTILE_FACTOR][SUPERTILE_FACTOR];
                 if (justRefresh) {
                     // put in newtiles the one that we're refreshing in its rightful position
-                    int i = (tile.late6min - supertile.late6min) / ParkingsService.TILE_SIZE;
-                    int j = (tile.lone6min - supertile.lone6min) / ParkingsService.TILE_SIZE;
+                    int i = (tile.late6min - supertile.late6min) / ParkingsService.TILE_SIZE_E6;
+                    int j = (tile.lone6min - supertile.lone6min) / ParkingsService.TILE_SIZE_E6;
                     if (i < 0 || j < 0 || i >= SUPERTILE_FACTOR || j >= SUPERTILE_FACTOR) {
                         Log.e(TAG, "supertile doesn't contain the tile we're refreshing: tile " + tile + " supertile + " + supertile + " factor " + SUPERTILE_FACTOR);
                     } else {
@@ -182,8 +182,8 @@ class TileDownloaderThread implements Runnable {
                                 MapTile newtile = new MapTile();
                                 newtile.lastUpdate = time;
                                 newtile.nextUpdate = time + Config.DEFAULT_TILE_TTL; // todo this should come from HTTP caching info
-                                newtile.late6min = supertile.late6min + i*ParkingsService.TILE_SIZE;
-                                newtile.lone6min = supertile.lone6min + j*ParkingsService.TILE_SIZE;
+                                newtile.late6min = supertile.late6min + i*ParkingsService.TILE_SIZE_E6;
+                                newtile.lone6min = supertile.lone6min + j*ParkingsService.TILE_SIZE_E6;
                                 newtile.parkings = new HashMap<String, Parking>(200);
                                 newtiles[i][j] = newtile;
 //                                Log.v(TAG, "added new tile " + newtile);
@@ -197,9 +197,9 @@ class TileDownloaderThread implements Runnable {
                                 continue;
                             }
                             Parking newparking = pinfo.createParking();
-                            int i = (pinfo.late6-supertile.late6min)/ParkingsService.TILE_SIZE;
+                            int i = (pinfo.late6-supertile.late6min)/ParkingsService.TILE_SIZE_E6;
                             if (pinfo.late6<supertile.late6min) i--;
-                            int j = (pinfo.lone6-supertile.lone6min)/ParkingsService.TILE_SIZE;
+                            int j = (pinfo.lone6-supertile.lone6min)/ParkingsService.TILE_SIZE_E6;
                             if (pinfo.lone6<supertile.lone6min) j--;
                             if (i<0 || i >=SUPERTILE_FACTOR || j<0 || j >= SUPERTILE_FACTOR) {
 //                                Log.w(TAG, "parking from server is not in supertile: " + pinfo.id);
@@ -286,9 +286,9 @@ class TileDownloaderThread implements Runnable {
         for (ParkingLite remembered : toAdd) {
             // check if the position is in the current supertile:
             if (remembered.point.latitude*1e6<supertile.late6min) continue;
-            int i = ((int)Math.floor(remembered.point.latitude*1e6)-supertile.late6min)/ParkingsService.TILE_SIZE;
+            int i = ((int)Math.floor(remembered.point.latitude*1e6)-supertile.late6min)/ParkingsService.TILE_SIZE_E6;
             if (remembered.point.longitude*1e6<supertile.lone6min) continue;
-            int j = ((int)Math.floor(remembered.point.longitude*1e6)-supertile.lone6min)/ParkingsService.TILE_SIZE;
+            int j = ((int)Math.floor(remembered.point.longitude*1e6)-supertile.lone6min)/ParkingsService.TILE_SIZE_E6;
             if (i >=SUPERTILE_FACTOR || j >= SUPERTILE_FACTOR) {
                 // this car park not in the current supertile
                 continue;
@@ -415,11 +415,11 @@ class TileDownloaderThread implements Runnable {
      */
     public synchronized void refreshTile(LatLng point, Uri extraId, Model extraData, CarparkDetailsUpdateListener extraListener) {
         // check the tile and load all remembered but unloaded car parks; forget any remembered car parks loaded in normal tile; and then tell the listener and drop the listener from remembered carparks
-        int tileLatE0 = (int)(point.latitude*1e6) / ParkingsService.TILE_SIZE; if (point.latitude < 0) tileLatE0--;
-        int tileLonE0 = (int)(point.longitude*1e6) / ParkingsService.TILE_SIZE; if (point.longitude < 0) tileLonE0--;
+        int tileLatE0 = (int)(point.latitude*1e6) / ParkingsService.TILE_SIZE_E6; if (point.latitude < 0) tileLatE0--;
+        int tileLonE0 = (int)(point.longitude*1e6) / ParkingsService.TILE_SIZE_E6; if (point.longitude < 0) tileLonE0--;
 
-        this.cacheTemplate.late6min = tileLatE0 * ParkingsService.TILE_SIZE;
-        this.cacheTemplate.lone6min = tileLonE0 * ParkingsService.TILE_SIZE;
+        this.cacheTemplate.late6min = tileLatE0 * ParkingsService.TILE_SIZE_E6;
+        this.cacheTemplate.lone6min = tileLonE0 * ParkingsService.TILE_SIZE_E6;
         long time = System.currentTimeMillis();
         MapTile retval = this.cache.get(this.cacheTemplate);
         Event request = new Event(new MapTile(this.cacheTemplate), time);

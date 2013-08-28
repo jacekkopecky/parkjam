@@ -47,11 +47,11 @@ class MapTile {
         return this.late6min == omr.late6min && this.lone6min == omr.lone6min;
     }
 
-    private static final int OFFSET = 360000000/ParkingsService.TILE_SIZE;
+    private static final int OFFSET = 360000000/ParkingsService.TILE_SIZE_E6;
 
     @Override
     public int hashCode() {
-        return this.late6min/ParkingsService.TILE_SIZE + this.lone6min/ParkingsService.TILE_SIZE*OFFSET;
+        return this.late6min/ParkingsService.TILE_SIZE_E6 + this.lone6min/ParkingsService.TILE_SIZE_E6*OFFSET;
     }
 
     @Override

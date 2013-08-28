@@ -100,8 +100,8 @@ class NearPrecomputationThread implements Runnable, TileUpdateListener, TileDesi
                 forceUpdate |= this.lastCoords == null;
                 if (!forceUpdate) {
                     for (MapTile tile : this.updatedTiles) {
-                        int tileLatE0 = tile.late6min / ParkingsService.TILE_SIZE;
-                        int tileLonE0 = tile.lone6min / ParkingsService.TILE_SIZE;
+                        int tileLatE0 = tile.late6min / ParkingsService.TILE_SIZE_E6;
+                        int tileLonE0 = tile.lone6min / ParkingsService.TILE_SIZE_E6;
                         if (tileLatE0 >= this.lastTileMinLatE0 &&
                                 tileLonE0 >= this.lastTileMinLonE0 &&
                                 tileLatE0 <= this.lastTileMaxLatE0 &&
@@ -124,20 +124,20 @@ class NearPrecomputationThread implements Runnable, TileUpdateListener, TileDesi
                 int late6 = (int) Math.floor(coords.getLatitude()*1e6);
                 int lone6 = (int) Math.floor(coords.getLongitude()*1e6);
 
-                int tileLatE0 = late6 / ParkingsService.TILE_SIZE; if (late6 < 0) tileLatE0--;
-                int tileLonE0 = lone6 / ParkingsService.TILE_SIZE; if (lone6 < 0) tileLonE0--;
+                int tileLatE0 = late6 / ParkingsService.TILE_SIZE_E6; if (late6 < 0) tileLatE0--;
+                int tileLonE0 = lone6 / ParkingsService.TILE_SIZE_E6; if (lone6 < 0) tileLonE0--;
 
                 // the stuff with % is about whether more than a half of the border tile is visible (so we don't really necessarily have space next to it)
 
                 // first check that the new request isn't already satisfied
                 if (forceUpdate ||
-                        ((tileLatE0 == this.lastTileMinLatE0) && (late6 - tileLatE0*ParkingsService.TILE_SIZE)*2 < ParkingsService.TILE_SIZE) ||
+                        ((tileLatE0 == this.lastTileMinLatE0) && (late6 - tileLatE0*ParkingsService.TILE_SIZE_E6)*2 < ParkingsService.TILE_SIZE_E6) ||
                         (tileLatE0 < this.lastTileMinLatE0) ||
-                        ((tileLonE0 == this.lastTileMinLonE0) && (lone6 - tileLonE0*ParkingsService.TILE_SIZE)*2 < ParkingsService.TILE_SIZE) ||
+                        ((tileLonE0 == this.lastTileMinLonE0) && (lone6 - tileLonE0*ParkingsService.TILE_SIZE_E6)*2 < ParkingsService.TILE_SIZE_E6) ||
                         (tileLonE0 < this.lastTileMinLonE0) ||
-                        ((tileLatE0 == this.lastTileMaxLatE0) && (late6 - tileLatE0*ParkingsService.TILE_SIZE)*2 > ParkingsService.TILE_SIZE) ||
+                        ((tileLatE0 == this.lastTileMaxLatE0) && (late6 - tileLatE0*ParkingsService.TILE_SIZE_E6)*2 > ParkingsService.TILE_SIZE_E6) ||
                         (tileLatE0 > this.lastTileMaxLatE0) ||
-                        ((tileLonE0 == this.lastTileMaxLonE0) && (lone6 - tileLonE0*ParkingsService.TILE_SIZE)*2 > ParkingsService.TILE_SIZE) ||
+                        ((tileLonE0 == this.lastTileMaxLonE0) && (lone6 - tileLonE0*ParkingsService.TILE_SIZE_E6)*2 > ParkingsService.TILE_SIZE_E6) ||
                         (tileLonE0 > this.lastTileMaxLonE0)) {
                     // need to recompute
 
@@ -153,17 +153,17 @@ class NearPrecomputationThread implements Runnable, TileUpdateListener, TileDesi
 
                     this.currentCoveredCoordinatesE6 =
                             new MapRectangle(
-                                    tileMinLatE0 * ParkingsService.TILE_SIZE,
-                                    tileMinLonE0 * ParkingsService.TILE_SIZE,
-                                    tileMaxLatE0 * ParkingsService.TILE_SIZE,
-                                    tileMaxLonE0 * ParkingsService.TILE_SIZE);
+                                    tileMinLatE0 * ParkingsService.TILE_SIZE_E6,
+                                    tileMinLonE0 * ParkingsService.TILE_SIZE_E6,
+                                    tileMaxLatE0 * ParkingsService.TILE_SIZE_E6,
+                                    tileMaxLonE0 * ParkingsService.TILE_SIZE_E6);
 
                     List<Parking> retval = new ArrayList<Parking>(200);
 //                    int count=0; int total=0;
                     // todo this should go from the center, not from the corner
                     for (int latE0 = tileMinLatE0; latE0 <= tileMaxLatE0; latE0++) {
                         for (int lonE0 = tileMinLonE0; lonE0 <= tileMaxLonE0; lonE0++) {
-                            MapTile tile = this.tileDownloader.getTile(latE0*ParkingsService.TILE_SIZE, lonE0*ParkingsService.TILE_SIZE);
+                            MapTile tile = this.tileDownloader.getTile(latE0*ParkingsService.TILE_SIZE_E6, lonE0*ParkingsService.TILE_SIZE_E6);
 //                            total++;
                             if (tile != null) {
                                 retval.addAll(tile.parkings.values());
