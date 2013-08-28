@@ -16,17 +16,17 @@
 
 package uk.ac.open.kmi.parking;
 
-import uk.ac.open.kmi.parking.service.ParkingsService;
-import android.preference.PreferenceManager;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.ImageView;
-import android.widget.TableLayout;
-import android.widget.TextView;
-
-import com.google.android.gms.maps.GoogleMap;
+//import uk.ac.open.kmi.parking.service.ParkingsService;
+//import android.preference.PreferenceManager;
+//import android.view.View;
+//import android.view.View.OnClickListener;
+//import android.view.ViewGroup;
+//import android.view.ViewGroup.LayoutParams;
+//import android.widget.ImageView;
+//import android.widget.TableLayout;
+//import android.widget.TextView;
+//
+//import com.google.android.gms.maps.GoogleMap;
 
 /**
  * a map overlay that contains some DrawableOverlayItems
@@ -68,11 +68,11 @@ class BubbleOverlay {
 //        this.density = density;
 //    }
 //
-//    /**
-//     * set item to show in the bubble, set it to null to remove the bubble
-//     * WARNING: this must be called from the UI thread that calls draw()
-//     * @param item the item to show in the bubble, null if no bubble should be shown
-//     */
+    /**
+     * set item to show in the bubble, set it to null to remove the bubble
+     * WARNING: this must be called from the UI thread that calls draw()
+     * @param item the item to show in the bubble, null if no bubble should be shown
+     */
     public void setItem(MapItem item) {
 //        if (this.bubbleView != null) {
 //            if (this.bubbleCarpark != null && this.bubbleCarpark.equals(item)) {
