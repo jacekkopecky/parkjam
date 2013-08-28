@@ -207,24 +207,6 @@ public class MainActivity extends Activity implements
 
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
-//        MarkerOptions mo = new MarkerOptions().draggable(true);
-//        this.map.addMarker(mo
-//            .position(new LatLng(50.799, -1.1))
-//            .title("top")
-//            .snippet("Population: 776733"));
-//        final Marker m = this.map.addMarker(mo
-//            .position(new LatLng(50.8, -1.1))
-//            .title("San Francisco")
-//            .snippet("Population: 776733"));
-//        this.map.setOnMarkerClickListener(new OnMarkerClickListener() {
-//            private boolean full = true;
-//            public boolean onMarkerClick(Marker arg0) {
-//                this.full = !this.full;
-//                m.setIcon(BitmapDescriptorFactory.fromResource(this.full ? R.drawable.parking_full : R.drawable.parking_available));
-//                Toast.makeText(MainActivity.this, "changing to " + this.full, Toast.LENGTH_SHORT).show();
-//                return false;
-//            }
-//        });
 
 //        List<Overlay> overlays = this.mapView.getOverlays();
 
