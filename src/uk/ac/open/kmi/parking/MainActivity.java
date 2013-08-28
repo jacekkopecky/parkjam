@@ -66,19 +66,14 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * main
  * @author Jacek Kopecky
  *
  */
-@SuppressWarnings("deprecation") // todo drop this
 public class MainActivity extends Activity implements
         LocationListener,
         SortedCurrentItemsUpdateListener,
@@ -415,6 +410,9 @@ public class MainActivity extends Activity implements
         this.parkingsService.registerCarparkDetailsUpdateListener(this);
         this.parkingsService.geocoder = new Geocoder(this);
         this.parkingsService.startService();
+
+        // start downloading tiles at current map location
+        this.parkingsService.getSortedCurrentItems(this.map.getCameraPosition().target);
 
         if (this.desiredCarpark != null) {
             showDialog(DIALOG_LOADING_CARPARK);
@@ -840,6 +838,7 @@ public class MainActivity extends Activity implements
             public void run() {
                 MainActivity.this.bubbleOverlay.updateAvailability(parking);
                 MainActivity.this.pinnedDrawerAdapter.updateIfContains(parking);
+                MainActivity.this.carparkManager.updateAvailability(parking);
 //                MainActivity.this.mapView.invalidate();
             }
         });

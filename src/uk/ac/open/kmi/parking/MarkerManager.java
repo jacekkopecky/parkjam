@@ -91,10 +91,7 @@ public class MarkerManager implements OnMarkerClickListener {
             Marker m = this.carpark2marker.get(p);
             if (m != null) {
                 // update the availability (save old availabilities and only change icon on actual change)
-                BitmapDescriptor bd = p.getBitmapDescriptor();
-                if (this.carpark2avail.get(p) != bd) {
-                    m.setIcon(bd);
-                    this.carpark2avail.put(p, bd);
+                if (updateCarparkMarker(p, m)) {
                     updated++;
                 }
             } else {
@@ -114,7 +111,7 @@ public class MarkerManager implements OnMarkerClickListener {
 
         if (!currentOutline.isEmpty()) {
             if (this.outline == null) {
-                this.outline = this.map.addPolygon(new PolygonOptions().addAll(currentOutline).fillColor(0).strokeWidth(1));
+                this.outline = this.map.addPolygon(new PolygonOptions().addAll(currentOutline).fillColor(0).strokeColor(0xffc763ad).strokeWidth(1));
             } else {
                 this.outline.setPoints(currentOutline);
             }
@@ -130,12 +127,32 @@ public class MarkerManager implements OnMarkerClickListener {
         Log.d(TAG, "update took " + (System.currentTimeMillis() - starttime) + "ms, add/del/upd: " + added + "/" + removed + "/" + updated);
     }
 
+    private boolean updateCarparkMarker(MapItem p, Marker m) {
+        BitmapDescriptor bd = p.getBitmapDescriptor();
+        if (this.carpark2avail.get(p) != bd) {
+            m.setIcon(bd);
+            this.carpark2avail.put(p, bd);
+            return true;
+        }
+        return false;
+    }
+
     public boolean onMarkerClick(Marker m) {
         // todo update the title and such data of the marker to the details of the car park of this marker
         return false;
     }
 
-    public void onCarparkUpdated(Parking p) {
-        // todo update the car park's marker's icon only
+    /**
+     * update the marker of this given car park
+     * @param p car park that was updated
+     */
+    public void updateAvailability(Parking p) {
+        // update the car park's marker's icon only
+        Marker m = this.carpark2marker.get(p);
+        if (m != null) {
+            updateCarparkMarker(p, m);
+        } else {
+            Log.e(TAG, "no marker found for car park " + p);
+        }
     }
 }
