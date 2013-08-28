@@ -16,11 +16,12 @@
 
 package uk.ac.open.kmi.parking;
 
-import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.LatLng;
 
 /**
  * this class implements a geopoint defined as the average of a bunch of points - later it could be upgraded to be an actual polygon that a parking could draw
- * todo treat this as an actual polygon
+ * todo treat this as an actual polygon, with centroid
+ * this class seems to be disused at the moment
  * @author Jacek Kopecky
  *
  */
@@ -33,18 +34,18 @@ public class Polygon {
 //        super(avg(0,latlone6), avg(1,latlone6));
 //    }
 
-    public LatLng avg(int... latlone6) {
-        return new LatLng(avg(0,latlone6), avg(1,latlone6));
-    }
-
-    private static int avg(int offset, int[] latlone6) {
-        if ((latlone6.length | 1) == 1) {
-            throw new IllegalArgumentException("Polygon constructor must get an even number of agruments, each two subsequent params forming a latitude/longitude pair");
-        }
-        long sum = 0;
-        for (int i=offset; i< latlone6.length; i+=2) {
-            sum += latlone6[i];
-        }
-        return (int)(sum*2/latlone6.length); // *2 because the length is twice the number of points
-    }
+//    private LatLng avg(int... latlone6) {
+//        return new LatLng(avg(0,latlone6), avg(1,latlone6));
+//    }
+//
+//    private static int avg(int offset, int[] latlone6) {
+//        if ((latlone6.length | 1) == 1) {
+//            throw new IllegalArgumentException("Polygon constructor must get an even number of agruments, each two subsequent params forming a latitude/longitude pair");
+//        }
+//        long sum = 0;
+//        for (int i=offset; i< latlone6.length; i+=2) {
+//            sum += latlone6[i];
+//        }
+//        return (int)(sum*2/latlone6.length); // *2 because the length is twice the number of points
+//    }
 }
