@@ -42,7 +42,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
     private static final String TAG = "sorting thread";
 
     volatile Collection<MapItem> sortedCurrentItems = Collections.emptyList(); // HardwiredParkingList.listParkings();
-    volatile List<LatLng> currentSortedOutline = new ArrayList<LatLng>(4);
+    volatile List<LatLng> currentSortedOutline = new ArrayList<LatLng>(5);
 
     private volatile MapRectangle currentCoveredCoordinatesE6 = null;
     private final BlockingQueue<Event> eventQueue = new ArrayBlockingQueue<Event>(1000); // todo make this number configurable? also the number of updatedTiles below
@@ -260,6 +260,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                 this.currentSortedOutline.add(new LatLng(outlineLatMin, outlineLonMax));
                 this.currentSortedOutline.add(new LatLng(outlineLatMax, outlineLonMax));
                 this.currentSortedOutline.add(new LatLng(outlineLatMax, outlineLonMin));
+                this.currentSortedOutline.add(new LatLng(outlineLatMin, outlineLonMin));
 
                 // let listeners know about this change (even if there are no car parks, the coords may have changed)
                 synchronized(this) {

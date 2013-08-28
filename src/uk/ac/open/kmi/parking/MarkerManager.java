@@ -33,7 +33,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 /**
  * this class manages the markers shown on the map, and listens to the events that affect them
@@ -51,7 +52,7 @@ public class MarkerManager implements OnMarkerClickListener {
     private final Map<MapItem, Marker> carpark2marker = new HashMap<MapItem, Marker>();
     private final Map<MapItem, Object> carpark2avail = new HashMap<MapItem, Object>();
 
-    private com.google.android.gms.maps.model.Polygon outline = null;
+    private Polyline outline = null;
 
     private final Set<MapItem> tmpObsoleteCarparks = new HashSet<MapItem>();
 
@@ -111,7 +112,7 @@ public class MarkerManager implements OnMarkerClickListener {
 
         if (!currentOutline.isEmpty()) {
             if (this.outline == null) {
-                this.outline = this.map.addPolygon(new PolygonOptions().addAll(currentOutline).fillColor(0).strokeColor(0xffc763ad).strokeWidth(1));
+                this.outline = this.map.addPolyline(new PolylineOptions().addAll(currentOutline).color(0xffc763ad).width(1.5f));
             } else {
                 this.outline.setPoints(currentOutline);
             }
