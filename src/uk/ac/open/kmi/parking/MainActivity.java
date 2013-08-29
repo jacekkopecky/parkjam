@@ -23,7 +23,7 @@ import java.util.List;
 import uk.ac.open.kmi.parking.service.CarparkAvailabilityUpdateListener;
 import uk.ac.open.kmi.parking.service.CarparkDetailsUpdateListener;
 import uk.ac.open.kmi.parking.service.ParkingsService;
-import uk.ac.open.kmi.parking.service.SortedCurrentItemsUpdateListener;
+import uk.ac.open.kmi.parking.service.SortedCurrentCarparksUpdateListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -76,7 +76,7 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class MainActivity extends Activity implements
         LocationListener,
-        SortedCurrentItemsUpdateListener,
+        SortedCurrentCarparksUpdateListener,
 //        NearbyCarparkUpdateListener,
         LoadingStatus.Listener,
         CarparkAvailabilityUpdateListener,
@@ -381,7 +381,7 @@ public class MainActivity extends Activity implements
     @Override
     protected void onRestoreInstanceState(Bundle state) {
         this.animateToNextLocationFix = state.getBoolean(SAVED_ANIMATE_TO_NEXT_LOCATION, true);
-        String bubble = state.getString(SAVED_BUBBLE_ITEM);
+        String bubble = state.getString(SAVED_BUBBLE_CARPARK);
         if (bubble != null) {
             this.carparkManager.showBubble(Parking.getParking(Uri.parse(bubble)));
         }
@@ -395,7 +395,7 @@ public class MainActivity extends Activity implements
 //        this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
 
         LoadingStatus.registerListener(this);
-        this.parkingsService.registerSortedCurrentItemsUpdateListener(this);
+        this.parkingsService.registerSortedCurrentCarparksUpdateListener(this);
 //        this.parkingsService.registerNearbyCurrentItemsUpdateListener(this);
         this.parkingsService.registerCarparkAvailabilityUpdateListener(this);
         this.parkingsService.registerCarparkDetailsUpdateListener(this);
@@ -403,7 +403,7 @@ public class MainActivity extends Activity implements
         this.parkingsService.startService();
 
         // start downloading tiles at current map location
-        this.parkingsService.getSortedCurrentItems(this.map.getCameraPosition().target);
+        this.parkingsService.getSortedCurrentCarparks(this.map.getCameraPosition().target);
 
         if (this.desiredCarpark != null) {
             showDialog(DIALOG_LOADING_CARPARK);
@@ -447,7 +447,7 @@ public class MainActivity extends Activity implements
             this.map.moveCamera(CameraUpdateFactory.newLatLng(parking.point));
             this.carparkManager.showBubble(parking);
         } else {
-            if (!parking.equals(this.carparkManager.getBubbleItem())) {
+            if (!parking.equals(this.carparkManager.getBubbleCarpark())) {
                 this.carparkManager.removeBubble();
             }
             this.map.animateCamera(CameraUpdateFactory.newLatLng(parking.point), new GoogleMap.CancelableCallback() {
@@ -477,7 +477,7 @@ public class MainActivity extends Activity implements
         this.parkingsService.geocoder = null;
         this.parkingsService.unregisterCarparkDetailsUpdateListener(this);
         this.parkingsService.unregisterCarparkAvailabilityUpdateListener(this);
-        this.parkingsService.unregisterSortedCurrentItemsUpdateListener(this);
+        this.parkingsService.unregisterSortedCurrentCarparksUpdateListener(this);
 //        this.parkingsService.unregisterNearbyCurrentItemsUpdateListener(this);
         this.parkingsService.stopService(this);
 
@@ -515,11 +515,11 @@ public class MainActivity extends Activity implements
     /**
      * helper method that calls the details view
      * @param context the current activity
-     * @param item the parking whose details should be viewed
+     * @param p the parking whose details should be viewed
      */
-    public static void showDetailsForCarpark(Context context, MapItem item) {
+    public static void showDetailsForCarpark(Context context, Parking p) {
         Intent intent = new Intent(context, ParkingDetailsActivity.class);
-        intent.setData(item.id);
+        intent.setData(p.id);
         context.startActivity(intent);
     }
 
@@ -687,9 +687,9 @@ public class MainActivity extends Activity implements
 
     void pinCarpark(Parking p, boolean pin) {
         this.parkingsService.pinCarpark(p, pin, this);
-        boolean drawerHasItems = this.pinnedDrawerAdapter.update();
-        if (drawerHasItems != this.showingPinned) {
-            this.showingPinned = drawerHasItems;
+        boolean drawerHasCarparks = this.pinnedDrawerAdapter.update();
+        if (drawerHasCarparks != this.showingPinned) {
+            this.showingPinned = drawerHasCarparks;
             updateUIState();
         }
 //        this.bubbleOverlay.updatePinnedStatus(p);  todo
@@ -813,7 +813,7 @@ public class MainActivity extends Activity implements
         }
     };
 
-    public void onSortedCurrentItemsUpdated() {
+    public void onSortedCurrentCarparksUpdated() {
         runOnUiThread(this.updateUIStateTask);
     }
 
@@ -988,7 +988,7 @@ public class MainActivity extends Activity implements
         return this.searchDialog;
     }
 
-    void openNavigationTo(MapItem p) {
+    void openNavigationTo(Parking p) {
         String saddr = ""; // start point address
         if (this.currentLocation != null) {
             saddr = "saddr=" + this.currentLocation.getLatitude() + "," + this.currentLocation.getLongitude() + "&";
@@ -1001,15 +1001,15 @@ public class MainActivity extends Activity implements
 
     private static final String SAVED_ANIMATE_TO_NEXT_LOCATION = "uk.ac.open.kmi.parking.animate-to-next-location";
     private static final String SAVED_ADDING_MODE = "uk.ac.open.kmi.parking.adding-mode";
-    private static final String SAVED_BUBBLE_ITEM = "uk.ac.open.kmi.parking.bubble-item";
+    private static final String SAVED_BUBBLE_CARPARK = "uk.ac.open.kmi.parking.bubble-carpark";
     private static final String SAVED_MAP_ZOOM = "uk.ac.open.kmi.parking.zoom-level.float";
     private static final String SAVED_SHOWING_PINNED_DRAWER = "uk.ac.open.kmi.parking.show-pinned-drawer";
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
         state.putBoolean(SAVED_ANIMATE_TO_NEXT_LOCATION, this.animateToNextLocationFix);
-        Parking bubble = (Parking)this.carparkManager.getBubbleItem();
-        state.putString(SAVED_BUBBLE_ITEM, bubble == null ? null : bubble.id.toString());
+        Parking bubble = this.carparkManager.getBubbleCarpark();
+        state.putString(SAVED_BUBBLE_CARPARK, bubble == null ? null : bubble.id.toString());
         state.putBoolean(SAVED_ADDING_MODE, this.addingMode);
         state.putFloat(SAVED_MAP_ZOOM, this.map.getCameraPosition().zoom);
         state.putBoolean(SAVED_SHOWING_PINNED_DRAWER, this.showingPinned);

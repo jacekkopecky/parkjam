@@ -17,16 +17,16 @@
 package uk.ac.open.kmi.parking.service;
 
 /**
- * listener for when there's a change in the sorted list of items near the user's current UI view location
+ * listener for when there's a change in the sorted list of car parks near the user's current UI view location
  * not guaranteed to be called on the GUI thread
  * @author Jacek Kopecky
  *
  */
-public interface SortedCurrentItemsUpdateListener {
+public interface SortedCurrentCarparksUpdateListener {
 
     /**
-     * called on a change in the sorted list of items near the user's current UI view location
+     * called on a change in the sorted list of carparks near the user's current UI view location
      */
-    public void onSortedCurrentItemsUpdated();
+    public void onSortedCurrentCarparksUpdated();
 
 }

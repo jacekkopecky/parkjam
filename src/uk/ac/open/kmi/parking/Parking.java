@@ -34,7 +34,7 @@ import com.hp.hpl.jena.rdf.model.Property;
  * @author Jacek Kopecky
  *
  */
-public class Parking extends MapItem {
+public class Parking {
 //    @SuppressWarnings("unused")
     private static final String TAG = "parking";
 
@@ -42,6 +42,21 @@ public class Parking extends MapItem {
 
     @SuppressWarnings("javadoc")
     public static enum Availability { FULL, AVAILABLE, UNKNOWN };
+
+    /**
+     * the RDF ID of the car park
+     */
+    public final Uri id;
+
+    /**
+     * the location of this car park
+     */
+    public final LatLng point;
+
+    /**
+     * the title of this car park (allowed to change)
+     */
+    protected String title;
 
     /**
      * whether the car park is seen as avaiable
@@ -118,16 +133,8 @@ public class Parking extends MapItem {
      */
     public boolean unconfirmed;
 
-    // todo this can be more hard-wired and faster
     private static BitmapDescriptor drawFull = null;
     private static BitmapDescriptor drawAvailable = null;
-//    private static Drawable drawUnknown = null;
-//    private static View drawHighlightA = null;
-//    private static View drawHighlightF = null;
-//    private static View drawHighlightU = null;
-//    private static Rect boundsFull = null;
-//    private static Rect boundsAvailable = null;
-//    private static Rect boundsUnknown = null;
 
     /**
      * constructor, fills all the fields
@@ -143,7 +150,9 @@ public class Parking extends MapItem {
      * @param unconfirmed whether the car park is submitted recently and not yet approved
      */
     public Parking(LatLng point, String title, Uri id, String availabilityResource, String updateResource, Availability available, Long timestamp, long availTTL, Property titleProperty, boolean unconfirmed) {
-        super(point, title, id);
+        this.point = point;
+        this.title = title;
+        this.id = id;
         this.availabilityEffective = available;
         this.availabilityReported = available;
         this.availabilityTimestamp = timestamp;
@@ -165,45 +174,9 @@ public class Parking extends MapItem {
         knownParkings.put(id, new WeakReference<Parking>(this));
     }
 
-    /* *
-     * constructor, fills all the fields
-     * @param lat latitude
-     * @param lon longitude
-     * @param title car park name
-     * @param id RDF id
-     * @param available availability status
-     * /
-    public Parking(double lat, double lon, String title, Uri id, boolean available) {
-        super(new GeoPoint((int)(lat*1e6), (int)(lon*1e6)), title, "subtitle not used at the moment", id);
-        this.latitude = lat;
-        this.longitude = lon;
-        this.available = available;
-    }*/
-
-//    @Override
-//    public Drawable getDrawable() {
-//        if (drawFull == null) {
-//            throw new IllegalStateException("must use Parking.setDrawables() before using Parking instances in an overlay");
-//        }
-//        Drawable retval = null;
-//        switch (this.availabilityEffective) {
-//        case AVAILABLE:
-//            retval = drawAvailable;
-//            retval.setBounds(boundsAvailable);
-//            break;
-//        case FULL:
-//            retval = drawFull;
-//            retval.setBounds(boundsFull);
-//            break;
-//        case UNKNOWN:
-//            retval = drawUnknown;
-//            retval.setBounds(boundsUnknown);
-//            break;
-//        }
-//        return retval;
-//    }
-
-    @Override
+    /**
+     * @return the bitmap to be used for this car park's marker
+     */
     public BitmapDescriptor getBitmapDescriptor() {
         if (drawFull == null) {
             throw new IllegalStateException("must use Parking.setDrawables() before using Parking instances in an overlay");
@@ -222,45 +195,6 @@ public class Parking extends MapItem {
         }
         return retval;
     }
-
-//    @Override
-//    public View getHighlight() {
-//        if (drawFull == null) {
-//            throw new IllegalStateException("must use Parking.setDrawables() before using Parking instances in an overlay");
-//        }
-//        switch (this.availabilityEffective) {
-//        case AVAILABLE:
-//            return drawHighlightA;
-//        case FULL:
-//            return drawHighlightF;
-//        default:
-//            return drawHighlightU;
-//        }
-//    }
-//
-//    /**
-//     * sets the drawables to be used for full and available parkings
-//     * @param full drawable for full parkings
-//     * @param fullBounds the bounds for the drawable for full parkings - this can be used to put the origin point in the center (an icon), or at the bottom middle (a pin in the map)
-//     * @param available drawable for available parkings
-//     * @param availableBounds the bounds for the drawable for available parkings
-//     * @param unknown drawable for parkings with unknown availability
-//     * @param unknownBounds the bounds for the drawable for unknown-availability parkings
-//     * @param highlightA view for highlighting the current parking if available
-//     * @param highlightF view for highlighting the current parking if full
-//     * @param highlightU view for highlighting the current parking if unknown
-//     */
-//    public static void setDrawables(Drawable full, Rect fullBounds, Drawable available, Rect availableBounds, Drawable unknown, Rect unknownBounds, View highlightA, View highlightF, View highlightU) {
-//        drawFull = full;
-//        drawAvailable = available;
-//        drawUnknown = unknown;
-//        drawHighlightA = highlightA;
-//        drawHighlightF = highlightF;
-//        drawHighlightU = highlightU;
-//        boundsFull = fullBounds;
-//        boundsAvailable = availableBounds;
-//        boundsUnknown = unknownBounds;
-//    }
 
     /**
      * sets the drawables to be used for full and available parkings
@@ -294,9 +228,6 @@ public class Parking extends MapItem {
      * @return the parking or null
      */
     public static Parking getParking(Uri id) {
-//        if (id == null) {
-//            return null;
-//        }
         WeakReference<Parking> ref = knownParkings.get(id);
         Parking retval;
         if (ref != null) {
@@ -381,5 +312,112 @@ public class Parking extends MapItem {
         this.hasAnyTitle = true;
         this.title = title;
         this.titleProperty = titleProperty;
+    }
+
+
+    /**
+     * return the (current) title of this car park
+     * @return the title of this carpark
+     */
+    public String getTitle() {
+        return this.title;
+    }
+
+    /**
+     * comparator that sorts drawables north-to-south, west-to-east
+     */
+    public static class NW2SEComparator implements java.util.Comparator<Parking> {
+
+        public int compare(Parking object1, Parking object2) {
+            if (object1 == null) {
+                if (object2 == null) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (object2 == null) {
+                return 1;
+            }
+            LatLng p1 = object1.point;
+            LatLng p2 = object2.point;
+            if (p1.latitude > p2.latitude) {
+                return -1;
+            } else if (p1.latitude == p2.latitude) {
+                if (p1.longitude > p2.longitude) {
+                    return -1;
+                } else if (p1.longitude == p2.longitude) {
+                    int h1 = object1.hashCode();
+                    int h2 = object2.hashCode();
+                    return h1 < h2 ? -1 : (h1 == h2 ? 0 : 1);
+                } else {
+                    return 1;
+                }
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    /**
+     * comparator that sorts drawables by maximum{lat,long} distance from the center
+     */
+    public static class SquareDistComparator implements java.util.Comparator<Parking> {
+
+        private final LatLng center;
+        /**
+         * ratio of longitude length to latitude - at equator, that's 1; at higher latitudes it becomes smaller as the longitude lines get closer together
+         */
+        public final double lonRatio;
+
+        /**
+         * @param center the center along the distance from which the objects will be compared
+         */
+        public SquareDistComparator(LatLng center) {
+            this.center = center;
+            this.lonRatio = Math.cos(center.latitude*(Math.PI/180d));
+        }
+
+        public int compare(Parking object1, Parking object2) {
+            if (object1 == null) {
+                if (object2 == null) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (object2 == null) {
+                return 1;
+            }
+            if (object1 == object2 || object1.equals(object2)) return 0;
+
+            double o1dist = squareDist(object1.point);
+            double o2dist = squareDist(object2.point);
+            if (o1dist > o2dist) {
+                return 1;
+            } else if (o1dist == o2dist) {
+                int h1 = object1.hashCode();
+                int h2 = object2.hashCode();
+                if (h1 == h2) {
+                    h1 = System.identityHashCode(object1);
+                    h2 = System.identityHashCode(object2);
+                }
+                return h1 < h2 ? -1 : (h1 == h2 ? 0 : 1);
+            } else {
+                return -1;
+            }
+        }
+
+        /**
+         * computes the square distance (maximum of the lat and long distances, compensating for longitude meaning less distance in higher latitudes) of the point to the given center
+         * @param point the point
+         * @return the square distance in lengths of latitude
+         */
+        public double squareDist(LatLng point) {
+            return Math.max(Math.abs(point.latitude-this.center.latitude), Math.abs(point.longitude-this.center.longitude)*this.lonRatio);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "parking " + this.title;
     }
 }

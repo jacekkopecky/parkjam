@@ -30,8 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import android.util.Log;
 
-import uk.ac.open.kmi.parking.MapItem;
-import uk.ac.open.kmi.parking.MapItem.SquareDistComparator;
+import uk.ac.open.kmi.parking.Parking.SquareDistComparator;
 import uk.ac.open.kmi.parking.Parking;
 
 /**
@@ -41,7 +40,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
 //    @SuppressWarnings("unused")
     private static final String TAG = "sorting thread";
 
-    volatile Collection<MapItem> sortedCurrentItems = Collections.emptyList(); // HardwiredParkingList.listParkings();
+    volatile Collection<Parking> sortedCurrentCarparks = Collections.emptyList(); // HardwiredParkingList.listParkings();
     volatile List<LatLng> currentSortedOutline = new ArrayList<LatLng>(5);
 
     private volatile MapRectangle currentCoveredCoordinatesE6 = null;
@@ -161,7 +160,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                 final boolean onlyConfirmed = !ParkingsService.get(null).getShowUnconfirmedCarparks();
 
                 SquareDistComparator comparator = new SquareDistComparator(coords);
-                TreeSet<MapItem> retval = new TreeSet<MapItem>(comparator);
+                TreeSet<Parking> retval = new TreeSet<Parking>(comparator);
                 int count=0; int total=0;
 
                 // this thread also makes sure to update tiles when they expire, by doing a refresh
@@ -218,29 +217,29 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
 
                 // setting the current car parks nearest to the map camera, and the outline of the displayed carparks
                 // this must be set before listeners are called because they may use it
-                ArrayList<MapItem> nearest = new ArrayList<MapItem>(ParkingsService.MAX_CARPARKS_DISPLAYED);
-                MapItem firstItemOutside = null;
+                ArrayList<Parking> nearest = new ArrayList<Parking>(ParkingsService.MAX_CARPARKS_DISPLAYED);
+                Parking firstCarparkOutside = null;
                 int i = 0;
-                for (MapItem p: retval) {
+                for (Parking p: retval) {
                     if ((i++) < ParkingsService.MAX_CARPARKS_DISPLAYED) {
                         nearest.add(p);
                     } else {
-                        firstItemOutside = p;
+                        firstCarparkOutside = p;
                         break;
                     }
                 }
-                this.sortedCurrentItems = nearest;
+                this.sortedCurrentCarparks = nearest;
 
                 this.currentSortedOutline.clear();
 
-                // compute the outline of the sorted items
+                // compute the outline of the sorted carparks
                 double outlineLatMin = this.currentCoveredCoordinatesE6.latminE6/1e6d;
                 double outlineLatMax = this.currentCoveredCoordinatesE6.latmaxE6/1e6d;
                 double outlineLonMin = this.currentCoveredCoordinatesE6.lonminE6/1e6d;
                 double outlineLonMax = this.currentCoveredCoordinatesE6.lonmaxE6/1e6d;
 
-                if (firstItemOutside != null) {
-                    double currentSortedOutlineDistanceLat = comparator.squareDist(firstItemOutside.point);
+                if (firstCarparkOutside != null) {
+                    double currentSortedOutlineDistanceLat = comparator.squareDist(firstCarparkOutside.point);
                     double currentSortedOutlineDistanceLon = currentSortedOutlineDistanceLat / comparator.lonRatio;
                     double latMin = coords.latitude - currentSortedOutlineDistanceLat;
                     double latMax = coords.latitude + currentSortedOutlineDistanceLat;
@@ -262,8 +261,8 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
 
                 // let listeners know about this change (even if there are no car parks, the coords may have changed)
                 synchronized(this) {
-                    for (SortedCurrentItemsUpdateListener listener : this.updateListeners) {
-                        listener.onSortedCurrentItemsUpdated();
+                    for (SortedCurrentCarparksUpdateListener listener : this.updateListeners) {
+                        listener.onSortedCurrentCarparksUpdated();
                     }
                 }
                 Log.d(TAG, "recomputed (with " + count + " out of " + total + " tiles, " + retval.size() + " parkings) in " + (System.currentTimeMillis()-startTime) + "ms");
@@ -341,12 +340,12 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
         }
     }
 
-    private final Set<SortedCurrentItemsUpdateListener> updateListeners = new HashSet<SortedCurrentItemsUpdateListener>();
+    private final Set<SortedCurrentCarparksUpdateListener> updateListeners = new HashSet<SortedCurrentCarparksUpdateListener>();
 
-    public synchronized void registerUpdateListener(SortedCurrentItemsUpdateListener listener) {
+    public synchronized void registerUpdateListener(SortedCurrentCarparksUpdateListener listener) {
         this.updateListeners.add(listener);
     }
-    public synchronized void unregisterUpdateListener(SortedCurrentItemsUpdateListener listener) {
+    public synchronized void unregisterUpdateListener(SortedCurrentCarparksUpdateListener listener) {
         this.updateListeners.remove(listener);
     }
 }

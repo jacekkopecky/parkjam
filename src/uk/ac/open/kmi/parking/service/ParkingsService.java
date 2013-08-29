@@ -19,7 +19,6 @@ package uk.ac.open.kmi.parking.service;
 import java.util.Collection;
 import java.util.List;
 
-import uk.ac.open.kmi.parking.MapItem;
 import uk.ac.open.kmi.parking.Parking;
 import uk.ac.open.kmi.parking.Parking.Availability;
 import uk.ac.open.kmi.parking.R;
@@ -118,7 +117,7 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
     // listeners supported by parking service:
     // ParkingAvailabilityChange
     // ParkingDetailsChange
-        // ParkingsListChange - SortedCurrentItemsUpdateListener, NearCurrentItemsUpdateListener
+        // ParkingsListChange - SortedCurrentCarparksUpdateListener, NearCurrentCarparksUpdateListener
 
 
     // todo check that for every registerListener there is an unregisterListener, maybe without exceptions
@@ -162,29 +161,28 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
     }
 
     /**
-     * returns (quickly) a precomputed collection of drawable overlay items for the given map
-     * todo extract this into a DrawableOverlayItemContainer interface? there should be multiple impls for this because we want parkings, businesses, events etc.
+     * returns (quickly) a precomputed collection of carparks for the given map
      * @param mapCenter center of the map
-     * @return a collection of drawable overlay items, sorted north-to-south
+     * @return a collection of carparks
      */
-    public Collection<MapItem> getSortedCurrentItems(LatLng mapCenter) {
+    public Collection<Parking> getSortedCurrentCarparks(LatLng mapCenter) {
         if (!this.threadsStopped) {
             // forward the location to the sorting precomputation thread
             this.sortingPrecomputer.onNewCoordinates(mapCenter);
         }
-        return getSortedCurrentItems();
+        return getSortedCurrentCarparks();
     }
 
     /**
-     * returns (quickly) a precomputed collection of drawable overlay items
-     * @return a collection of drawable overlay items, sorted north-to-south
+     * returns (quickly) a precomputed collection of carparks
+     * @return a collection of carparks
      */
-    public Collection<MapItem> getSortedCurrentItems() {
-        return this.sortingPrecomputer.sortedCurrentItems;
+    public Collection<Parking> getSortedCurrentCarparks() {
+        return this.sortingPrecomputer.sortedCurrentCarparks;
     }
 
     /**
-     * returns (quickly) a precomputed outline for the current sorted items
+     * returns (quickly) a precomputed outline for the current sorted carparks
      * @return the outline as a list of points for a polygon
      */
     public List<LatLng> getCurrentSortedOutline() {
@@ -192,34 +190,34 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
     }
 
     /**
-     * register a listener for updates of the current sorted items collection
+     * register a listener for updates of the current sorted carparks collection
      * @param listener the listener
      */
-    public synchronized void registerSortedCurrentItemsUpdateListener(SortedCurrentItemsUpdateListener listener) {
+    public synchronized void registerSortedCurrentCarparksUpdateListener(SortedCurrentCarparksUpdateListener listener) {
         this.sortingPrecomputer.registerUpdateListener(listener);
     }
 
     /**
-     * unregister a listener for updates of the current sorted items collection
+     * unregister a listener for updates of the current sorted carparks collection
      * @param listener the listener
      */
-    public synchronized void unregisterSortedCurrentItemsUpdateListener(SortedCurrentItemsUpdateListener listener) {
+    public synchronized void unregisterSortedCurrentCarparksUpdateListener(SortedCurrentCarparksUpdateListener listener) {
         this.sortingPrecomputer.unregisterUpdateListener(listener);
     }
 
     /**
-     * register a listener for updates of the current near items collection
+     * register a listener for updates of the current near carparks collection
      * @param listener the listener
      */
-    public synchronized void registerNearbyCurrentItemsUpdateListener(NearbyCarparkUpdateListener listener) {
+    public synchronized void registerNearbyCurrentCarparksUpdateListener(NearbyCarparkUpdateListener listener) {
         this.nearPrecomputer.registerUpdateListener(listener);
     }
 
     /**
-     * unregister a listener for updates of the current near items collection
+     * unregister a listener for updates of the current near carparks collection
      * @param listener the listener
      */
-    public synchronized void unregisterNearbyCurrentItemsUpdateListener(NearbyCarparkUpdateListener listener) {
+    public synchronized void unregisterNearbyCurrentCarparksUpdateListener(NearbyCarparkUpdateListener listener) {
         this.nearPrecomputer.unregisterUpdateListener(listener);
     }
 

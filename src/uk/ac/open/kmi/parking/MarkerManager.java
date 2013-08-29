@@ -49,13 +49,13 @@ public class MarkerManager implements OnMarkerClickListener {
     private GoogleMap map;
     private Context context;
 
-    private final Map<MapItem, Marker> carpark2marker = new HashMap<MapItem, Marker>();
-    private final Map<MapItem, Object> carpark2avail = new HashMap<MapItem, Object>();
+    private final Map<Parking, Marker> carpark2marker = new HashMap<Parking, Marker>();
+    private final Map<Parking, Object> carpark2avail = new HashMap<Parking, Object>();
 
     private Polyline outline = null;
 //    private Label label;
 
-    private final Set<MapItem> tmpObsoleteCarparks = new HashSet<MapItem>();
+    private final Set<Parking> tmpObsoleteCarparks = new HashSet<Parking>();
 
     private final MarkerOptions commonOptions = new MarkerOptions();
 
@@ -76,7 +76,7 @@ public class MarkerManager implements OnMarkerClickListener {
         this.commonOptions.anchor(.5f, 1f).draggable(false);
     }
 
-    public void showBubble(MapItem p) {
+    public void showBubble(Parking p) {
         // todo
     }
 
@@ -85,12 +85,12 @@ public class MarkerManager implements OnMarkerClickListener {
         return false;
     }
 
-    public MapItem getBubbleItem() {
+    public Parking getBubbleCarpark() {
         // todo
         return null;
     }
 
-    public void updateDetails(MapItem p) {
+    public void updateDetails(Parking p) {
         // todo
     }
 
@@ -104,11 +104,11 @@ public class MarkerManager implements OnMarkerClickListener {
         // get current sorted car parks - need not be sorted any more
         this.tmpObsoleteCarparks.clear();
         this.tmpObsoleteCarparks.addAll(this.carpark2marker.keySet());
-        Collection<MapItem> carparks = this.parkingsService.getSortedCurrentItems();
+        Collection<Parking> carparks = this.parkingsService.getSortedCurrentCarparks();
         List<LatLng> currentOutline = this.parkingsService.getCurrentSortedOutline();
 
         int added = 0, removed = 0, updated = 0;
-        for (MapItem p : carparks) {
+        for (Parking p : carparks) {
             this.tmpObsoleteCarparks.remove(p);
             Marker m = this.carpark2marker.get(p);
             if (m != null) {
@@ -122,7 +122,7 @@ public class MarkerManager implements OnMarkerClickListener {
                 this.commonOptions.icon(bd)
                     .position(p.point)
                     .title(p.getTitle())
-                    .snippet(ParkingDetailsActivity.getAvailabilityDescription(this.context, (Parking)p, false));
+                    .snippet(ParkingDetailsActivity.getAvailabilityDescription(this.context, p, false));
                 m = this.map.addMarker(this.commonOptions);
                 this.carpark2marker.put(p, m);
                 this.carpark2avail.put(p, bd);
@@ -141,7 +141,7 @@ public class MarkerManager implements OnMarkerClickListener {
         }
 
         // for each marker whose car park we don't know any more, remove it
-        for (MapItem p: this.tmpObsoleteCarparks) {
+        for (Parking p: this.tmpObsoleteCarparks) {
             this.carpark2marker.remove(p).remove();
             this.carpark2avail.remove(p);
             removed++;
@@ -153,7 +153,7 @@ public class MarkerManager implements OnMarkerClickListener {
         Log.d(TAG, "update took " + (System.currentTimeMillis() - starttime) + "ms, add/del/upd: " + added + "/" + removed + "/" + updated);
     }
 
-    private boolean updateCarparkMarker(MapItem p, Marker m) {
+    private boolean updateCarparkMarker(Parking p, Marker m) {
         BitmapDescriptor bd = p.getBitmapDescriptor();
         if (this.carpark2avail.get(p) != bd) {
             m.setIcon(bd);

@@ -81,7 +81,7 @@ public class MyLocationTracker implements
         }
 
         // tell parkings service that the map has moved
-        this.parkingsService.getSortedCurrentItems(this.map.getCameraPosition().target);
+        this.parkingsService.getSortedCurrentCarparks(this.map.getCameraPosition().target);
 
     }
 
