@@ -70,7 +70,28 @@ public class MarkerManager implements OnMarkerClickListener {
         this.map = map;
         this.context = context;
 
+        map.setOnMarkerClickListener(this);
+//        map.setInfoWindowAdapter(this);
+
         this.commonOptions.anchor(.5f, 1f).draggable(false);
+    }
+
+    public void showBubble(MapItem p) {
+        // todo
+    }
+
+    public boolean removeBubble() {
+        // todo
+        return false;
+    }
+
+    public MapItem getBubbleItem() {
+        // todo
+        return null;
+    }
+
+    public void updateDetails(MapItem p) {
+        // todo
     }
 
     /**
@@ -126,6 +147,9 @@ public class MarkerManager implements OnMarkerClickListener {
             removed++;
         }
         this.tmpObsoleteCarparks.clear();
+
+        // todo if the bubble is being shown, update that information as well
+
         Log.d(TAG, "update took " + (System.currentTimeMillis() - starttime) + "ms, add/del/upd: " + added + "/" + removed + "/" + updated);
     }
 
@@ -141,7 +165,8 @@ public class MarkerManager implements OnMarkerClickListener {
 
     public boolean onMarkerClick(Marker m) {
         // todo update the title and such data of the marker to the details of the car park of this marker
-        return false;
+        m.showInfoWindow();
+        return true;
     }
 
     /**
@@ -149,6 +174,7 @@ public class MarkerManager implements OnMarkerClickListener {
      * @param p car park that was updated
      */
     public void updateAvailability(Parking p) {
+        // todo also update availability description in bubble if that is shown
         // update the car park's marker's icon only
         Marker m = this.carpark2marker.get(p);
         if (m != null) {

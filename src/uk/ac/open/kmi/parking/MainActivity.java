@@ -90,7 +90,6 @@ public class MainActivity extends Activity implements
     private GoogleMap map;
     private MyLocationTracker myLocTracker;
     private MarkerManager carparkManager;
-    private BubbleOverlay bubbleOverlay;
     private LocationClient locationClient;
     private LocationRequest locationRequest;
     private AnimationDrawable loadingAnimation;
@@ -235,14 +234,6 @@ public class MainActivity extends Activity implements
 //
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-//        this.bubbleOverlay = new BubbleOverlay(
-        this.bubbleOverlay = new BubbleOverlay();
-//                this,
-//                this.parkingsService,
-//                this.map,
-//                dm.density);
-//
 
         if (dm.widthPixels / 3 > getResources().getDimension(R.dimen.pinned_drawer_width_max)) {
             android.view.ViewGroup.LayoutParams lp = this.pinnedDrawerContainer.getLayoutParams();
@@ -392,7 +383,7 @@ public class MainActivity extends Activity implements
         this.animateToNextLocationFix = state.getBoolean(SAVED_ANIMATE_TO_NEXT_LOCATION, true);
         String bubble = state.getString(SAVED_BUBBLE_ITEM);
         if (bubble != null) {
-            this.bubbleOverlay.setItem(Parking.getParking(Uri.parse(bubble)));
+            this.carparkManager.showBubble(Parking.getParking(Uri.parse(bubble)));
         }
         this.addingMode = state.getBoolean(SAVED_ADDING_MODE, false);
     }
@@ -443,28 +434,26 @@ public class MainActivity extends Activity implements
                 animateToCurrentLocation(true);
                 this.animateToNextLocationFix = false;
             }
-            this.bubbleOverlay.bringToFront();
             this.parkingsService.onLocationChanged(this.currentLocation);
         }
 
         this.pinnedDrawerAdapter.update();
         updateUIState();
         this.carparkManager.update();
-        this.bubbleOverlay.updateDetails(null);
     }
 
     void centerOnCarpark(final Parking parking, boolean immediate) {
         if (immediate) {
             this.map.moveCamera(CameraUpdateFactory.newLatLng(parking.point));
-            this.bubbleOverlay.setItem(parking);
+            this.carparkManager.showBubble(parking);
         } else {
-            if (!parking.equals(this.bubbleOverlay.getItem())) {
-                this.bubbleOverlay.removeItem();
+            if (!parking.equals(this.carparkManager.getBubbleItem())) {
+                this.carparkManager.removeBubble();
             }
             this.map.animateCamera(CameraUpdateFactory.newLatLng(parking.point), new GoogleMap.CancelableCallback() {
                 public void onCancel() { /* ignore */ }
                 public void onFinish() {
-                    MainActivity.this.bubbleOverlay.setItem(parking);
+                    MainActivity.this.carparkManager.showBubble(parking);
                 }
             });
         }
@@ -506,7 +495,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onBackPressed() {
-        if (this.bubbleOverlay.removeItem()) {
+        if (this.carparkManager.removeBubble()) {
 //            updateUIState();
         } else if (this.addingMode) {
             this.addingMode = false;
@@ -606,7 +595,7 @@ public class MainActivity extends Activity implements
 
 
         // drop bubble
-        this.bubbleOverlay.removeItem();
+        this.carparkManager.removeBubble();
 
         this.addingMode = true;
         updateUIState();
@@ -703,7 +692,7 @@ public class MainActivity extends Activity implements
             this.showingPinned = drawerHasItems;
             updateUIState();
         }
-        this.bubbleOverlay.updatePinnedStatus(p);
+//        this.bubbleOverlay.updatePinnedStatus(p);  todo
     }
 
     void reportAvailability(Parking park, boolean avail) {
@@ -720,7 +709,6 @@ public class MainActivity extends Activity implements
             this.animateToNextLocationFix = false;
         }
         this.parkingsService.onLocationChanged(location);
-        this.bubbleOverlay.bringToFront();
         this.myLocTracker.onLocationChanged(location);
 //        Log.d(TAG, "onLocationChanged called");
 
@@ -745,7 +733,7 @@ public class MainActivity extends Activity implements
 
         hideStatusText();
 
-        this.bubbleOverlay.updateAvailability();
+//        this.carparkManager.updateAvailability();
 //        this.mapView.invalidate();
 
         if (this.addingMode) {
@@ -836,7 +824,6 @@ public class MainActivity extends Activity implements
     public void onCarparkAvailabilityUpdated(final Parking parking) {
         runOnUiThread(new Runnable() {
             public void run() {
-                MainActivity.this.bubbleOverlay.updateAvailability(parking);
                 MainActivity.this.pinnedDrawerAdapter.updateIfContains(parking);
                 MainActivity.this.carparkManager.updateAvailability(parking);
 //                MainActivity.this.mapView.invalidate();
@@ -880,7 +867,7 @@ public class MainActivity extends Activity implements
     public void onCarparkInformationUpdated(final Parking parking) {
         runOnUiThread(new Runnable() {
             public void run() {
-                MainActivity.this.bubbleOverlay.updateDetails(parking);
+                MainActivity.this.carparkManager.updateDetails(parking);
                 MainActivity.this.pinnedDrawerAdapter.updateIfContains(parking);
             }
         });
@@ -1021,7 +1008,7 @@ public class MainActivity extends Activity implements
     @Override
     protected void onSaveInstanceState(Bundle state) {
         state.putBoolean(SAVED_ANIMATE_TO_NEXT_LOCATION, this.animateToNextLocationFix);
-        Parking bubble = this.bubbleOverlay.getItem();
+        Parking bubble = (Parking)this.carparkManager.getBubbleItem();
         state.putString(SAVED_BUBBLE_ITEM, bubble == null ? null : bubble.id.toString());
         state.putBoolean(SAVED_ADDING_MODE, this.addingMode);
         state.putFloat(SAVED_MAP_ZOOM, this.map.getCameraPosition().zoom);
@@ -1044,7 +1031,6 @@ public class MainActivity extends Activity implements
                 animateToCurrentLocation(true);
                 this.animateToNextLocationFix = false;
             }
-            this.bubbleOverlay.bringToFront();
             this.parkingsService.onLocationChanged(this.currentLocation);
         }
     }
