@@ -198,7 +198,7 @@ public class MainActivity extends Activity implements
 
         this.carparkManager = new MarkerManager(this, this.parkingsService, this.map);
 
-        this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map);
+        this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map, this);
 
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
@@ -1047,6 +1047,10 @@ public class MainActivity extends Activity implements
             this.bubbleOverlay.bringToFront();
             this.parkingsService.onLocationChanged(this.currentLocation);
         }
+    }
+
+    Location getCurrentLocation() {
+        return this.currentLocation;
     }
 
     public void onDisconnected() {

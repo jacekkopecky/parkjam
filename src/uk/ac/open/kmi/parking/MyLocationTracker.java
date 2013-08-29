@@ -46,20 +46,23 @@ public class MyLocationTracker implements
 
     private GoogleMap map;
     private ParkingsService parkingsService;
+    private MainActivity activity;
     private boolean tracking = false;
     private long inAnimationUntil = 0;
 
     /**
      * @param ps parkings service
      * @param map the map to follow
+     * @param activity the activity that knows our current location
      */
-    public MyLocationTracker(ParkingsService ps, GoogleMap map) {
+    public MyLocationTracker(ParkingsService ps, GoogleMap map, MainActivity activity) {
         this.parkingsService = ps;
+        this.activity = activity;
 
         map.setOnMyLocationButtonClickListener(this);
         map.setOnCameraChangeListener(this);
         map.setMyLocationEnabled(true);
-        map.getUiSettings().setMyLocationButtonEnabled(true);
+        map.getUiSettings().setMyLocationButtonEnabled(activity.getCurrentLocation() != null);
         this.map = map;
     }
 
@@ -67,13 +70,14 @@ public class MyLocationTracker implements
         this.tracking = true;
         this.map.getUiSettings().setMyLocationButtonEnabled(false);
         MyLocationTracker.this.inAnimationUntil = System.currentTimeMillis() + 1200;
-        return false;
+        onLocationChanged(this.activity.getCurrentLocation());
+        return true;
     }
 
     public void onCameraChange(CameraPosition arg0) {
         if (this.inAnimationUntil < System.currentTimeMillis()) {
             this.tracking = false;
-            this.map.getUiSettings().setMyLocationButtonEnabled(true);
+            this.map.getUiSettings().setMyLocationButtonEnabled(this.activity.getCurrentLocation() != null);
         }
 
         // tell parkings service that the map has moved
@@ -82,6 +86,11 @@ public class MyLocationTracker implements
     }
 
     public void onLocationChanged(Location loc) {
+        if (loc == null) {
+            this.map.getUiSettings().setMyLocationButtonEnabled(false);
+            return;
+        }
+
         if (this.tracking) {
             this.map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude())), 1000, new CancelableCallback() {
 
@@ -91,6 +100,8 @@ public class MyLocationTracker implements
 
                 public void onCancel() { /* noop */ }
             });
+        } else {
+            this.map.getUiSettings().setMyLocationButtonEnabled(true);
         }
     }
 
