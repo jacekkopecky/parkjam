@@ -55,8 +55,6 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
     private final static int[] SQUARE_WALK_Y = new int[] { 2,   2, 3, 2, 1,   1, 3, 3, 1,   0, 2, 4, 2,   1, 0, 0, 1, 3, 4, 4, 3,   0, 0, 4, 4};
 
 
-    private static final int MAX_CARPARKS_DISPLAYED = 64; // todo make configurable or put in XML?
-
     public SortingPrecomputationThread(TileDownloaderThread tileDownloader) {
         this.tileDownloader = tileDownloader;
         tileDownloader.registerTileUpdateListener(this);
@@ -220,11 +218,11 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
 
                 // setting the current car parks nearest to the map camera, and the outline of the displayed carparks
                 // this must be set before listeners are called because they may use it
-                ArrayList<MapItem> nearest = new ArrayList<MapItem>(MAX_CARPARKS_DISPLAYED);
+                ArrayList<MapItem> nearest = new ArrayList<MapItem>(ParkingsService.MAX_CARPARKS_DISPLAYED);
                 MapItem firstItemOutside = null;
                 int i = 0;
                 for (MapItem p: retval) {
-                    if ((i++) < MAX_CARPARKS_DISPLAYED) {
+                    if ((i++) < ParkingsService.MAX_CARPARKS_DISPLAYED) {
                         nearest.add(p);
                     } else {
                         firstItemOutside = p;
@@ -260,7 +258,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                 this.currentSortedOutline.add(new LatLng(outlineLatMin, outlineLonMax));
                 this.currentSortedOutline.add(new LatLng(outlineLatMax, outlineLonMax));
                 this.currentSortedOutline.add(new LatLng(outlineLatMax, outlineLonMin));
-                this.currentSortedOutline.add(new LatLng(outlineLatMin, outlineLonMin));
+                this.currentSortedOutline.add(this.currentSortedOutline.get(0));
 
                 // let listeners know about this change (even if there are no car parks, the coords may have changed)
                 synchronized(this) {

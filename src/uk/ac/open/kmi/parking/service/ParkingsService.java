@@ -54,6 +54,11 @@ public class ParkingsService implements NearbyCarparkUpdateListener {
      */
     public static final double TILE_SIZE_D = TILE_SIZE_E6 / 1e6d;
 
+    /**
+     * how many car parks can be displayed at once
+     */
+    public static final int MAX_CARPARKS_DISPLAYED = 64; // todo make configurable or put in XML?
+
     private SortingPrecomputationThread sortingPrecomputer;
     private NearPrecomputationThread nearPrecomputer;
     private TileDownloaderThread tileDownloader;
