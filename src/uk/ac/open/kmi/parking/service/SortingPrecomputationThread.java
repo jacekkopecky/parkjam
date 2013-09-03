@@ -26,18 +26,16 @@ import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import android.util.Log;
-
-import uk.ac.open.kmi.parking.Parking.SquareDistComparator;
 import uk.ac.open.kmi.parking.Parking;
+import uk.ac.open.kmi.parking.Parking.SquareDistComparator;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * this thread computes in the background the car parks that are near the currently visible coordinates
  */
 class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileDesirabilityChecker {
-//    @SuppressWarnings("unused")
+    @SuppressWarnings("unused")
     private static final String TAG = "sorting thread";
 
     volatile Collection<Parking> sortedCurrentCarparks = Collections.emptyList(); // HardwiredParkingList.listParkings();
@@ -249,9 +247,9 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                     if (latMax < outlineLatMax) outlineLatMax = latMax;
                     if (lonMin > outlineLonMin) outlineLonMin = lonMin;
                     if (lonMax < outlineLonMax) outlineLonMax = lonMax;
-                    Log.d(TAG, "outline until nearest point");
+//                    Log.d(TAG, "outline until nearest point");
                 } else {
-                    Log.d(TAG, "max outline");
+//                    Log.d(TAG, "max outline");
                 }
                 this.currentSortedOutline.add(new LatLng(outlineLatMin, outlineLonMin));
                 this.currentSortedOutline.add(new LatLng(outlineLatMin, outlineLonMax));
@@ -265,7 +263,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                         listener.onSortedCurrentCarparksUpdated();
                     }
                 }
-                Log.d(TAG, "recomputed (with " + count + " out of " + total + " tiles, " + retval.size() + " parkings) in " + (System.currentTimeMillis()-startTime) + "ms");
+//                Log.d(TAG, "recomputed (with " + count + " out of " + total + " tiles, " + retval.size() + " parkings) in " + (System.currentTimeMillis()-startTime) + "ms");
             } catch (InterruptedException e) {
                 //                    Log.i(TAG, "thread interrupted, quitting");
                 if (refresher != null) {
