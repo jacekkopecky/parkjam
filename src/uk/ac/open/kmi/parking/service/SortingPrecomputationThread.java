@@ -93,7 +93,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                 LatLng coords = null;
 
                 Event event = this.eventQueue.take();
-                long startTime = System.currentTimeMillis();
+//                long startTime = System.currentTimeMillis();
                 do {
                     switch (event.type) {
                     case NEW_COORDINATES:
@@ -159,7 +159,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
 
                 SquareDistComparator comparator = new SquareDistComparator(coords);
                 TreeSet<Parking> retval = new TreeSet<Parking>(comparator);
-                int count=0; int total=0;
+//                int count=0; int total=0;
 
                 // this thread also makes sure to update tiles when they expire, by doing a refresh
                 long minNextUpdateTime = Long.MAX_VALUE;
@@ -170,7 +170,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                     int lonTile = tileMinLonTile + SQUARE_WALK_Y[i];
 
                     MapTile tile = this.tileDownloader.getTile(latTile*ParkingsService.TILE_SIZE_E6, lonTile*ParkingsService.TILE_SIZE_E6);
-                    total++;
+//                    total++;
                     if (tile != null) {
                         if (tile.nextUpdate < minNextUpdateTime) {
                             minNextUpdateTime = tile.nextUpdate;
@@ -181,7 +181,7 @@ class SortingPrecomputationThread implements Runnable, TileUpdateListener, TileD
                             }
                             retval.add(parking);
                         }
-                        count++;
+//                        count++;
                     }
                 }
 
