@@ -588,9 +588,21 @@ class TileDownloaderThread implements Runnable {
 
         public Parking createParking() {
             // todo is initial availability TTL of 5s a good value? it should be the same as the smallest value the server would return from PAVAIL
+            Uri uri = Uri.parse(this.id);
+            Parking old = Parking.getParking(uri);
+            if (old != null && old.point.latitude == this.lat && old.point.longitude == this.lon) {
+                old.setTitle(this.title, this.titleProperty);
+                old.availabilityResource = this.availabilityResource;
+                old.updateResource = this.updateResource;
+                old.setAvailability(this.availability, this.timestamp);
+                old.lastAvailUpdate = System.currentTimeMillis();
+                old.nextAvailUpdate = old.lastAvailUpdate + Config.DEFAULT_AVAIL_TTL;
+                old.unconfirmed = this.unconfirmed;
+                return old;
+            }
             return new Parking(new LatLng(this.lat, this.lon),
                     this.title,
-                    Uri.parse(this.id),
+                    uri,
                     this.availabilityResource,
                     this.updateResource,
                     this.availability,
