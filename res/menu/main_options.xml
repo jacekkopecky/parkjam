@@ -11,7 +11,7 @@
     <item android:id="@+id/menu_pinned"
           android:title="@string/menu_pinned_show"
           android:icon="@drawable/ic_menu_make_offline_grey"
-          android:showAsAction="never"/>
+          android:showAsAction="ifRoom"/>
     <item android:id="@+id/menu_search"
           android:title="@string/menu_search" 
           android:icon="@android:drawable/ic_menu_search"

@@ -28,7 +28,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
@@ -67,6 +66,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -192,10 +192,15 @@ public class MainActivity extends Activity implements
             this.showPinnedWhenAnyFound = false;
         }
 
-        this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
-        this.map.moveCamera(CameraUpdateFactory.zoomTo(savedInstanceState == null ? INITIAL_ZOOM : savedInstanceState.getFloat(SAVED_MAP_ZOOM, INITIAL_ZOOM)));
+        MapFragment mf = (MapFragment)getFragmentManager().findFragmentById(R.id.mapview);
+        this.map = mf.getMap();
+        if (savedInstanceState == null) {
+            this.map.moveCamera(CameraUpdateFactory.zoomTo(INITIAL_ZOOM));
+        } else if (savedInstanceState.containsKey(SAVED_CAMERA_POSITION)) {
+            this.map.moveCamera(CameraUpdateFactory.newCameraPosition((CameraPosition) savedInstanceState.getParcelable(SAVED_CAMERA_POSITION)));
+        }
 
-        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map);
+        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map, mf);
 
         this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map, this);
 
@@ -431,7 +436,7 @@ public class MainActivity extends Activity implements
             this.currentLocation = this.locationClient.getLastLocation();
             Log.d(TAG, "animate1: " + this.animateToNextLocationFix);
             if (this.animateToNextLocationFix && this.currentLocation != null) {
-                animateToCurrentLocation(true);
+                animateToCurrentLocation(true, true);
                 this.animateToNextLocationFix = false;
             }
             this.parkingsService.onLocationChanged(this.currentLocation);
@@ -514,13 +519,12 @@ public class MainActivity extends Activity implements
 //
     /**
      * helper method that calls the details view
-     * @param context the current activity
      * @param p the parking whose details should be viewed
      */
-    public static void showDetailsForCarpark(Context context, Parking p) {
-        Intent intent = new Intent(context, ParkingDetailsActivity.class);
+    public void showDetailsForCarpark(Parking p) {
+        Intent intent = new Intent(this, ParkingDetailsActivity.class);
         intent.setData(p.id);
-        context.startActivity(intent);
+        startActivity(intent);
     }
 
     @Override
@@ -624,8 +628,8 @@ public class MainActivity extends Activity implements
 //                      Log.i(TAG, "car park added and loaded");
                         //     upon submission, open the details view so user can immediately fill in properties
                         //     also automatically have the new car park as watched
-                        MainActivity.this.centerOnCarpark(parking, false);
-                        showDetailsForCarpark(MainActivity.this, parking);
+                        centerOnCarpark(parking, false);
+                        showDetailsForCarpark(parking);
                     }
                 });
             }
@@ -633,14 +637,26 @@ public class MainActivity extends Activity implements
         updateUIState();
     }
 
-    private void animateToCurrentLocation(boolean zoomOutIfNecessary) {
+    private void animateToCurrentLocation(boolean zoomOutIfNecessary, boolean immediate) {
         if (this.currentLocation != null) {
-            this.map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(this.currentLocation.getLatitude(), this.currentLocation.getLongitude())));
+            if (immediate) {
+                this.map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(this.currentLocation.getLatitude(), this.currentLocation.getLongitude())));
+            } else {
+                this.map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(this.currentLocation.getLatitude(), this.currentLocation.getLongitude())));
+            }
             final float accuracy = this.currentLocation.getAccuracy();
             if (zoomOutIfNecessary & accuracy > 200f & Math.abs(this.map.getCameraPosition().zoom - INITIAL_ZOOM) < .1f) {
-                this.map.animateCamera(CameraUpdateFactory.zoomOut());
-                if (accuracy > 500f) {
+                if (immediate) {
+                    this.map.moveCamera(CameraUpdateFactory.zoomOut());
+                } else {
                     this.map.animateCamera(CameraUpdateFactory.zoomOut());
+                }
+                if (accuracy > 500f) {
+                    if (immediate) {
+                        this.map.moveCamera(CameraUpdateFactory.zoomOut());
+                    } else {
+                        this.map.animateCamera(CameraUpdateFactory.zoomOut());
+                    }
                 }
             }
         } else {
@@ -675,7 +691,7 @@ public class MainActivity extends Activity implements
             reportAvailability(this.contextMenuCarpark, false);
             return true;
         case R.id.menu_currpark_show_details:
-            showDetailsForCarpark(this, this.contextMenuCarpark);
+            showDetailsForCarpark(this.contextMenuCarpark);
             return true;
         case R.id.menu_currpark_unpin:
             pinCarpark(this.contextMenuCarpark, false);
@@ -705,7 +721,7 @@ public class MainActivity extends Activity implements
         // todo only change current near carpark if the accuracy of the fix is good enough (e.g. within the limit distance to the near carpark)
         this.currentLocation = location;
         if (this.animateToNextLocationFix && this.currentLocation != null) {
-            animateToCurrentLocation(false);
+            animateToCurrentLocation(false, false);
             this.animateToNextLocationFix = false;
         }
         this.parkingsService.onLocationChanged(location);
@@ -734,7 +750,6 @@ public class MainActivity extends Activity implements
         hideStatusText();
 
 //        this.carparkManager.updateAvailability();
-//        this.mapView.invalidate();
 
         if (this.addingMode) {
             hidePinnedDrawer();
@@ -826,7 +841,6 @@ public class MainActivity extends Activity implements
             public void run() {
                 MainActivity.this.pinnedDrawerAdapter.updateIfContains(parking);
                 MainActivity.this.carparkManager.updateAvailability(parking);
-//                MainActivity.this.mapView.invalidate();
             }
         });
     }
@@ -1002,8 +1016,8 @@ public class MainActivity extends Activity implements
     private static final String SAVED_ANIMATE_TO_NEXT_LOCATION = "uk.ac.open.kmi.parking.animate-to-next-location";
     private static final String SAVED_ADDING_MODE = "uk.ac.open.kmi.parking.adding-mode";
     private static final String SAVED_BUBBLE_CARPARK = "uk.ac.open.kmi.parking.bubble-carpark";
-    private static final String SAVED_MAP_ZOOM = "uk.ac.open.kmi.parking.zoom-level.float";
     private static final String SAVED_SHOWING_PINNED_DRAWER = "uk.ac.open.kmi.parking.show-pinned-drawer";
+    private static final String SAVED_CAMERA_POSITION = "uk.ac.oepn.kmi.parking.camera-position";
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
@@ -1011,8 +1025,8 @@ public class MainActivity extends Activity implements
         Parking bubble = this.carparkManager.getBubbleCarpark();
         state.putString(SAVED_BUBBLE_CARPARK, bubble == null ? null : bubble.id.toString());
         state.putBoolean(SAVED_ADDING_MODE, this.addingMode);
-        state.putFloat(SAVED_MAP_ZOOM, this.map.getCameraPosition().zoom);
         state.putBoolean(SAVED_SHOWING_PINNED_DRAWER, this.showingPinned);
+        state.putParcelable(SAVED_CAMERA_POSITION, this.map.getCameraPosition());
     }
 
     public void onConnectionFailed(ConnectionResult arg0) {
@@ -1021,6 +1035,7 @@ public class MainActivity extends Activity implements
     }
 
     public void onConnected(Bundle arg0) {
+        Log.d(TAG, "onConnected called, " + this.currentLocation);
         // start periodic updates
         this.locationClient.requestLocationUpdates(this.locationRequest, this);
 
@@ -1028,7 +1043,7 @@ public class MainActivity extends Activity implements
             this.currentLocation = this.locationClient.getLastLocation();
 //            Toast.makeText(this, "location: " + this.currentLocation, Toast.LENGTH_LONG).show();
             if (this.animateToNextLocationFix && this.currentLocation != null) {
-                animateToCurrentLocation(true);
+                animateToCurrentLocation(true, true);
                 this.animateToNextLocationFix = false;
             }
             this.parkingsService.onLocationChanged(this.currentLocation);

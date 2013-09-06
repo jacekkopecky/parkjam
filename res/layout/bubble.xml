@@ -60,18 +60,32 @@
     </TableRow>
     
     <TableRow>
-        <ScrollView
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_span="2"
-            android:id="@+id/bubble_details_scrollview"
-            android:scrollbarStyle="insideOverlay">
-            <LinearLayout
-                android:id="@+id/bubble_details" 
-                android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_span="2">
+            <ScrollView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </ScrollView>
+                android:layout_height="0dp"
+                android:id="@+id/bubble_details_scrollview"
+                android:scrollbarStyle="insideOverlay">
+                <LinearLayout
+                    android:id="@+id/bubble_details" 
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </ScrollView>
+
+            <ImageView
+                android:id="@+id/bubble_ellipsis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_alignBottom="@id/bubble_details_scrollview"
+                android:layout_alignRight="@id/bubble_details_scrollview"
+                android:src="@drawable/ellipsis" />
+        </RelativeLayout>
+
 <!--         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -81,7 +95,7 @@
             android:src="@drawable/btn_circle_go3" /> -->
     </TableRow>
     
-    <TableRow>
+<!--     <TableRow>
     <View
         android:id="@+id/bubble_bottom_separator"
         android:layout_marginTop="1mm"
@@ -151,71 +165,6 @@
             android:clickable="true"
             android:id="@+id/bubble_directions"
             android:src="@drawable/ic_menu_directions" />
-<!--             <View
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_width="0dp" />                
-            <TextView
-                style="@style/bubble.button"
-                android:clickable="true"
-                android:id="@+id/bubble_pin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/btn_pin_inactive"
-                android:text="PIN" />
-            <View
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_width="0dp" />                
-            <View
-                android:layout_marginLeft="1mm"
-                android:layout_marginRight="1mm" 
-                android:layout_height="@dimen/bubble_button_height"
-                android:layout_width="@dimen/bubble_separator_width"
-                android:background="@color/bubble_separator"
-                />
-            <View
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_width="0dp" />                
-            <TextView
-                style="@style/bubble.button"
-                android:clickable="true"
-                android:id="@+id/bubble_report_spaces"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/green_circle"
-                android:text="AVAILABLE" />
-            <View
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_width="0dp" />                
-            <View
-                android:layout_marginLeft="1mm"
-                android:layout_marginRight="1mm" 
-                android:layout_height="@dimen/bubble_button_height"
-                android:layout_width="@dimen/bubble_separator_width"
-                android:background="@color/bubble_separator"
-                />
-            <View
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_width="0dp" />                
-            <TextView
-                style="@style/bubble.button"
-                android:clickable="true"
-                android:id="@+id/bubble_report_full"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/red_circle"
-                android:text="FULL" />
-            <View
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_width="0dp" />                
- -->            
         </LinearLayout>
-        
-    <!--  todo add buttons and text for pin, report full, confirm available -->
-
+ -->        
 </TableLayout>

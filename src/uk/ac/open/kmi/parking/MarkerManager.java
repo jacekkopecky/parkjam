@@ -24,11 +24,22 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.open.kmi.parking.service.ParkingsService;
-import android.content.Context;
+import android.graphics.Point;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.TableLayout;
+import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -41,15 +52,17 @@ import com.google.android.gms.maps.model.PolylineOptions;
  * @author Jacek Kopecky
  *
  */
-public class MarkerManager implements OnMarkerClickListener {
+public class MarkerManager implements OnMarkerClickListener, OnMapClickListener, OnInfoWindowClickListener, InfoWindowAdapter {
     //  @SuppressWarnings("unused")
     private static final String TAG = "marker manager";
 
     private ParkingsService parkingsService;
     private GoogleMap map;
-    private Context context;
+    private MapFragment mapFragment;
+    private MainActivity activity;
 
     private final Map<Parking, Marker> carpark2marker = new HashMap<Parking, Marker>();
+    private final Map<Marker, Parking> marker2carpark = new HashMap<Marker, Parking>();
     private final Map<Parking, Object> carpark2avail = new HashMap<Parking, Object>();
 
     private Polyline outline = null;
@@ -64,34 +77,149 @@ public class MarkerManager implements OnMarkerClickListener {
      * @param context activity
      * @param ps instance of parkingsservice
      * @param map instance of map
+     * @param mf map fragment that holds the map
      */
-    public MarkerManager(Context context, ParkingsService ps, GoogleMap map) {
+    public MarkerManager(MainActivity context, ParkingsService ps, GoogleMap map, MapFragment mf) {
         this.parkingsService = ps;
         this.map = map;
-        this.context = context;
+        this.activity = context;
+        this.mapFragment = mf;
 
         map.setOnMarkerClickListener(this);
-//        map.setInfoWindowAdapter(this);
+        map.setOnMapClickListener(this);
+        map.setOnInfoWindowClickListener(this);
+        map.setInfoWindowAdapter(this);
 
         this.commonOptions.anchor(.5f, 1f).draggable(false);
     }
 
+    private Parking currentBubble = null;
+    private Parking desiredCarpark = null;
+    private View currentBubbleView = null;
+    private Marker currentBubbleMarker = null;
+
+
+    /**
+     * shows the info window for this car park (and centers on the car park, possibly only if the window would otherwise not be completely shown)
+     * @param p the selected car park
+     */
     public void showBubble(Parking p) {
-        // todo
+        if (p == null || (this.currentBubble != null && !p.equals(this.currentBubble))) {
+            removeBubble();
+        }
+
+        this.parkingsService.setCurrentExplicitCarpark(p);
+        this.currentBubble = p;
+
+        Marker m = this.carpark2marker.get(p);
+        if (m == null) {
+            // set desired bubble car park, assume map is already moved there or something else is done so the carpark will soon be loaded
+            // on updates, if we encounter the car park, go there
+            this.desiredCarpark = p;
+        } else {
+            this.desiredCarpark = null;
+            this.carpark2marker.get(p).showInfoWindow(); // this will also set this.currentBubbleView and this.currentBubbleMarker
+        }
     }
 
+    private void ensureInfoWindowOnScreen(Marker m) {
+        Projection proj = this.map.getProjection();
+        Point p = proj.toScreenLocation(m.getPosition());
+        View mapView = this.mapFragment.getView();
+        if (mapView == null) {
+            Log.w(TAG, "no view in ensureInfoWindow; fragment not initialized?");
+            return;
+        }
+
+        int maxY = mapView.getHeight();
+        int minY = Parking.getDrawablesHeight();
+
+        int width = Parking.getDrawablesWidth()/2;
+        if (this.currentBubbleView != null) {
+            minY += this.currentBubbleView.getHeight();
+            Log.d(TAG, "min top clearance: " + minY);
+            width = this.currentBubbleView.getWidth()/2;
+        }
+
+        int minX = width;
+        int maxX = mapView.getWidth()-width;
+
+        int dx = 0; // p.x - mapView.getWidth()/2;
+        int dy = 0; // p.y - minY;
+        if (p.x < minX) {
+            dx = p.x - minX;
+        } else if (p.x > maxX) {
+            dx = p.x - maxX;
+        }
+        if (p.y < minY) {
+            dy = p.y - minY;
+        } else if (p.y > maxY) {
+            dy = p.y - maxY;
+        }
+
+        if (dx != 0 || dy != 0) {
+            this.map.animateCamera(CameraUpdateFactory.scrollBy(dx, dy), 500, null);
+        }
+    }
+
+    /**
+     * remove the info window and any other artefacts of a car park marker being selected
+     * @return true if something was removed
+     */
     public boolean removeBubble() {
-        // todo
-        return false;
+//        Log.d(TAG, "removing bubble at ", new Exception());
+        if (this.currentBubble == null) {
+            return false;
+        }
+
+        Marker m = this.carpark2marker.get(this.currentBubble);
+        this.currentBubble = null;
+        this.parkingsService.setCurrentExplicitCarpark(null);
+
+        if (m != null) {
+            if (m.isInfoWindowShown()) {
+                m.hideInfoWindow();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            Log.e(TAG, "marker not found for car park " + this.currentBubble);
+            return false;
+        }
     }
 
+    /**
+     * returns the currently selected car park
+     * @return the currently selected car park
+     */
     public Parking getBubbleCarpark() {
-        // todo
-        return null;
+        return this.currentBubble;
     }
 
+    /**
+     * updates the bubble, if shown for this car park
+     * @param p the car park that was updated
+     */
     public void updateDetails(Parking p) {
-        // todo
+        Log.d(TAG, "updateDetails for parking " + p);
+        if (this.currentBubble == null) {
+            return;
+        }
+        if (p == null || this.currentBubble.equals(p)) {
+            // update parking instance in case it's stale
+            this.currentBubble = Parking.getParking(this.currentBubble.id);
+            if (this.currentBubble == null) {
+                removeBubble();
+                Log.d(TAG, "removed bubble because the parking disappeared");
+                return;
+            }
+            fillBubbleHeading();
+            fillBubbleDetails(true);
+            this.currentBubbleMarker.showInfoWindow();
+            adjustBubbleHeight();
+
+        }
     }
 
     /**
@@ -99,7 +227,7 @@ public class MarkerManager implements OnMarkerClickListener {
      * must be called from the UI thread; or anyway, from a single tread
      */
     public void update() {
-        Log.d(TAG, "update"); final long starttime = System.currentTimeMillis();
+//        Log.d(TAG, "update"); final long starttime = System.currentTimeMillis();
 
         // get current sorted car parks - need not be sorted any more
         this.tmpObsoleteCarparks.clear();
@@ -107,14 +235,14 @@ public class MarkerManager implements OnMarkerClickListener {
         Collection<Parking> carparks = this.parkingsService.getSortedCurrentCarparks();
         List<LatLng> currentOutline = this.parkingsService.getCurrentSortedOutline();
 
-        int added = 0, removed = 0, updated = 0;
+//        int added = 0, removed = 0, updated = 0;
         for (Parking p : carparks) {
             this.tmpObsoleteCarparks.remove(p);
             Marker m = this.carpark2marker.get(p);
             if (m != null) {
                 // update the availability (save old availabilities and only change icon on actual change)
                 if (updateCarparkMarker(p, m)) {
-                    updated++;
+//                    updated++;
                 }
             } else {
                 // if we don't have a marker for it, create one, save it
@@ -122,13 +250,44 @@ public class MarkerManager implements OnMarkerClickListener {
                 this.commonOptions.icon(bd)
                     .position(p.point)
                     .title(p.getTitle())
-                    .snippet(ParkingDetailsActivity.getAvailabilityDescription(this.context, p, false));
+                    .snippet(ParkingDetailsActivity.getAvailabilityDescription(this.activity, p, false));
                 m = this.map.addMarker(this.commonOptions);
                 this.carpark2marker.put(p, m);
+                this.marker2carpark.put(m, p);
                 this.carpark2avail.put(p, bd);
-                added++;
+//                added++;
+            }
+            if (p.equals(this.desiredCarpark)) {
+                this.desiredCarpark = null;
+                final Marker mm = m;
+                final Parking pp = p;
+                View view = this.mapFragment.getView();
+                if (view == null) {
+                    Log.w(TAG, "no view in update(); fragment not initialized?");
+                    return;
+                }
+                view.post(new Runnable() {
+                    public void run() {
+                        showBubble(pp);
+                        ensureInfoWindowOnScreen(mm);
+                    }
+                });
             }
         }
+
+        if (this.tmpObsoleteCarparks.contains(this.currentBubble)) {
+            removeBubble();
+        }
+
+        // for each marker whose car park we don't know any more, remove it
+        for (Parking p: this.tmpObsoleteCarparks) {
+            this.carpark2avail.remove(p);
+            Marker m = this.carpark2marker.remove(p);
+            this.marker2carpark.remove(m);
+            m.remove();
+//            removed++;
+        }
+        this.tmpObsoleteCarparks.clear();
 
         if (!currentOutline.isEmpty()) {
             if (this.outline == null) {
@@ -140,17 +299,9 @@ public class MarkerManager implements OnMarkerClickListener {
             }
         }
 
-        // for each marker whose car park we don't know any more, remove it
-        for (Parking p: this.tmpObsoleteCarparks) {
-            this.carpark2marker.remove(p).remove();
-            this.carpark2avail.remove(p);
-            removed++;
-        }
-        this.tmpObsoleteCarparks.clear();
-
         // todo if the bubble is being shown, update that information as well
 
-        Log.d(TAG, "update took " + (System.currentTimeMillis() - starttime) + "ms, add/del/upd: " + added + "/" + removed + "/" + updated);
+//        Log.d(TAG, "update took " + (System.currentTimeMillis() - starttime) + "ms, add/del/upd: " + added + "/" + removed + "/" + updated);
     }
 
     private boolean updateCarparkMarker(Parking p, Marker m) {
@@ -164,8 +315,8 @@ public class MarkerManager implements OnMarkerClickListener {
     }
 
     public boolean onMarkerClick(Marker m) {
-        // todo update the title and such data of the marker to the details of the car park of this marker
-        m.showInfoWindow();
+        showBubble(this.marker2carpark.get(m));
+        ensureInfoWindowOnScreen(m);
         return true;
     }
 
@@ -179,10 +330,141 @@ public class MarkerManager implements OnMarkerClickListener {
         Marker m = this.carpark2marker.get(p);
         if (m != null) {
             updateCarparkMarker(p, m);
+//            if (!m.isInfoWindowShown()) {
+//                removeBubble();
+//            }
         } else {
             Log.e(TAG, "no marker found for car park " + p);
         }
+
+        if (p.equals(this.currentBubble)) {
+            this.currentBubble = p; // in case the instance has been updated
+            updateDetails(p);
+        }
     }
+
+    public void onMapClick(LatLng arg0) {
+        removeBubble();
+//        Log.i(TAG, "on map click, current markers window showing: " + (this.currentBubble == null ? "none" : this.carpark2marker.get(this.currentBubble).isInfoWindowShown()));
+    }
+
+    public void onInfoWindowClick(Marker m) {
+        checkMarkerIsCurrentCarpark("click on info window", m);
+        this.activity.showDetailsForCarpark(this.currentBubble);
+    }
+
+    private Parking checkMarkerIsCurrentCarpark(String where, Marker m) {
+        if (this.currentBubble == null) {
+            Log.e(TAG, where + ": no current bubble carpark!");
+        } else
+        if (!m.equals(this.carpark2marker.get(this.currentBubble))) {
+            Log.e(TAG, where + ": current bubble carpark: " + this.currentBubble + ", marker is " + m + " but current bubble carpark has marker " + this.carpark2marker.get(this.currentBubble));
+        }
+        return this.marker2carpark.get(m);
+    }
+
+    public View getInfoContents(Marker m) {
+        return null;
+    }
+
+    public View getInfoWindow(Marker m) {
+        checkMarkerIsCurrentCarpark("getInfoWindow", m);
+        if (m.equals(this.currentBubbleMarker)) {
+            fillBubbleHeading(); // this updates the availability so that the time indication (like 5m ago) stays current-ish
+            Log.d(TAG, "returning previous info window");
+            return this.currentBubbleView;
+        }
+
+        this.currentBubbleMarker = m;
+        this.currentBubbleView = this.activity.getLayoutInflater().inflate(R.layout.bubble, null);
+        ((TableLayout)this.currentBubbleView.findViewById(R.id.bubble)).setColumnShrinkable(0, true);
+        fillBubbleHeading();
+        fillBubbleDetails(false);
+
+        // set up resizing and repositioning
+        adjustBubbleHeight();
+
+        return this.currentBubbleView;
+    }
+
+    private void fillBubbleHeading() {
+        if (this.currentBubbleView == null) {
+            Log.w(TAG, "no bubble view in fillBubbleHeading");
+            return;
+        }
+        if (this.currentBubble == null) {
+            Log.w(TAG, "no bubble in fillBubbleHeading");
+            return;
+        }
+        ((TextView)this.currentBubbleView.findViewById(R.id.bubble_title)).setText(this.currentBubble.getTitle());
+        ((TextView)this.currentBubbleView.findViewById(R.id.bubble_availability)).setText(ParkingDetailsActivity.getAvailabilityDescription(this.activity, this.currentBubble, false));
+    }
+
+    private void fillBubbleDetails(boolean empty) {
+        ViewGroup layout = (ViewGroup)this.currentBubbleView.findViewById(R.id.bubble_details);
+        if (empty) {
+            layout.removeAllViews();
+        }
+        ParkingDetailsActivity.createDetailsEntries(this.activity, layout, this.currentBubble, null, true /* todo this.showUnconfirmedProperties */, false);
+
+        // adjusting bubble height needs to be done by the caller of fillBubbleDetails
+//        adjustBubbleHeight();
+    }
+
+    private void adjustBubbleHeight() {
+        final View view = this.mapFragment.getView();
+        if (view == null) {
+            Log.w(TAG, "no view in adjustBubbleHeight; fragment not initialized?");
+            return;
+        }
+        view.post(new Runnable() {
+            public void run() {
+                // adjust size
+//                Log.d(TAG, "adjusting size");
+                View details = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_details);
+                View detailsScrollView = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_details_scrollview);
+                View detailsTopSeparator = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_top_separator);
+                View detailsEllipsis = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_ellipsis);
+                LayoutParams lpS = detailsScrollView.getLayoutParams();
+                final int maxDetailsHeight = view.getHeight()/4;
+                final int height = details.getHeight();
+                if (height == 0) {
+                    detailsTopSeparator.setVisibility(View.GONE);
+//                    Log.d(TAG, "adjusting size height 0 ");
+                } else {
+                    detailsTopSeparator.setVisibility(View.VISIBLE);
+//                    Log.d(TAG, "adjusting size height non-0");
+                }
+                int oldHeight = detailsScrollView.getHeight();
+//                Log.d(TAG, "old height: " + oldHeight);
+                lpS.height = height < maxDetailsHeight ? height : maxDetailsHeight;
+                if (lpS.height < height) {
+                    detailsEllipsis.setVisibility(View.VISIBLE);
+                } else {
+                    detailsEllipsis.setVisibility(View.GONE);
+                }
+//                Log.d(TAG, "adjusting size height " + lpS.height);
+                detailsScrollView.setLayoutParams(lpS);
+                if (lpS.height != oldHeight) {
+                    Log.d(TAG, "scheduling new showInfoWindow");
+                    MarkerManager.this.currentBubbleMarker.showInfoWindow();
+                    view.post(new Runnable() {
+                        public void run() {
+                            ensureInfoWindowOnScreen(MarkerManager.this.currentBubbleMarker);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    // todo do a bit of this around here:
+//  this.currentBubble = Parking.getParking(this.currentBubble.id);
+//  if (this.currentBubble == null) {
+//      setItem(null);
+//      return;
+//  }
+
 
 //    private static class Label {
 //        private static final String STRING_MAX = "MAX CARPARKS";

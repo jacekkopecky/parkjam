@@ -135,6 +135,8 @@ public class Parking {
 
     private static BitmapDescriptor drawFull = null;
     private static BitmapDescriptor drawAvailable = null;
+    private static int drawHeight = 0;
+    private static int drawWidth = 0;
 
     /**
      * constructor, fills all the fields
@@ -204,6 +206,23 @@ public class Parking {
     public static void setDrawables(Bitmap full, Bitmap available) {
         drawFull = BitmapDescriptorFactory.fromBitmap(full);
         drawAvailable = BitmapDescriptorFactory.fromBitmap(available);
+        drawHeight = full.getHeight(); // assuming that both are the same height
+        drawWidth = full.getWidth(); // assuming that both are the same height
+        Log.d(TAG, "draw height: " + drawHeight);
+    }
+
+    /**
+     * @return the height of the marker drawables
+     */
+    public static int getDrawablesHeight() {
+        return drawHeight;
+    }
+
+    /**
+     * @return the width of the marker drawables
+     */
+    public static int getDrawablesWidth() {
+        return drawWidth;
     }
 
     @Override
@@ -309,7 +328,7 @@ public class Parking {
      * @param titleProperty the property from which the title comes
      */
     public synchronized void setTitle(String title, Property titleProperty) {
-        this.hasAnyTitle = true;
+        this.hasAnyTitle = titleProperty != null;
         this.title = title;
         this.titleProperty = titleProperty;
     }
