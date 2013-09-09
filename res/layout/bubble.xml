@@ -68,7 +68,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:id="@+id/bubble_details_scrollview"
-                android:scrollbarStyle="insideOverlay">
+                android:scrollbarStyle="insideOverlay"
+                android:fadingEdgeLength="2mm"
+                android:requiresFadingEdge="horizontal|vertical">
                 <LinearLayout
                     android:id="@+id/bubble_details" 
                     android:orientation="vertical"
