@@ -91,15 +91,17 @@
         <item name="android:paddingBottom">2dp</item>
         <item name="android:background">@color/details_dark</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>        
+        <item name="android:layout_height">@dimen/details_heading_height</item>        
         <item name="android:textStyle">bold</item>
-    </style>
+        <item name="android:gravity">center_vertical|left</item>
+        </style>
     
     <style name="details.heading_text">
         <item name="android:background">@color/details_dark</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>        
+        <item name="android:layout_height">@dimen/details_heading_height</item>        
+        <item name="android:gravity">center_vertical|left</item>
     </style>
     
     <style name="details_edit_dialog">

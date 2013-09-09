@@ -6,7 +6,7 @@
     <dimen name="bubble_button_height">40dp</dimen>
     <dimen name="bubble_separator_width">1dp</dimen>
     <dimen name="currpark_text_size">24sp</dimen>
-    <dimen name="currpark_details_text_size">20sp</dimen>
+    <dimen name="currpark_details_text_size">30sp</dimen>
     <dimen name="currpark_shadow_width">5dp</dimen>
     <dimen name="addpark_btn_text_size">16sp</dimen>
     <dimen name="addpark_text_size">16sp</dimen>
@@ -19,6 +19,7 @@
     <dimen name="details_entry_side_padding">1mm</dimen>
     <dimen name="details_entry_topbottom_padding">1mm</dimen>
     <dimen name="details_avail_buttons_size">60dp</dimen>
+    <dimen name="details_heading_height">6mm</dimen>
     <dimen name="status_bar_height">54dp</dimen>
     <dimen name="pinned_drawer_height">160dp</dimen>
     <dimen name="pinned_drawer_width_max">240dp</dimen>
