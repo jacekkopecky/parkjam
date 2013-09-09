@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:layout_alignBottom="@id/bubble_details_scrollview"
-                android:layout_alignRight="@id/bubble_details_scrollview"
+                android:layout_alignParentRight="true"
                 android:src="@drawable/ellipsis" />
         </RelativeLayout>
 
