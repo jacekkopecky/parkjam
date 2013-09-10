@@ -16,7 +16,7 @@
         >
             
         <TextView
-            style="@style/currpark_text.details"
+            style="@style/currpark_text_details"
             android:id="@+id/details_currpark"
             android:freezesText="true"
             android:layout_width="0dp"

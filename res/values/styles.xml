@@ -1,36 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="currpark">
-        <item name="android:textColor">@color/default_text</item>
-        <item name="android:textSize">@dimen/currpark_text_size</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:typeface">sans</item>
-        <item name="android:background">@color/currpark_background</item>
-        <item name="android:paddingTop">1mm</item>        
-        <item name="android:paddingLeft">1mm</item>        
-        <item name="android:paddingRight">1mm</item>        
-        <item name="android:paddingBottom">1mm</item>
-        <item name="android:gravity">center_vertical|center_horizontal</item>
-    </style>
-    <style name="currpark_container">
-        <item name="android:background">@color/currpark_background</item>
-    </style>
-    <style name="currpark_text">
-        <item name="android:textColor">@color/default_text</item>
-        <item name="android:textSize">@dimen/currpark_text_size</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:typeface">sans</item>
-        <item name="android:gravity">center_vertical|center_horizontal</item>
-    </style>
     <style name="status_text">
-        <item name="android:textColor">@color/default_text</item>
-        <item name="android:background">@color/currpark_background</item>
-        <item name="android:textSize">@dimen/currpark_text_size</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/status_text</item>
+        <item name="android:textSize">@dimen/status_text_size</item>
         <item name="android:typeface">sans</item>
         <item name="android:gravity">center_vertical|center_horizontal</item>
     </style>
-    
+
     <style name="addpark_btn_text">
         <item name="android:textColor">@color/addpark_btn_text</item>
         <item name="android:textSize">@dimen/addpark_btn_text_size</item>
@@ -39,17 +15,29 @@
         <item name="android:gravity">center_vertical|center_horizontal</item>
     </style>
     
-    <style name="currpark.addpark">
+    <style name="addpark">
+        <item name="android:textColor">@color/addpark_text</item>
         <item name="android:textSize">@dimen/addpark_text_size</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:background">@color/currpark_background</item>
         <item name="android:paddingTop">0mm</item>        
+        <item name="android:paddingLeft">1mm</item>        
+        <item name="android:paddingRight">1mm</item>        
+        <item name="android:paddingBottom">1mm</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
     </style>
-    
-    <style name="currpark_text.details">
+        
+    <style name="currpark_text_details">
+        <item name="android:textColor">@color/default_details_text</item>
+        <item name="android:textSize">@dimen/currpark_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:typeface">sans</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
         <item name="android:textSize">@dimen/currpark_details_text_size</item>
         <item name="android:gravity">center</item>
     </style>
-    
+
     <style name="details">
         <item name="android:background">#8000</item>
         <item name="android:textColor">@color/default_details_text</item>
@@ -169,7 +157,8 @@
     <color name="details_line_separator">#888</color>
     <color name="details_unverified_text">#ceadd1</color>
     
-    <color name="default_text">#fff</color>
+    <color name="status_text">#000</color>
+    <color name="addpark_text">#fff</color>
     <color name="bubble_text">#fff</color>
     <color name="bubble_link">#6cf</color>
     <color name="bubble_separator">#8fff</color>
@@ -190,8 +179,8 @@
     <color name="orange_dark">#f15a22</color>
     <color name="orange_light">#ff931e</color>
     
-    <color name="bubble_highlight_pressed">#fa0</color>
-    <color name="bubble_highlight_active">#80af</color>
+    <color name="bubble_highlight_pressed">@android:color/holo_blue_light</color>
+    <color name="bubble_highlight_active">@android:color/holo_blue_dark</color>
     <color name="transparent">#0000</color>
     
 </resources>

@@ -96,8 +96,9 @@ public class MainActivity extends Activity implements
 
     private ParkingsService parkingsService = null;
 
+    boolean showUnconfirmedProperties;
+
     private TextView statusTextView;
-    private View statusContainer;
     private View addparkContainer;
     private ListView pinnedDrawer;
     private View pinnedDrawerContainer;
@@ -145,6 +146,7 @@ public class MainActivity extends Activity implements
 
         this.parkingsService = ParkingsService.get(this);
         this.parkingsService.setShowUnconfirmedCarparks(checkSettingsPref(Preferences.PREFERENCE_SHOW_UNCONFIRMED_PROPERTIES, true));
+        this.showUnconfirmedProperties = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Preferences.PREFERENCE_SHOW_UNCONFIRMED_PROPERTIES, true);
 
         Intent intent = this.getIntent();
         this.desiredCarpark = intent.getData();
@@ -179,7 +181,6 @@ public class MainActivity extends Activity implements
         });
 
         this.statusTextView = (TextView) findViewById(R.id.status_text);
-        this.statusContainer = findViewById(R.id.status_container);
 
         this.pinnedDrawer = (ListView) findViewById(R.id.pinned_drawer);
         this.pinnedDrawerContainer = findViewById(R.id.pinned_drawer_container);
@@ -200,43 +201,14 @@ public class MainActivity extends Activity implements
             this.map.moveCamera(CameraUpdateFactory.newCameraPosition((CameraPosition) savedInstanceState.getParcelable(SAVED_CAMERA_POSITION)));
         }
 
-        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map, mf);
+        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map, mf, this.findViewById(R.id.bubble_buttons));
 
         this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map, this);
 
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
-
-//        List<Overlay> overlays = this.mapView.getOverlays();
-
-//        // set parking drawables
-//        Drawable drawableFull = this.getResources().getDrawable(R.drawable.parking_full);
-//        int width = drawableFull.getIntrinsicWidth();
-//        int height = drawableFull.getIntrinsicHeight();
-////        Rect drawableFullBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
-//        Rect drawableFullBounds = new Rect(-width/2, -height, width-width/2, 0);
-//
-//        Drawable drawableAvailable = this.getResources().getDrawable(R.drawable.parking_available);
-//        width = drawableAvailable.getIntrinsicWidth();
-//        height = drawableAvailable.getIntrinsicHeight();
-////        Rect drawableAvailableBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
-//        Rect drawableAvailableBounds = new Rect(-width/2, -height, width-width/2, 0);
-//
-//        Drawable drawableUnknown = this.getResources().getDrawable(R.drawable.parking_busy);
-//        width = drawableUnknown.getIntrinsicWidth();
-//        height = drawableUnknown.getIntrinsicHeight();
-////        Rect drawableUnknownBounds = new Rect(-width/2, -height/2, width-width/2, height-height/2);
-//        Rect drawableUnknownBounds = new Rect(-width/2, -height, width-width/2, 0);
-//
-//        View viewHighlightA = new View(this);
-//        viewHighlightA.setBackgroundResource(R.drawable.parking_available_highlight);
-//        View viewHighlightF = new View(this);
-//        viewHighlightF.setBackgroundResource(R.drawable.parking_full_highlight);
-//        View viewHighlightU = new View(this);
-//        viewHighlightU.setBackgroundResource(R.drawable.parking_busy_highlight);
-//
         Parking.setDrawables(BitmapFactory.decodeResource(this.getResources(), R.drawable.parking_full), BitmapFactory.decodeResource(this.getResources(), R.drawable.parking_available));
-//
+
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -256,7 +228,6 @@ public class MainActivity extends Activity implements
         this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         this.locationRequest.setInterval(5000);
         this.locationRequest.setFastestInterval(1000);
-
     }
 
     private void showTermsAndConditions() {
@@ -397,6 +368,9 @@ public class MainActivity extends Activity implements
     public void onResume() {
         Log.i(TAG, "onResume");
         super.onResume();
+
+        this.showUnconfirmedProperties = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Preferences.PREFERENCE_SHOW_UNCONFIRMED_PROPERTIES, true);
+
 //        this.map = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapview)).getMap();
 
         LoadingStatus.registerListener(this);
@@ -455,12 +429,8 @@ public class MainActivity extends Activity implements
             if (!parking.equals(this.carparkManager.getBubbleCarpark())) {
                 this.carparkManager.removeBubble();
             }
-            this.map.animateCamera(CameraUpdateFactory.newLatLng(parking.point), new GoogleMap.CancelableCallback() {
-                public void onCancel() { /* ignore */ }
-                public void onFinish() {
-                    MainActivity.this.carparkManager.showBubble(parking);
-                }
-            });
+            this.map.animateCamera(CameraUpdateFactory.newLatLng(parking.point));
+            MainActivity.this.carparkManager.showBubble(parking);
         }
 //        updateUIState();
     }
@@ -708,7 +678,7 @@ public class MainActivity extends Activity implements
             this.showingPinned = drawerHasCarparks;
             updateUIState();
         }
-//        this.bubbleOverlay.updatePinnedStatus(p);  todo
+        this.carparkManager.updatePinnedStatus(p);
     }
 
     void reportAvailability(Parking park, boolean avail) {
@@ -784,13 +754,13 @@ public class MainActivity extends Activity implements
 
     private void showStatusText(int resource) {
         hideAddparkViews();
-        hidePinnedDrawer();
+        this.carparkManager.removeBubble();
         this.statusTextView.setText(resource);
-        this.statusContainer.setVisibility(View.VISIBLE);
+        this.statusTextView.setVisibility(View.VISIBLE);
     }
 
     private void hideStatusText() {
-        this.statusContainer.setVisibility(View.GONE);
+        this.statusTextView.setVisibility(View.INVISIBLE);
     }
 
     private void hidePinnedDrawer() {

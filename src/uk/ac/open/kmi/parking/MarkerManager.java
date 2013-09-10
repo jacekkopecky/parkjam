@@ -26,11 +26,16 @@ import java.util.Set;
 import uk.ac.open.kmi.parking.service.ParkingsService;
 import android.graphics.Point;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -52,7 +57,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
  * @author Jacek Kopecky
  *
  */
-public class MarkerManager implements OnMarkerClickListener, OnMapClickListener, OnInfoWindowClickListener, InfoWindowAdapter {
+public class MarkerManager implements OnMarkerClickListener, OnMapClickListener, OnInfoWindowClickListener, InfoWindowAdapter, OnLongClickListener, OnClickListener {
     //  @SuppressWarnings("unused")
     private static final String TAG = "marker manager";
 
@@ -60,6 +65,11 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
     private GoogleMap map;
     private MapFragment mapFragment;
     private MainActivity activity;
+    private View bubbleButtons;
+    private ImageView bubbleButtonAvail;
+    private ImageView bubbleButtonFull;
+    private ImageView bubbleButtonPin;
+    private ImageView bubbleButtonDirections;
 
     private final Map<Parking, Marker> carpark2marker = new HashMap<Parking, Marker>();
     private final Map<Marker, Parking> marker2carpark = new HashMap<Marker, Parking>();
@@ -78,12 +88,29 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
      * @param ps instance of parkingsservice
      * @param map instance of map
      * @param mf map fragment that holds the map
+     * @param bubbleButtons view that holds the bubble buttons
      */
-    public MarkerManager(MainActivity context, ParkingsService ps, GoogleMap map, MapFragment mf) {
+    public MarkerManager(final MainActivity context, ParkingsService ps, GoogleMap map, MapFragment mf, View bubbleButtons) {
         this.parkingsService = ps;
         this.map = map;
         this.activity = context;
         this.mapFragment = mf;
+        this.bubbleButtons = bubbleButtons;
+
+        this.bubbleButtonAvail = (ImageView) bubbleButtons.findViewById(R.id.bubble_report_available);
+        this.bubbleButtonFull = (ImageView) bubbleButtons.findViewById(R.id.bubble_report_full);
+        this.bubbleButtonPin = (ImageView) bubbleButtons.findViewById(R.id.bubble_pin);
+        this.bubbleButtonDirections = (ImageView) bubbleButtons.findViewById(R.id.bubble_directions);
+
+        this.bubbleButtonAvail.setOnLongClickListener(this);
+        this.bubbleButtonFull.setOnLongClickListener(this);
+        this.bubbleButtonPin.setOnLongClickListener(this);
+        this.bubbleButtonDirections.setOnLongClickListener(this);
+
+        this.bubbleButtonAvail.setOnClickListener(this);
+        this.bubbleButtonFull.setOnClickListener(this);
+        this.bubbleButtonPin.setOnClickListener(this);
+        this.bubbleButtonDirections.setOnClickListener(this);
 
         map.setOnMarkerClickListener(this);
         map.setOnMapClickListener(this);
@@ -91,6 +118,44 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         map.setInfoWindowAdapter(this);
 
         this.commonOptions.anchor(.5f, 1f).draggable(false);
+    }
+
+    /**
+     * on long click of any bubble button show the button's tag as a hint
+     * @param v the bubble button
+     * @return true if a hint is shown
+     */
+    public boolean onLongClick(View v) {
+        if (v.getTag() == null) {
+            return false;
+        }
+        Toast t = Toast.makeText(this.activity, v.getTag().toString(), Toast.LENGTH_SHORT);
+        t.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, (v.getLeft()+v.getRight())/2 - ((View)(v.getParent())).getWidth()/2, v.getHeight()+t.getView().getHeight()+10);
+        t.show();
+        return true;
+    }
+
+    /**
+     * on click of any bubble button handle the action
+     * @param v the button
+     */
+    public void onClick(View v) {
+        switch (v.getId()) {
+        case R.id.bubble_pin:
+            this.activity.pinCarpark(this.currentBubble, !this.parkingsService.isPinnedCarpark(this.currentBubble));
+            break;
+        case R.id.bubble_report_available:
+            this.activity.reportAvailability(this.currentBubble, true);
+            break;
+        case R.id.bubble_report_full:
+            this.activity.reportAvailability(this.currentBubble, false);
+            break;
+        case R.id.bubble_directions:
+            this.activity.openNavigationTo(this.currentBubble);
+            break;
+        default:
+            Log.w(TAG, "unknown button pressed: " + v.getId());
+        }
     }
 
     private Parking currentBubble = null;
@@ -110,6 +175,9 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
 
         this.parkingsService.setCurrentExplicitCarpark(p);
         this.currentBubble = p;
+        updatePinnedStatus();
+        this.bubbleButtons.setVisibility(View.VISIBLE);
+//        updateButtons(p);
 
         Marker m = this.carpark2marker.get(p);
         if (m == null) {
@@ -137,7 +205,7 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         int width = Parking.getDrawablesWidth()/2;
         if (this.currentBubbleView != null) {
             minY += this.currentBubbleView.getHeight();
-            Log.d(TAG, "min top clearance: " + minY);
+//            Log.d(TAG, "min top clearance: " + minY);
             width = this.currentBubbleView.getWidth()/2;
         }
 
@@ -168,9 +236,22 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
      */
     public boolean removeBubble() {
 //        Log.d(TAG, "removing bubble at ", new Exception());
+//        this.bubbleButtons.animate().translationYBy(this.bubbleButtons.getHeight()).setListener(new AnimatorListenerAdapter() {
+//            public void onAnimationEnd(Animator animation) {
+//                MarkerManager.this.bubbleButtons.setVisibility(View.GONE);
+//                MarkerManager.this.bubbleButtons.setTranslationY(0);
+//            }
+//            public void onAnimationCancel(Animator animation) {
+//                MarkerManager.this.bubbleButtons.setVisibility(View.GONE);
+//                MarkerManager.this.bubbleButtons.setTranslationY(0);
+//            }
+//        });
+
+
         if (this.currentBubble == null) {
             return false;
         }
+        MarkerManager.this.bubbleButtons.setVisibility(View.INVISIBLE);
 
         Marker m = this.carpark2marker.get(this.currentBubble);
         this.currentBubble = null;
@@ -202,7 +283,7 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
      * @param p the car park that was updated
      */
     public void updateDetails(Parking p) {
-        Log.d(TAG, "updateDetails for parking " + p);
+//        Log.d(TAG, "updateDetails for parking " + p);
         if (this.currentBubble == null) {
             return;
         }
@@ -211,14 +292,13 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
             this.currentBubble = Parking.getParking(this.currentBubble.id);
             if (this.currentBubble == null) {
                 removeBubble();
-                Log.d(TAG, "removed bubble because the parking disappeared");
+//                Log.d(TAG, "removed bubble because the parking disappeared");
                 return;
             }
             fillBubbleHeading();
-            fillBubbleDetails(true);
+            fillBubbleDetails();
             this.currentBubbleMarker.showInfoWindow();
-            adjustBubbleHeight();
-
+//            updateButtons(p);
         }
     }
 
@@ -283,6 +363,9 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         for (Parking p: this.tmpObsoleteCarparks) {
             this.carpark2avail.remove(p);
             Marker m = this.carpark2marker.remove(p);
+            if (p.equals(this.currentBubble)) {
+                removeBubble();
+            }
             this.marker2carpark.remove(m);
             m.remove();
 //            removed++;
@@ -325,24 +408,56 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
      * @param p car park that was updated
      */
     public void updateAvailability(Parking p) {
-        // todo also update availability description in bubble if that is shown
         // update the car park's marker's icon only
         Marker m = this.carpark2marker.get(p);
         if (m != null) {
             updateCarparkMarker(p, m);
-//            if (!m.isInfoWindowShown()) {
-//                removeBubble();
-//            }
         } else {
             Log.e(TAG, "no marker found for car park " + p);
+            return;
         }
 
         if (p.equals(this.currentBubble)) {
+            if (!m.isInfoWindowShown()) {
+                m.showInfoWindow();
+            }
+
             this.currentBubble = p; // in case the instance has been updated
             updateDetails(p);
         }
     }
 
+    /**
+     * update the UI to match the pinned status of the given car park
+     * @param p the car park
+     */
+    public void updatePinnedStatus(Parking p) {
+        if (p.equals(this.currentBubble)) {
+            updatePinnedStatus();
+        }
+    }
+
+    private void updatePinnedStatus() {
+        if (this.parkingsService.isPinnedCarpark(this.currentBubble)) {
+            this.bubbleButtonPin.setImageResource(R.drawable.btn_pin_active);
+        } else {
+            this.bubbleButtonPin.setImageResource(R.drawable.btn_pin_inactive);
+        }
+    }
+
+//    private void updateButtons(Parking p) {
+//        if (p.isAvailabilityReportOutdated()) {
+//            this.bubbleButtonAvail.setImageResource(R.drawable.green_circle_32px);
+//            this.bubbleButtonFull.setImageResource(R.drawable.red_circle_32px);
+//        } else if (p.getEffectiveAvailability() == Parking.Availability.AVAILABLE) {
+//            this.bubbleButtonAvail.setImageResource(R.drawable.green_circle_haloy_32px);
+//            this.bubbleButtonFull.setImageResource(R.drawable.red_circle_32px);
+//        } else {
+//            this.bubbleButtonAvail.setImageResource(R.drawable.green_circle_32px);
+//            this.bubbleButtonFull.setImageResource(R.drawable.red_circle_haloy_32px);
+//        }
+//    }
+//
     public void onMapClick(LatLng arg0) {
         removeBubble();
 //        Log.i(TAG, "on map click, current markers window showing: " + (this.currentBubble == null ? "none" : this.carpark2marker.get(this.currentBubble).isInfoWindowShown()));
@@ -363,28 +478,27 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         return this.marker2carpark.get(m);
     }
 
-    public View getInfoContents(Marker m) {
-        return null;
-    }
-
     public View getInfoWindow(Marker m) {
         checkMarkerIsCurrentCarpark("getInfoWindow", m);
         if (m.equals(this.currentBubbleMarker)) {
             fillBubbleHeading(); // this updates the availability so that the time indication (like 5m ago) stays current-ish
-            Log.d(TAG, "returning previous info window");
+//            Log.d(TAG, "returning previous info window");
             return this.currentBubbleView;
         }
 
         this.currentBubbleMarker = m;
-        this.currentBubbleView = this.activity.getLayoutInflater().inflate(R.layout.bubble, null);
-        ((TableLayout)this.currentBubbleView.findViewById(R.id.bubble)).setColumnShrinkable(0, true);
+        if (this.currentBubbleView == null) {
+            this.currentBubbleView = this.activity.getLayoutInflater().inflate(R.layout.bubble, null);
+            ((TableLayout)this.currentBubbleView.findViewById(R.id.bubble)).setColumnShrinkable(0, true);
+        }
         fillBubbleHeading();
-        fillBubbleDetails(false);
-
-        // set up resizing and repositioning
-        adjustBubbleHeight();
+        fillBubbleDetails();
 
         return this.currentBubbleView;
+    }
+
+    public View getInfoContents(Marker m) {
+        return null;
     }
 
     private void fillBubbleHeading() {
@@ -400,367 +514,53 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         ((TextView)this.currentBubbleView.findViewById(R.id.bubble_availability)).setText(ParkingDetailsActivity.getAvailabilityDescription(this.activity, this.currentBubble, false));
     }
 
-    private void fillBubbleDetails(boolean empty) {
-        ViewGroup layout = (ViewGroup)this.currentBubbleView.findViewById(R.id.bubble_details);
-        if (empty) {
-            layout.removeAllViews();
-        }
-        ParkingDetailsActivity.createDetailsEntries(this.activity, layout, this.currentBubble, null, true /* todo this.showUnconfirmedProperties */, false);
+    /**
+     * the caller of this method needs to adjust bubble height
+     * @param empty
+     */
+    private void fillBubbleDetails() {
+        ViewGroup details = (ViewGroup)this.currentBubbleView.findViewById(R.id.bubble_details);
+        details.removeAllViews();
+        ParkingDetailsActivity.createDetailsEntries(this.activity, details, this.currentBubble, null, this.activity.showUnconfirmedProperties, false);
 
-        // adjusting bubble height needs to be done by the caller of fillBubbleDetails
-//        adjustBubbleHeight();
-    }
-
-    private void adjustBubbleHeight() {
-        final View view = this.mapFragment.getView();
-        if (view == null) {
-            Log.w(TAG, "no view in adjustBubbleHeight; fragment not initialized?");
+        // adjust bubble size
+        final View mapView = this.mapFragment.getView();
+        if (mapView == null) {
+            Log.w(TAG, "no map view! fragment not initialized?");
             return;
         }
-        view.post(new Runnable() {
+
+        // make sure the view is laid out
+        this.currentBubbleView.measure(View.MeasureSpec.makeMeasureSpec(mapView.getWidth(), View.MeasureSpec.AT_MOST), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        this.currentBubbleView.layout(0, 0, this.currentBubbleView.getMeasuredWidth(), this.currentBubbleView.getMeasuredHeight());
+//        Log.d(TAG, "measured: " + this.currentBubbleView.getMeasuredWidth() + "x" + this.currentBubbleView.getMeasuredHeight());
+
+        View detailsScrollView = this.currentBubbleView.findViewById(R.id.bubble_details_scrollview);
+        View detailsTopSeparator = this.currentBubbleView.findViewById(R.id.bubble_top_separator);
+        View detailsEllipsis = this.currentBubbleView.findViewById(R.id.bubble_ellipsis);
+        final int maxDetailsHeight = mapView.getHeight()/4;
+        final int height = details.getHeight();
+        if (height == 0) {
+            detailsTopSeparator.setVisibility(View.GONE);
+        } else {
+            detailsTopSeparator.setVisibility(View.VISIBLE);
+        }
+
+        LayoutParams lpS = detailsScrollView.getLayoutParams();
+        if (height <= maxDetailsHeight) {
+            lpS.height = height;
+            detailsEllipsis.setVisibility(View.GONE);
+        } else {
+            lpS.height = maxDetailsHeight;
+            detailsEllipsis.setVisibility(View.VISIBLE);
+        }
+        detailsScrollView.setLayoutParams(lpS);
+
+        mapView.post(new Runnable() {
             public void run() {
-                // adjust size
-//                Log.d(TAG, "adjusting size");
-                View details = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_details);
-                View detailsScrollView = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_details_scrollview);
-                View detailsTopSeparator = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_top_separator);
-                View detailsEllipsis = MarkerManager.this.currentBubbleView.findViewById(R.id.bubble_ellipsis);
-                LayoutParams lpS = detailsScrollView.getLayoutParams();
-                final int maxDetailsHeight = view.getHeight()/4;
-                final int height = details.getHeight();
-                if (height == 0) {
-                    detailsTopSeparator.setVisibility(View.GONE);
-//                    Log.d(TAG, "adjusting size height 0 ");
-                } else {
-                    detailsTopSeparator.setVisibility(View.VISIBLE);
-//                    Log.d(TAG, "adjusting size height non-0");
-                }
-                int oldHeight = detailsScrollView.getHeight();
-//                Log.d(TAG, "old height: " + oldHeight);
-                lpS.height = height < maxDetailsHeight ? height : maxDetailsHeight;
-                if (lpS.height < height) {
-                    detailsEllipsis.setVisibility(View.VISIBLE);
-                } else {
-                    detailsEllipsis.setVisibility(View.GONE);
-                }
-//                Log.d(TAG, "adjusting size height " + lpS.height);
-                detailsScrollView.setLayoutParams(lpS);
-                if (lpS.height != oldHeight) {
-                    Log.d(TAG, "scheduling new showInfoWindow");
-                    MarkerManager.this.currentBubbleMarker.showInfoWindow();
-                    view.post(new Runnable() {
-                        public void run() {
-                            ensureInfoWindowOnScreen(MarkerManager.this.currentBubbleMarker);
-                        }
-                    });
-                }
+                ensureInfoWindowOnScreen(MarkerManager.this.currentBubbleMarker);
             }
         });
     }
-
-    // todo do a bit of this around here:
-//  this.currentBubble = Parking.getParking(this.currentBubble.id);
-//  if (this.currentBubble == null) {
-//      setItem(null);
-//      return;
-//  }
-
-
-//    private static class Label {
-//        private static final String STRING_MAX = "MAX CARPARKS";
-//        private static final String STRING_NUM = " CARPARKS";
-//        private final Polyline characters[] = new Polyline[15];
-//        private final PolylineOptions opts = new PolylineOptions();
-//
-//        public Label(List<LatLng> currentOutline, GoogleMap map, int count) {
-//            this.opts.visible(false).color(0xffc763ad).width(1f).add(new LatLng(0f,0f));
-//            for (int i=0; i<this.characters.length; i++) {
-//                this.characters[i] = map.addPolyline(this.opts);
-//            }
-//            this.move(currentOutline, count);
-//        }
-//
-//        public void move(List<LatLng> currentOutline, int count) {
-//            double latmin = Math.min(currentOutline.get(0).latitude, currentOutline.get(2).latitude);
-//            double lonmin = Math.min(currentOutline.get(0).longitude, currentOutline.get(2).longitude);
-//            double lonmax = Math.max(currentOutline.get(0).longitude, currentOutline.get(2).longitude);
-//
-//            double scaleLon = (lonmax-lonmin)/72d;
-//            double scaleLat = scaleLon * Math.cos(latmin);
-//
-//            String result = STRING_MAX;
-//            if (count < ParkingsService.MAX_CARPARKS_DISPLAYED) {
-//                result = Integer.toString(count) + STRING_NUM;
-//            }
-//
-//            double originLat = latmin - 5d*scaleLat;
-//            double originLon = (lonmax+lonmin)/2d+1.5d*scaleLat*result.length();
-//
-////            Log.d(TAG, String.format("latmin: %f  lonmin: %f  lonmax: %f  scaleLon: %f  scaleLat: %f  originLat: %f  originLon: %f  string '%s'", latmin, lonmin, lonmax, scaleLon, scaleLat, originLat, originLon, result));
-//
-//            final int resultEnd = result.length() - 1;
-//            for (int i=0; i<this.characters.length; i++) {
-//                if (i>resultEnd) {
-//                    this.characters[i].setVisible(false);
-//                    Log.d(TAG, "no character " + i);
-//                } else {
-//                    originLon -= 3d*scaleLon;
-//                    List<LatLng> charPoints = Character.getChar(result.charAt(resultEnd-i), originLat, originLon, scaleLat, scaleLon);
-//                    if (charPoints != null) {
-//                        this.characters[i].setPoints(charPoints);
-//                        this.characters[i].setVisible(true);
-//                        Log.d(TAG, "showing character '" + result.charAt(resultEnd-i) + "' at originLon " + originLon);
-//                    } else {
-//                        this.characters[i].setVisible(false);
-//                        Log.d(TAG, "hiding character " + i);
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//    }
-//
-//    private static abstract class Character {
-//
-//        private static LatLng n(double lat, double lon, double scaleLat, double scaleLon, int x, int y) {
-//            return new LatLng(lat+y*scaleLat, lon+x*scaleLon);
-//        }
-//
-//        private static List<LatLng> character_0(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 2, 1));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_1(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_2(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_3(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 2, 1));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 1, 2));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_4(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_5(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 2, 4));
-//            l.add(n(la, lo, sa, so, 0, 4));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 1, 3));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 2, 1));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_6(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 2, 4));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 2, 1));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 1, 3));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_7(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 4));
-//            l.add(n(la, lo, sa, so, 2, 4));
-//            l.add(n(la, lo, sa, so, 1, 2));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_8(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 2, 1));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_9(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 2, 1));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 1, 1));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_A(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_C(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 2, 4));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_K(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 0, 4));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 2, 4));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_M(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 0, 4));
-//            l.add(n(la, lo, sa, so, 1, 2));
-//            l.add(n(la, lo, sa, so, 2, 4));
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_P(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 0, 4));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 1, 2));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_R(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 0, 4));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            l.add(n(la, lo, sa, so, 1, 2));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 1, 2));
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_S(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 1));
-//            l.add(n(la, lo, sa, so, 1, 0));
-//            l.add(n(la, lo, sa, so, 2, 1));
-//            l.add(n(la, lo, sa, so, 2, 2));
-//            l.add(n(la, lo, sa, so, 0, 2));
-//            l.add(n(la, lo, sa, so, 0, 3));
-//            l.add(n(la, lo, sa, so, 1, 4));
-//            l.add(n(la, lo, sa, so, 2, 3));
-//            return l;
-//        }
-//
-//        private static List<LatLng> character_X(double la, double lo, double sa, double so) {
-//            List<LatLng> l = new ArrayList<LatLng>(9);
-//            l.add(n(la, lo, sa, so, 0, 4));
-//            l.add(n(la, lo, sa, so, 2, 0));
-//            l.add(n(la, lo, sa, so, 1, 2));
-//            l.add(n(la, lo, sa, so, 0, 0));
-//            l.add(n(la, lo, sa, so, 2, 4));
-//            return l;
-//        }
-//
-//        static List<LatLng> getChar(char c, double lat, double lon, double scaleLat, double scaleLon) {
-//            switch (c) {
-//            case '0': return character_0(lat, lon, scaleLat, scaleLon);
-//            case '1': return character_1(lat, lon, scaleLat, scaleLon);
-//            case '2': return character_2(lat, lon, scaleLat, scaleLon);
-//            case '3': return character_3(lat, lon, scaleLat, scaleLon);
-//            case '4': return character_4(lat, lon, scaleLat, scaleLon);
-//            case '5': return character_5(lat, lon, scaleLat, scaleLon);
-//            case '6': return character_6(lat, lon, scaleLat, scaleLon);
-//            case '7': return character_7(lat, lon, scaleLat, scaleLon);
-//            case '8': return character_8(lat, lon, scaleLat, scaleLon);
-//            case '9': return character_9(lat, lon, scaleLat, scaleLon);
-//            case 'A': return character_A(lat, lon, scaleLat, scaleLon);
-//            case 'C': return character_C(lat, lon, scaleLat, scaleLon);
-//            case 'K': return character_K(lat, lon, scaleLat, scaleLon);
-//            case 'M': return character_M(lat, lon, scaleLat, scaleLon);
-//            case 'P': return character_P(lat, lon, scaleLat, scaleLon);
-//            case 'R': return character_R(lat, lon, scaleLat, scaleLon);
-//            case 'S': return character_S(lat, lon, scaleLat, scaleLon);
-//            case 'X': return character_X(lat, lon, scaleLat, scaleLon);
-//            default: return null;
-//            }
-//        }
-//    }
-
 
 }

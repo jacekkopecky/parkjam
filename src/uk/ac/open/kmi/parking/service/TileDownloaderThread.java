@@ -599,17 +599,18 @@ class TileDownloaderThread implements Runnable {
                 old.nextAvailUpdate = old.lastAvailUpdate + Config.DEFAULT_AVAIL_TTL;
                 old.unconfirmed = this.unconfirmed;
                 return old;
+            } else {
+                return new Parking(new LatLng(this.lat, this.lon),
+                        this.title,
+                        uri,
+                        this.availabilityResource,
+                        this.updateResource,
+                        this.availability,
+                        this.timestamp,
+                        Config.DEFAULT_AVAIL_TTL,
+                        this.titleProperty,
+                        this.unconfirmed);
             }
-            return new Parking(new LatLng(this.lat, this.lon),
-                    this.title,
-                    uri,
-                    this.availabilityResource,
-                    this.updateResource,
-                    this.availability,
-                    this.timestamp,
-                    Config.DEFAULT_AVAIL_TTL,
-                    this.titleProperty,
-                    this.unconfirmed);
         }
     }
 }

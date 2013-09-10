@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bubble_buttons"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="fill_horizontal|center_vertical"
+    android:visibility="invisible"
+    android:orientation="horizontal" >
+
+    <ImageView
+        style="@style/bubble.button"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:clickable="true"
+        android:longClickable="true"
+        android:id="@+id/bubble_pin"
+        android:tag="@string/bubble_pin_tag"
+        android:src="@drawable/btn_pin_inactive" />
+    <ImageView
+        style="@style/bubble.button"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:clickable="true"
+        android:longClickable="true"
+        android:tag="@string/bubble_directions_tag"
+        android:hapticFeedbackEnabled="true" 
+        android:id="@+id/bubble_directions"
+        android:src="@drawable/ic_menu_directions" />
+    <ImageView
+        style="@style/bubble.button"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:clickable="true"
+        android:longClickable="true"
+        android:tag="@string/bubble_report_available_tag"
+        android:id="@+id/bubble_report_available"
+        android:src="@drawable/green_circle_32px" />
+    <ImageView
+        style="@style/bubble.button"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:clickable="true"
+        android:longClickable="true"
+        android:tag="@string/bubble_report_full_tag"
+        android:id="@+id/bubble_report_full"
+        android:src="@drawable/red_circle_32px" />
+</LinearLayout>
