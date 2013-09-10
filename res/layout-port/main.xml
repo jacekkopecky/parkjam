@@ -81,21 +81,6 @@
             android:layout_height="2mm" />
     </LinearLayout>
 	    
-<!--     <LinearLayout
-        android:id="@+id/status_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:minHeight="@dimen/status_bar_height" 
-        android:gravity="center"
-        android:orientation="vertical">
-        
-        <ImageView
-            android:layout_width="match_parent"  
-            android:src="@drawable/currpark_gradient"
-            android:layout_height="2mm" />
-    </LinearLayout>
- -->    
     <LinearLayout
         android:id="@+id/pinned_drawer_container"
         android:layout_marginLeft="@dimen/status_bar_height" 

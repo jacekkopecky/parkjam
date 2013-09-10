@@ -413,7 +413,7 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         if (m != null) {
             updateCarparkMarker(p, m);
         } else {
-            Log.e(TAG, "no marker found for car park " + p);
+//            Log.d(TAG, "no marker found for car park " + p);
             return;
         }
 
