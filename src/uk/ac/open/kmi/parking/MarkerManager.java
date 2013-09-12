@@ -576,7 +576,6 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         Point p2 = proj.toScreenLocation(outlinePoints.get(2));
         // compute the pixel distance of two opposite corners of the outline
         int dist = diagonal(p1.x-p2.x, p1.y-p2.y);
-        Log.d(TAG, "diag: " + dist + " (" + diagonal(proj.toScreenLocation(outlinePoints.get(1)).x-proj.toScreenLocation(outlinePoints.get(3)).x, proj.toScreenLocation(outlinePoints.get(1)).y-proj.toScreenLocation(outlinePoints.get(3)).y) + ") " + p1 + ", " + p2);
 
         // if the distance is too small (less than a 1/16th of the square of the diagonal dimension of the map view)
         View mapView = this.mapFragment.getView();
