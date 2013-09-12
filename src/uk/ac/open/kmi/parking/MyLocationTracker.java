@@ -50,14 +50,18 @@ public class MyLocationTracker implements
     private boolean tracking = false;
     private long inAnimationUntil = 0;
 
+    private MarkerManager carparkManager;
+
     /**
      * @param ps parkings service
      * @param map the map to follow
      * @param activity the activity that knows our current location
+     * @param carparkManager marker manager to judge if map is too far out
      */
-    public MyLocationTracker(ParkingsService ps, GoogleMap map, MainActivity activity) {
+    public MyLocationTracker(ParkingsService ps, GoogleMap map, MainActivity activity, MarkerManager carparkManager) {
         this.parkingsService = ps;
         this.activity = activity;
+        this.carparkManager = carparkManager;
 
         map.setOnMyLocationButtonClickListener(this);
         map.setOnCameraChangeListener(this);
@@ -74,7 +78,7 @@ public class MyLocationTracker implements
         return true;
     }
 
-    public void onCameraChange(CameraPosition arg0) {
+    public void onCameraChange(CameraPosition camera) {
         if (this.inAnimationUntil < System.currentTimeMillis()) {
             this.tracking = false;
             this.map.getUiSettings().setMyLocationButtonEnabled(this.activity.getCurrentLocation() != null);
@@ -82,7 +86,7 @@ public class MyLocationTracker implements
 
         // tell parkings service that the map has moved
         this.parkingsService.getSortedCurrentCarparks(this.map.getCameraPosition().target);
-
+        this.carparkManager.checkTooFarOut();
     }
 
     public void onLocationChanged(Location loc) {

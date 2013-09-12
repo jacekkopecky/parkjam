@@ -85,19 +85,18 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
      * @param ps instance of parkingsservice
      * @param map instance of map
      * @param mf map fragment that holds the map
-     * @param bubbleButtons view that holds the bubble buttons
      */
-    public MarkerManager(final MainActivity activity, ParkingsService ps, GoogleMap map, MapFragment mf, View bubbleButtons) {
+    public MarkerManager(final MainActivity activity, ParkingsService ps, GoogleMap map, MapFragment mf) {
         this.parkingsService = ps;
         this.map = map;
         this.activity = activity;
         this.mapFragment = mf;
-        this.bubbleButtons = bubbleButtons;
+        this.bubbleButtons = activity.findViewById(R.id.bubble_buttons);
 
-        this.bubbleButtonAvail = (ImageView) bubbleButtons.findViewById(R.id.bubble_report_available);
-        this.bubbleButtonFull = (ImageView) bubbleButtons.findViewById(R.id.bubble_report_full);
-        this.bubbleButtonPin = (ImageView) bubbleButtons.findViewById(R.id.bubble_pin);
-        this.bubbleButtonDirections = (ImageView) bubbleButtons.findViewById(R.id.bubble_directions);
+        this.bubbleButtonAvail = (ImageView) this.bubbleButtons.findViewById(R.id.bubble_report_available);
+        this.bubbleButtonFull = (ImageView) this.bubbleButtons.findViewById(R.id.bubble_report_full);
+        this.bubbleButtonPin = (ImageView) this.bubbleButtons.findViewById(R.id.bubble_pin);
+        this.bubbleButtonDirections = (ImageView) this.bubbleButtons.findViewById(R.id.bubble_directions);
 
         this.bubbleButtonAvail.setOnLongClickListener(activity.buttonHintHandler);
         this.bubbleButtonFull.setOnLongClickListener(activity.buttonHintHandler);
@@ -147,6 +146,8 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
     private Marker currentBubbleMarker = null;
 
     private long ensureInfoWindowOnScreenUntil = 0;
+
+    private boolean markersEnabled = true;
 
 
     /**
@@ -298,7 +299,7 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
 
     /**
      * update all the car park markers on the map.
-     * must be called from the UI thread; or anyway, from a single tread
+     * must be called from the UI thread
      */
     public void update() {
 //        Log.d(TAG, "update"); final long starttime = System.currentTimeMillis();
@@ -331,7 +332,8 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
                 this.carpark2avail.put(p, bd);
 //                added++;
             }
-            if (p.equals(this.desiredCarpark)) {
+            m.setVisible(this.markersEnabled);
+            if (this.markersEnabled && p.equals(this.desiredCarpark)) {
                 this.desiredCarpark = null;
                 final Parking pp = p;
                 View view = this.mapFragment.getView();
@@ -559,6 +561,43 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
             detailsEllipsis.setVisibility(View.VISIBLE);
         }
         detailsScrollView.setLayoutParams(lpS);
+    }
+
+    /**
+     * checks whether the outline on the map is too small to be useful
+     */
+    void checkTooFarOut() {
+        if (this.outline == null) {
+            return;
+        }
+        Projection proj = this.map.getProjection();
+        List<LatLng> outlinePoints = this.outline.getPoints();
+        Point p1 = proj.toScreenLocation(outlinePoints.get(0));
+        Point p2 = proj.toScreenLocation(outlinePoints.get(2));
+        // compute the pixel distance of two opposite corners of the outline
+        int dist = diagonal(p1.x-p2.x, p1.y-p2.y);
+        Log.d(TAG, "diag: " + dist + " (" + diagonal(proj.toScreenLocation(outlinePoints.get(1)).x-proj.toScreenLocation(outlinePoints.get(3)).x, proj.toScreenLocation(outlinePoints.get(1)).y-proj.toScreenLocation(outlinePoints.get(3)).y) + ") " + p1 + ", " + p2);
+
+        // if the distance is too small (less than a 1/16th of the square of the diagonal dimension of the map view)
+        View mapView = this.mapFragment.getView();
+        int mapDiag = diagonal(mapView.getWidth(), mapView.getHeight());
+
+        boolean tooFarOut = dist < mapDiag/4;
+        this.activity.setTooFarOut(tooFarOut);
+        this.setMarkersEnabled(!tooFarOut);
+    }
+
+    private int diagonal(double x, double y) {
+        return (int)Math.sqrt(x*x+y*y);
+    }
+
+    private void setMarkersEnabled(boolean enabled) {
+        if (this.markersEnabled == enabled) {
+            return;
+        }
+        this.markersEnabled  = enabled;
+        if (!enabled) removeBubble();
+        update();
     }
 
 }

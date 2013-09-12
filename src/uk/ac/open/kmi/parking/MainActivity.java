@@ -119,7 +119,7 @@ public class MainActivity extends Activity implements
 
     private Uri desiredCarpark = null;
 
-//    boolean tooFarOut = false;
+    boolean tooFarOut = false;
     boolean addingMode = false;
 
     private static final int DIALOG_TERMS = 0;
@@ -211,9 +211,9 @@ public class MainActivity extends Activity implements
             this.map.moveCamera(CameraUpdateFactory.newCameraPosition((CameraPosition) savedInstanceState.getParcelable(SAVED_CAMERA_POSITION)));
         }
 
-        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map, this.mapFragment, this.findViewById(R.id.bubble_buttons));
+        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map, this.mapFragment);
 
-        this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map, this);
+        this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map, this, this.carparkManager);
 
         this.animateToNextLocationFix = this.desiredCarpark == null;
 
@@ -494,13 +494,13 @@ public class MainActivity extends Activity implements
         }
     }
 
-//    void setTooFarOut(boolean far) {
-//        if (this.tooFarOut != far) {
-//            this.tooFarOut = far;
-//            this.updateUIState();
-//        }
-//    }
-//
+    void setTooFarOut(boolean far) {
+        if (this.tooFarOut != far) {
+            this.tooFarOut = far;
+            this.updateUIState();
+        }
+    }
+
     /**
      * helper method that calls the details view
      * @param p the parking whose details should be viewed
@@ -714,12 +714,9 @@ public class MainActivity extends Activity implements
      */
     private void updateUIState() {
 //        Log.d(TAG, "updating UI state");
-//        if (this.tooFarOut) {
-//            showStatusText(R.string.currpark_too_far_out);
-//            return;
-//        }
-
-        if (!this.addingMode && !this.parkingsService.loadedSomeCarparks()) {
+        if (this.tooFarOut) {
+            showStatusText(R.string.currpark_too_far_out);
+        } else if (!this.addingMode && !this.parkingsService.loadedSomeCarparks()) {
             showStatusText(R.string.currpark_initial);
         } else {
             hideStatusText();
