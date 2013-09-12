@@ -22,8 +22,8 @@
     <string name="menu_my_location">My loc</string>
     <string name="menu_search">Search</string>
     <string name="menu_favorites">Favorites</string>
-    <string name="menu_pinned_show">Show pinned</string>
-    <string name="menu_pinned_hide">Hide pinned</string>
+    <string name="menu_pinned_show">Show pinned car parks</string>
+    <string name="menu_pinned_hide">Hide pinned car parks</string>
     <string name="menu_find_my_car">Find my car</string>
     <string name="menu_add_carpark">New car park</string>
     

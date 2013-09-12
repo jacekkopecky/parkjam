@@ -26,16 +26,13 @@ import java.util.Set;
 import uk.ac.open.kmi.parking.service.ParkingsService;
 import android.graphics.Point;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -57,7 +54,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
  * @author Jacek Kopecky
  *
  */
-public class MarkerManager implements OnMarkerClickListener, OnMapClickListener, OnInfoWindowClickListener, InfoWindowAdapter, OnLongClickListener, OnClickListener {
+public class MarkerManager implements OnMarkerClickListener, OnMapClickListener, OnInfoWindowClickListener, InfoWindowAdapter, OnClickListener {
     //  @SuppressWarnings("unused")
     private static final String TAG = "marker manager";
 
@@ -84,16 +81,16 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
 
     /**
      * constructor
-     * @param context activity
+     * @param activity activity
      * @param ps instance of parkingsservice
      * @param map instance of map
      * @param mf map fragment that holds the map
      * @param bubbleButtons view that holds the bubble buttons
      */
-    public MarkerManager(final MainActivity context, ParkingsService ps, GoogleMap map, MapFragment mf, View bubbleButtons) {
+    public MarkerManager(final MainActivity activity, ParkingsService ps, GoogleMap map, MapFragment mf, View bubbleButtons) {
         this.parkingsService = ps;
         this.map = map;
-        this.activity = context;
+        this.activity = activity;
         this.mapFragment = mf;
         this.bubbleButtons = bubbleButtons;
 
@@ -102,14 +99,15 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         this.bubbleButtonPin = (ImageView) bubbleButtons.findViewById(R.id.bubble_pin);
         this.bubbleButtonDirections = (ImageView) bubbleButtons.findViewById(R.id.bubble_directions);
 
-        this.bubbleButtonAvail.setOnLongClickListener(this);
-        this.bubbleButtonFull.setOnLongClickListener(this);
-        this.bubbleButtonPin.setOnLongClickListener(this);
-        this.bubbleButtonDirections.setOnLongClickListener(this);
+        this.bubbleButtonAvail.setOnLongClickListener(activity.buttonHintHandler);
+        this.bubbleButtonFull.setOnLongClickListener(activity.buttonHintHandler);
+        this.bubbleButtonPin.setOnLongClickListener(activity.buttonHintHandler);
+        this.bubbleButtonDirections.setOnLongClickListener(activity.buttonHintHandler);
 
         this.bubbleButtonAvail.setOnClickListener(this);
         this.bubbleButtonFull.setOnClickListener(this);
         this.bubbleButtonPin.setOnClickListener(this);
+//        this.bubbleButtonDrawer.setOnClickListener(this);
         this.bubbleButtonDirections.setOnClickListener(this);
 
         map.setOnMarkerClickListener(this);
@@ -118,21 +116,6 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         map.setInfoWindowAdapter(this);
 
         this.commonOptions.anchor(.5f, 1f).draggable(false);
-    }
-
-    /**
-     * on long click of any bubble button show the button's tag as a hint
-     * @param v the bubble button
-     * @return true if a hint is shown
-     */
-    public boolean onLongClick(View v) {
-        if (v.getTag() == null) {
-            return false;
-        }
-        Toast t = Toast.makeText(this.activity, v.getTag().toString(), Toast.LENGTH_SHORT);
-        t.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, (v.getLeft()+v.getRight())/2 - ((View)(v.getParent())).getWidth()/2, v.getHeight()+t.getView().getHeight()+10);
-        t.show();
-        return true;
     }
 
     /**

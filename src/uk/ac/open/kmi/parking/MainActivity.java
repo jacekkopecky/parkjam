@@ -44,16 +44,20 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -100,8 +104,10 @@ public class MainActivity extends Activity implements
 
     private TextView statusTextView;
     private View addparkContainer;
-    private ListView pinnedDrawer;
+    private ListView pinnedDrawerList;
     private View pinnedDrawerContainer;
+    private View pinnedDrawerCombo;
+    private ImageButton pinnedDrawerButton;
     private PinnedDrawerListAdapter pinnedDrawerAdapter;
     boolean showingPinned = false;
     boolean showPinnedWhenAnyFound = true;
@@ -182,26 +188,29 @@ public class MainActivity extends Activity implements
 
         this.statusTextView = (TextView) findViewById(R.id.status_text);
 
-        this.pinnedDrawer = (ListView) findViewById(R.id.pinned_drawer);
+        this.pinnedDrawerList = (ListView) findViewById(R.id.pinned_drawer);
         this.pinnedDrawerContainer = findViewById(R.id.pinned_drawer_container);
+        this.pinnedDrawerCombo = findViewById(R.id.pinned_drawer_combo);
+        this.pinnedDrawerButton = (ImageButton) findViewById(R.id.pinned_drawer_button);
         this.pinnedDrawerAdapter = new PinnedDrawerListAdapter(this);
 
-        this.pinnedDrawer.setAdapter(this.pinnedDrawerAdapter);
+        this.pinnedDrawerButton.setOnLongClickListener(this.buttonHintHandler);
+        this.pinnedDrawerList.setAdapter(this.pinnedDrawerAdapter);
 
         if (savedInstanceState != null) {
             this.showingPinned = savedInstanceState.getBoolean(SAVED_SHOWING_PINNED_DRAWER, this.showingPinned);
             this.showPinnedWhenAnyFound = false;
         }
 
-        MapFragment mf = (MapFragment)getFragmentManager().findFragmentById(R.id.mapview);
-        this.map = mf.getMap();
+        this.mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapview);
+        this.map = this.mapFragment.getMap();
         if (savedInstanceState == null) {
             this.map.moveCamera(CameraUpdateFactory.zoomTo(INITIAL_ZOOM));
         } else if (savedInstanceState.containsKey(SAVED_CAMERA_POSITION)) {
             this.map.moveCamera(CameraUpdateFactory.newCameraPosition((CameraPosition) savedInstanceState.getParcelable(SAVED_CAMERA_POSITION)));
         }
 
-        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map, mf, this.findViewById(R.id.bubble_buttons));
+        this.carparkManager = new MarkerManager(this, this.parkingsService, this.map, this.mapFragment, this.findViewById(R.id.bubble_buttons));
 
         this.myLocTracker = new MyLocationTracker(this.parkingsService, this.map, this);
 
@@ -508,10 +517,7 @@ public class MainActivity extends Activity implements
         Log.d(TAG, "onPrepareOptionsMenu");
         menu.findItem(R.id.menu_traffic).setChecked(this.map.isTrafficEnabled());
         menu.findItem(R.id.menu_satellite).setChecked(this.map.getMapType() != GoogleMap.MAP_TYPE_NORMAL);
-//        menu.findItem(R.id.menu_add_car_park).setVisible(!this.tooFarOut && !this.addingMode);
-        menu.findItem(R.id.menu_pinned).setTitle(this.showingPinned ? R.string.menu_pinned_hide : R.string.menu_pinned_show);
-//        menu.findItem(R.id.menu_pinned).setVisible(!this.tooFarOut && !this.addingMode);
-        menu.findItem(R.id.menu_pinned).setVisible(!this.addingMode);
+        menu.findItem(R.id.menu_add_car_park).setVisible(!this.addingMode);
         return true;
     }
 
@@ -545,10 +551,6 @@ public class MainActivity extends Activity implements
             // on pressing a result, go on to main activity again, show map there, maybe with an annotated pin with location?, with car parks
             // back button then should take you back to search results
             startAddressSearch();
-            return true;
-        case R.id.menu_pinned:
-            this.showingPinned = !this.showingPinned;
-            updateUIState();
             return true;
         default:
             return super.onOptionsItemSelected(item);
@@ -714,10 +716,9 @@ public class MainActivity extends Activity implements
 
         if (!this.addingMode && !this.parkingsService.loadedSomeCarparks()) {
             showStatusText(R.string.currpark_initial);
-            return;
+        } else {
+            hideStatusText();
         }
-
-        hideStatusText();
 
 //        this.carparkManager.updateAvailability();
 
@@ -763,29 +764,46 @@ public class MainActivity extends Activity implements
         this.statusTextView.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * this is called by the button that toggles the pinned drawer's showing and hiding
+     * @param v ignored
+     */
+    public void togglePinnedDrawer(@SuppressWarnings("unused") View v) {
+        this.showingPinned = !this.showingPinned;
+        updateUIState();
+    }
+
     private void hidePinnedDrawer() {
-        if (this.pinnedDrawer.getVisibility() == View.VISIBLE) {
-            Animation anim = new TranslateAnimation(0, 0, 0, -this.pinnedDrawerContainer.getHeight());
+        if (this.pinnedDrawerList.getVisibility() == View.VISIBLE) {
+//            Log.d(TAG, "hiding drawer");
+            Animation anim = new TranslateAnimation(0, 0, 0, this.pinnedDrawerList.getHeight());
             anim.setDuration(getResources().getInteger(R.integer.pinned_drawer_animation_duration));
             anim.setAnimationListener(new Animation.AnimationListener() {
                 public void onAnimationStart(Animation animation) { /* nothing */ }
                 public void onAnimationRepeat(Animation animation) { /* nothing */ }
-                public void onAnimationEnd(Animation animation) { MainActivity.this.pinnedDrawer.setVisibility(View.GONE); }
+                public void onAnimationEnd(Animation animation) {
+                    MainActivity.this.pinnedDrawerList.setVisibility(View.GONE);
+                    MainActivity.this.pinnedDrawerButton.setImageResource(R.drawable.chevron_up);
+                    MainActivity.this.pinnedDrawerButton.setTag(MainActivity.this.getResources().getString(R.string.menu_pinned_show));
+                }
             });
-            this.pinnedDrawer.startAnimation(anim);
+            this.pinnedDrawerCombo.startAnimation(anim);
         } else {
             // make sure
-            this.pinnedDrawer.setVisibility(View.GONE);
+            this.pinnedDrawerList.setVisibility(View.GONE);
         }
         this.parkingsService.setPinnedUpdating(false);
     }
 
     private void showPinnedDrawer() {
-        if (this.pinnedDrawer.getVisibility() != View.VISIBLE) {
-            Animation anim = new TranslateAnimation(0, 0, -this.pinnedDrawerContainer.getHeight(), 0);
+        if (this.pinnedDrawerList.getVisibility() != View.VISIBLE) {
+//            Log.d(TAG, "showing drawer");
+            Animation anim = new TranslateAnimation(0, 0, this.pinnedDrawerList.getHeight(), 0);
             anim.setDuration(getResources().getInteger(R.integer.pinned_drawer_animation_duration));
-            this.pinnedDrawer.startAnimation(anim);
-            this.pinnedDrawer.setVisibility(View.VISIBLE);
+            this.pinnedDrawerList.setVisibility(View.VISIBLE);
+            MainActivity.this.pinnedDrawerButton.setImageResource(R.drawable.chevron_down);
+            MainActivity.this.pinnedDrawerButton.setTag(MainActivity.this.getResources().getString(R.string.menu_pinned_hide));
+            this.pinnedDrawerCombo.startAnimation(anim);
         }
         this.parkingsService.setPinnedUpdating(true);
     }
@@ -1027,5 +1045,34 @@ public class MainActivity extends Activity implements
     public void onDisconnected() {
         // TODO Auto-generated method stub
 
+    }
+
+    final ButtonHintHandler buttonHintHandler = new ButtonHintHandler();
+    private static int[] viewLocation = new int[2];
+
+    private MapFragment mapFragment;
+
+    final class ButtonHintHandler implements OnLongClickListener {
+        /**
+         * on long click of any bubble button show the button's tag as a hint
+         * @param v the bubble button
+         * @return true if a hint is shown
+         */
+        public boolean onLongClick(View v) {
+            if (v.getTag() == null) {
+                Log.d(TAG, "no tag on long-clicked view");
+                return false;
+            }
+            Toast t = Toast.makeText(MainActivity.this, v.getTag().toString(), Toast.LENGTH_SHORT);
+            v.getLocationInWindow(viewLocation);
+            View toplevel = v;
+            for (ViewParent vp = v.getParent(); vp != toplevel && vp instanceof View; vp = vp.getParent()) {
+                toplevel = (View)vp;
+            }
+//            Log.d(TAG, "location: " + viewLocation[0] + "x" + viewLocation[1] + ", h: " + toplevel.getHeight());
+            t.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, viewLocation[0] + v.getWidth()/2 - MainActivity.this.mapFragment.getView().getWidth()/2, toplevel.getHeight() - viewLocation[1] + 10);
+            t.show();
+            return true;
+        }
     }
 }
