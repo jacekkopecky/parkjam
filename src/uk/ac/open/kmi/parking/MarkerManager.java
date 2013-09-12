@@ -146,15 +146,20 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
     private View currentBubbleView = null;
     private Marker currentBubbleMarker = null;
 
+    private long ensureInfoWindowOnScreenUntil = 0;
+
 
     /**
      * shows the info window for this car park (and centers on the car park, possibly only if the window would otherwise not be completely shown)
      * @param p the selected car park
      */
     public void showBubble(Parking p) {
+        Log.d(TAG, "show bubble for parking " + p);
         if (p == null || (this.currentBubble != null && !p.equals(this.currentBubble))) {
             removeBubble();
         }
+
+        this.ensureInfoWindowOnScreenUntil = System.currentTimeMillis()+1500; // todo this should be a constant somewhere
 
         this.parkingsService.setCurrentExplicitCarpark(p);
         this.currentBubble = p;
@@ -173,9 +178,15 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         }
     }
 
-    private void ensureInfoWindowOnScreen(Marker m) {
+    private void doEnsureInfoWindowOnScreen() {
+        if (this.ensureInfoWindowOnScreenUntil < System.currentTimeMillis()) {
+            return;
+        }
+        if (this.currentBubbleMarker == null) {
+            return; // marker disappeared
+        }
         Projection proj = this.map.getProjection();
-        Point p = proj.toScreenLocation(m.getPosition());
+        Point p = proj.toScreenLocation(this.currentBubbleMarker.getPosition());
         View mapView = this.mapFragment.getView();
         if (mapView == null) {
             Log.w(TAG, "no view in ensureInfoWindow; fragment not initialized?");
@@ -322,7 +333,6 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
             }
             if (p.equals(this.desiredCarpark)) {
                 this.desiredCarpark = null;
-                final Marker mm = m;
                 final Parking pp = p;
                 View view = this.mapFragment.getView();
                 if (view == null) {
@@ -332,7 +342,6 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
                 view.post(new Runnable() {
                     public void run() {
                         showBubble(pp);
-                        ensureInfoWindowOnScreen(mm);
                     }
                 });
             }
@@ -382,7 +391,6 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
 
     public boolean onMarkerClick(Marker m) {
         showBubble(this.marker2carpark.get(m));
-        ensureInfoWindowOnScreen(m);
         return true;
     }
 
@@ -463,9 +471,12 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
 
     public View getInfoWindow(Marker m) {
         checkMarkerIsCurrentCarpark("getInfoWindow", m);
+
+        // if it's the same marker as before, just return the same window
         if (m.equals(this.currentBubbleMarker)) {
             fillBubbleHeading(); // this updates the availability so that the time indication (like 5m ago) stays current-ish
 //            Log.d(TAG, "returning previous info window");
+            scheduleEnsureInfoWindowOnScreen();
             return this.currentBubbleView;
         }
 
@@ -477,7 +488,17 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         fillBubbleHeading();
         fillBubbleDetails();
 
+        scheduleEnsureInfoWindowOnScreen();
+
         return this.currentBubbleView;
+    }
+
+    private void scheduleEnsureInfoWindowOnScreen() {
+        this.mapFragment.getView().post(new Runnable() {
+            public void run() {
+                doEnsureInfoWindowOnScreen();
+            }
+        });
     }
 
     public View getInfoContents(Marker m) {
@@ -538,12 +559,6 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
             detailsEllipsis.setVisibility(View.VISIBLE);
         }
         detailsScrollView.setLayoutParams(lpS);
-
-        mapView.post(new Runnable() {
-            public void run() {
-                ensureInfoWindowOnScreen(MarkerManager.this.currentBubbleMarker);
-            }
-        });
     }
 
 }

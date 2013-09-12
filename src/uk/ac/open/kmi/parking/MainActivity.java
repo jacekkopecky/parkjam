@@ -69,6 +69,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.CancelableCallback;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -126,7 +127,7 @@ public class MainActivity extends Activity implements
     private static final int DIALOG_LOADING_CARPARK = 2;
     private static final int DIALOG_SEARCH = 3;
 
-    private static final float INITIAL_ZOOM = 18f;
+    private static final float INITIAL_ZOOM = 17f;
 
     private Dialog termsDialog = null;
     private ProgressDialog addparkDialog = null;
@@ -432,14 +433,18 @@ public class MainActivity extends Activity implements
 
     void centerOnCarpark(final Parking parking, boolean immediate) {
         if (immediate) {
-            this.map.moveCamera(CameraUpdateFactory.newLatLng(parking.point));
+            this.map.moveCamera(CameraUpdateFactory.newLatLngZoom(parking.point, INITIAL_ZOOM));
             this.carparkManager.showBubble(parking);
         } else {
             if (!parking.equals(this.carparkManager.getBubbleCarpark())) {
                 this.carparkManager.removeBubble();
             }
-            this.map.animateCamera(CameraUpdateFactory.newLatLng(parking.point));
-            MainActivity.this.carparkManager.showBubble(parking);
+            this.map.animateCamera(CameraUpdateFactory.newLatLngZoom(parking.point, INITIAL_ZOOM), new CancelableCallback() {
+                public void onFinish() {
+                    MainActivity.this.carparkManager.showBubble(parking);
+                }
+                public void onCancel() { /* nop */ }
+            });
         }
 //        updateUIState();
     }
@@ -768,7 +773,7 @@ public class MainActivity extends Activity implements
      * this is called by the button that toggles the pinned drawer's showing and hiding
      * @param v ignored
      */
-    public void togglePinnedDrawer(@SuppressWarnings("unused") View v) {
+    public void onPinnedDrawerToggleButtonPress(@SuppressWarnings("unused") View v) {
         this.showingPinned = !this.showingPinned;
         updateUIState();
     }
