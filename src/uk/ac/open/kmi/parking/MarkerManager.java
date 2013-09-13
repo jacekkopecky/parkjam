@@ -246,7 +246,7 @@ public class MarkerManager implements OnMarkerClickListener, OnMapClickListener,
         if (this.currentBubble == null) {
             return false;
         }
-        MarkerManager.this.bubbleButtons.setVisibility(View.INVISIBLE);
+        this.bubbleButtons.setVisibility(View.INVISIBLE);
 
         Marker m = this.carpark2marker.get(this.currentBubble);
         this.currentBubble = null;

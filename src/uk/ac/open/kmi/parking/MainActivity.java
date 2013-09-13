@@ -48,9 +48,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.ViewParent;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -786,7 +786,7 @@ public class MainActivity extends Activity implements
                 public void onAnimationEnd(Animation animation) {
                     MainActivity.this.pinnedDrawerList.setVisibility(View.GONE);
                     MainActivity.this.pinnedDrawerButton.setImageResource(R.drawable.chevron_up);
-                    MainActivity.this.pinnedDrawerButton.setTag(MainActivity.this.getResources().getString(R.string.menu_pinned_show));
+                    MainActivity.this.pinnedDrawerButton.setTag(MainActivity.this.getResources().getString(R.string.button_pinned_show));
                 }
             });
             this.pinnedDrawerCombo.startAnimation(anim);
@@ -804,7 +804,7 @@ public class MainActivity extends Activity implements
             anim.setDuration(getResources().getInteger(R.integer.pinned_drawer_animation_duration));
             this.pinnedDrawerList.setVisibility(View.VISIBLE);
             MainActivity.this.pinnedDrawerButton.setImageResource(R.drawable.chevron_down);
-            MainActivity.this.pinnedDrawerButton.setTag(MainActivity.this.getResources().getString(R.string.menu_pinned_hide));
+            MainActivity.this.pinnedDrawerButton.setTag(MainActivity.this.getResources().getString(R.string.button_pinned_hide));
             this.pinnedDrawerCombo.startAnimation(anim);
         }
         this.parkingsService.setPinnedUpdating(true);

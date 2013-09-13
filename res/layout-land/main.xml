@@ -130,7 +130,7 @@
                 android:longClickable="true"
                 android:onClick="onPinnedDrawerToggleButtonPress"
                 android:src="@drawable/chevron_up"
-                android:tag="@string/menu_pinned_show" />
+                android:tag="@string/button_pinned_show" />
         </RelativeLayout>
     </LinearLayout>
     
